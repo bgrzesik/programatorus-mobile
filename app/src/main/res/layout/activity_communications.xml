@@ -19,7 +19,7 @@
 
     <EditText
         android:id="@+id/editText"
-        android:layout_width="250dp"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_marginStart="8dp"
@@ -36,19 +36,6 @@
         app:layout_constraintStart_toEndOf="@+id/editText"
         app:layout_constraintTop_toTopOf="@+id/editText" />
 
-<!--    <SeekBar-->
-<!--        android:id="@+id/seekBar"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="86dp"-->
-<!--        android:layout_marginEnd="8dp"-->
-<!--        android:layout_marginLeft="8dp"-->
-<!--        android:layout_marginStart="8dp"-->
-<!--        android:layout_marginTop="44dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="1.0"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/label" />-->
-
 
 
     <TextView
@@ -62,15 +49,105 @@
         app:layout_constraintLeft_toLeftOf="parent"
         tools:layout_editor_absoluteX="36dp" />
 
+    <ListView
+        android:id="@+id/msgView"
+        android:layout_width="wrap_content"
+        android:layout_height="200dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/serverReplyLabel" />
+
+    <Button
+        android:id="@+id/filesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="get files"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/msgView" />
+
     <TextView
-        android:id="@+id/serverReplyText"
+        android:id="@+id/chosenBoard"
         style="?android:listSeparatorTextViewStyle"
         android:layout_width="wrap_content"
         android:layout_height="28dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="12dp"
+        android:text="Chosen binary file:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/serverReplyLabel" />
+        app:layout_constraintTop_toBottomOf="@id/filesButton" />
+
+    <TextView
+        android:id="@+id/boardsText"
+        style="?android:listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:text=" ... "
+        app:layout_constraintStart_toEndOf="@id/chosenBoard"
+        app:layout_constraintTop_toBottomOf="@id/filesButton" />
+
+    <ListView
+        android:id="@+id/boardsView"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/boardsText" />
+
+    <TextView
+        android:id="@+id/chosenBinary"
+        style="?android:listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:text="Chosen binary file:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/boardsView" />
+
+    <TextView
+        android:id="@+id/binaryText"
+        style="?android:listSeparatorTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="28dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="12dp"
+        android:text=" ..."
+        app:layout_constraintStart_toEndOf="@id/chosenBinary"
+        app:layout_constraintTop_toBottomOf="@id/boardsView" />
+
+    <ListView
+        android:id="@+id/binaryView"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/binaryText" />
+
+
+    <Button
+        android:id="@+id/flashRequest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="send flash request"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/binaryView" />
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

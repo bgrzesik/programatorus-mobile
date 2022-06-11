@@ -45,7 +45,7 @@ public class DeviceListActivity extends AppCompatActivity {
                 //Ask to the user turn the bluetooth on
                 Intent turnBTon = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this, new String[]{"Manifest.permission.BLUETOOTH_CONNECT"}, 2137);
+                    ActivityCompat.requestPermissions(this, new String[]{"Manifest.permission.BLUETOOTH_CONNECT"}, 1234);
                 }
                 startActivity(turnBTon);
             }
@@ -54,7 +54,7 @@ public class DeviceListActivity extends AppCompatActivity {
 
     private void listPairedDevices() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{"Manifest.permission.BLUETOOTH_CONNECT"}, 2137);
+            ActivityCompat.requestPermissions(this, new String[]{"Manifest.permission.BLUETOOTH_CONNECT"}, 1234);
         }
         mPairedDevices = mBluetoothAdapter.getBondedDevices();
         ArrayList list = new ArrayList();
