@@ -22,7 +22,7 @@ public class StreamParser {
         int result = 0;
         for (byte b: byte4) {
             result = result<<8;
-            result+= (int) b;
+            result+= (b & 0xff);
         }
         return result;
     }
@@ -32,6 +32,7 @@ public class StreamParser {
         Log.d(" ", "parse: " + Arrays.asList(bytes));
         buffer.addAll(Arrays.asList(bytes).subList(0, numBytes));
         byte[] header = {bytes[0]};
+        Log.d("buffer", String.valueOf(buffer));
         if(HEADER_LEN.get(buffer.get(0)) > buffer.size())
             return null;
 

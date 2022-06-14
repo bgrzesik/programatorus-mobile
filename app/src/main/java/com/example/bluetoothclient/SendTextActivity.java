@@ -84,17 +84,12 @@ public class SendTextActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        Log.d(TAG, "handleServerMessage: " + msg.substring(4500));
-
-        Log.d(TAG, "handleServerMessage: msg size " + msg.length());
-
-        JSONObject obj = new JSONObject(msg);
-
 
 
 
         switch(bytes.get(0)){
             case JSON_FILES_DATA:
+                JSONObject obj = new JSONObject(msg);
                 List<String> boards = JArrayToList(obj.getJSONArray("boards"));
                 boardFiles.clear();
                 boardFiles.addAll(boards);
@@ -214,7 +209,7 @@ public class SendTextActivity extends AppCompatActivity {
         requestFlash.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                byte[] data = String.format("{target: \'%s\', board: \'%s\'}",
+                byte[] data = String.format("{\"target\": \"%s\", \"board\": \"%s\"}",
                                 chosenBinFile.getText(), chosenBoard.getText())
                         .getBytes(StandardCharsets.UTF_8);
                 byte[] header = getHeader(FLASH_REQUEST, data.length);
