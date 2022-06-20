@@ -27,6 +27,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -125,7 +126,7 @@ public class SendTextActivity extends AppCompatActivity {
             switch (msg.what) {
                 case MessageUtils.MESSAGE_SEND:
 
-                    byte[] writeBuf = (byte[]) msg.obj;
+                    byte[] writeBuf = ((ByteBuffer) msg.obj).array();
                     // construct a string from the buffer
                     String writeMessage = new String(writeBuf);
                     msgLog.add("Me:  " + writeMessage);

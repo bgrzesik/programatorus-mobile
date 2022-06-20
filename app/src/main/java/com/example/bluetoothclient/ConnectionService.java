@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,13 +17,23 @@ import androidx.annotation.RequiresApi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+// TODO(bgrzesik) migrate this to actual Android service/BroadcastReceiver
 public class ConnectionService {
 
     private static final String TAG = "CoennctionService";
+    public static final int PUMP_DELAY = 10;
 
     private boolean connected = true;
     private ProgressDialog progressDialog;
@@ -30,16 +41,27 @@ public class ConnectionService {
     private BluetoothSocket bluetoothSocket = null;
     private ConnectedThread connectedThread;
     private Handler handler;
+    private String mDeviceAddress;
+    private Deque<ByteBuffer> mPendingWrites = new ArrayDeque<>();
+
+    private ScheduledExecutorService mExecutor = Executors.newScheduledThreadPool(1);
+    private Future<?> mPendingPumpWrites = null;
+
 
     private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    @SuppressLint("MissingPermission")
     public ConnectionService(Handler handler, String deviceAddress) {
         this.handler = handler;
+        this.mDeviceAddress = deviceAddress;
+        connect();
+    }
+
+    @SuppressLint("MissingPermission")
+    private void connect() {
         try {
             if (bluetoothSocket == null || !connected) {
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();    //get the mobile bluetooth device
-                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(deviceAddress);   //connects to the device's address and checks if it's available
+                BluetoothDevice device = bluetoothAdapter.getRemoteDevice(mDeviceAddress);   //connects to the device's address and checks if it's available
                 bluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(myUUID); //create a RFCOMM (SPP) connection
                 BluetoothAdapter.getDefaultAdapter().cancelDiscovery();
                 bluetoothSocket.connect();//start connection
@@ -51,7 +73,46 @@ public class ConnectionService {
             connectedThread = new ConnectedThread(bluetoothSocket);
             connectedThread.start();
         }
+
+        pumpPendingWrites();
     }
+
+    private void schedulePumpPendingWrites(boolean instant) {
+        Log.d(TAG, "schedulePumpPendingWrites: instant=" + instant);
+        if (mPendingPumpWrites != null && !mPendingPumpWrites.isDone()) {
+            return;
+        }
+        if (instant) {
+            mPendingPumpWrites = mExecutor.submit(this::pumpPendingWrites);
+        } else {
+            mPendingPumpWrites = mExecutor.schedule(this::pumpPendingWrites, PUMP_DELAY, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void pumpPendingWrites() {
+        Log.d(TAG, "pumpPendingWrites: connectedThread=" + connectedThread);
+        if (connectedThread == null) {
+            return;
+        }
+        while (!mPendingWrites.isEmpty()) {
+            ByteBuffer byteBuffer = mPendingWrites.peek();
+
+            Log.d(TAG, "pumpPendingWrites: Writing buffer size=" + byteBuffer.position());
+            try {
+                if (!connectedThread.write(byteBuffer)) {
+                    connectedThread = null;
+                    // TODO(bgrzesik): reconnect
+                    return;
+                }
+            } catch (Throwable th) {
+                Log.e(TAG, "pumpPendingWrites: Error while writing", th);
+                return;
+            }
+
+            mPendingWrites.pop();
+        }
+    }
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -121,16 +182,17 @@ public class ConnectionService {
             }
         }
 
-        public void write(byte[] bytes) {
+        public boolean write(ByteBuffer bytes) {
             try {
-                mmOutStream.write(bytes);
-                Log.d(TAG, Arrays.toString(bytes));
-                Log.d(TAG, "write: " + new String(bytes));
+                mmOutStream.write(bytes.array());
+                Log.d(TAG, Arrays.toString(bytes.array()));
+                Log.d(TAG, "write: " + new String(bytes.array()));
 
                 // Share the sent message with the UI activity.
                 Message writtenMsg = handler.obtainMessage(
                         MessageUtils.MESSAGE_SEND, -1, -1, bytes);
                 writtenMsg.sendToTarget();
+                return true;
             } catch (IOException e) {
                 Log.e(TAG, "Error occurred when sending data", e);
 
@@ -143,11 +205,23 @@ public class ConnectionService {
                 writeErrorMsg.setData(bundle);
                 handler.sendMessage(writeErrorMsg);
             }
+
+            return false;
         }
     }
 
     public void write(byte[] bytes){
-        connectedThread.write(bytes);
+        this.write(ByteBuffer.wrap(bytes));
+    }
+
+    public void write(ByteBuffer byteBuffer) {
+        mPendingWrites.add(byteBuffer);
+
+        if (connectedThread != null) {
+            schedulePumpPendingWrites(false);
+        } else {
+            connect();
+        }
     }
 
 }
