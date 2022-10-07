@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "BluetoothClient"
-include ':app'
-include ':lib_obex'
+include(":app")
+include(":lib_obex")
