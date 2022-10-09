@@ -1,21 +1,21 @@
 buildscript {
     dependencies {
         classpath("com.android.tools.build:gradle:7.2.2")
+        classpath(kotlin("gradle-plugin", "+"))
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.9.0")
+    }
+    repositories {
+        mavenCentral()
     }
 }
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id("com.android.application") version "7.2.2" apply false
-    id("com.android.library") version "7.2.2" apply false
-}
+    val androidPluginsVersion: String by project
 
-extra.apply {
-    set("compileSdkVersion", 30)
-    set("buildToolsVersion", "29.0.2")
-    set("minSdkVersion", 22)
-    set("targetSdkVersion", 32)
-    set("versionCode", 248)
-    set("versionName", "1.0.106")
+    id("com.android.application") version androidPluginsVersion apply false
+    id("com.android.library") version androidPluginsVersion apply false
+    id("com.google.protobuf") version "0.9.0" apply false
 }
 
 tasks.register("clean", Delete::class) {

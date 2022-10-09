@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.bluetoothclient">
+    package="programus.client">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -20,7 +20,7 @@
         android:theme="@style/Theme.BluetoothClient"
         tools:targetApi="31">
         <activity
-            android:name=".DeviceListActivity"
+            android:name=".ui.DeviceListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SendTextActivity" />
+        <activity android:name=".ui.SendTextActivity" />
     </application>
 
 </manifest>
