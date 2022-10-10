@@ -5,11 +5,8 @@ import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.transport.AbstractTransport
 import programatorus.client.transport.ConnectionState
 import programatorus.client.transport.ITransportClient
-import programatorus.client.transport.wrapper.OutgoingMessage
-import programus.proto.GenericMessage
-import java.io.InputStream
-import java.io.InterruptedIOException
-import java.io.OutputStream
+import programatorus.client.transport.wrapper.OutgoingPacket
+import java.io.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
@@ -20,10 +17,11 @@ abstract class IOTransport<T : IOTransport<T>>(
 ) : AbstractTransport(client), WeakRefFactoryMixin<T> {
 
     companion object {
-        const val TAG = "IOTransport"
+        private const val TAG = "IOTransport"
+        private const val MAX_SIZE = 1024
     }
 
-    private var mOutputQueue: BlockingQueue<OutgoingMessage> = ArrayBlockingQueue(16)
+    private var mOutputQueue: BlockingQueue<OutgoingPacket> = ArrayBlockingQueue(16)
     private var mRunning: AtomicBoolean = AtomicBoolean(false)
 
     private var mInputThread: IOThread<T>? = null
@@ -40,13 +38,13 @@ abstract class IOTransport<T : IOTransport<T>>(
 
     protected abstract fun doDisconnect()
 
-    override fun send(message: GenericMessage): OutgoingMessage {
-        val outgoing = OutgoingMessage(message)
+    override fun send(packet: ByteArray): OutgoingPacket {
+        val outgoing = OutgoingPacket(packet)
         mExecutor.submit { sendTask(outgoing) }
         return outgoing
     }
 
-    private fun sendTask(outgoing: OutgoingMessage) {
+    private fun sendTask(outgoing: OutgoingPacket) {
         mOutputQueue.add(outgoing)
     }
 
@@ -65,7 +63,7 @@ abstract class IOTransport<T : IOTransport<T>>(
         state = ConnectionState.CONNECTING
 
         if (!doConnect() || !isConnected) {
-            disconnect();
+            disconnect()
             state = ConnectionState.DISCONNECTED
             return false
         }
@@ -86,12 +84,28 @@ abstract class IOTransport<T : IOTransport<T>>(
     private fun inputThreadTask() {
         Log.d(TAG, "Trying to parse from input stream")
 
-        val message = MessagesIO.readMessage(inputStream!!)
-        Log.d(TAG, "Received message $message")
+        val dataInputStream = DataInputStream(inputStream!!)
+        val size = dataInputStream.readInt()
 
-        if (message != null) {
-            mExecutor.submit { client.onMessageReceived(message) }
+        if (size > MAX_SIZE) {
+            throw IOException("Too big packet requested")
         }
+
+        val buffer = ByteArray(size)
+        var pos = 0
+
+        while (pos < size) {
+            val read = dataInputStream.read(buffer, pos, size - pos)
+
+            if (read == -1) {
+                throw IOException("Unexpected EOF")
+            }
+
+            pos += read
+        }
+        Log.d(TAG, "Received packet size=$size")
+
+        mExecutor.submit { client.onPacketReceived(buffer) }
     }
 
     /**
@@ -104,10 +118,13 @@ abstract class IOTransport<T : IOTransport<T>>(
         try {
             Log.d(TAG, "Trying to write to output stream")
 
-            MessagesIO.writeMessage(outgoing.message, outputStream!!)
+            val dataOutgoingStream = DataOutputStream(outputStream!!)
+            dataOutgoingStream.writeInt(outgoing.packet.size)
+            dataOutgoingStream.write(outgoing.packet, 0, outgoing.packet.size)
+
             outputStream?.flush()
 
-            mExecutor.submit { outgoing.response.complete(outgoing.message) }
+            mExecutor.submit { outgoing.response.complete(outgoing) }
         } catch (th: Throwable) {
             outgoing.response.completeExceptionally(th)
         }
@@ -146,8 +163,12 @@ abstract class IOTransport<T : IOTransport<T>>(
                     try {
                         mIoOperation()
                     } catch (th: InterruptedIOException) {
+                        if (!isRunning)
+                            return
                         Log.e(TAG, "", th)
                     } catch (th: InterruptedException) {
+                        if (!isRunning)
+                            return
                         Log.e(TAG, "", th)
                     }
                 }

@@ -8,9 +8,6 @@ import java.io.*
 
 class ProtobufTest {
 
-    @Before
-    fun mockLog() = TestUtils.mockLog()
-
     @Test
     fun testBufferParseWrite() {
         val outputStream = ByteArrayOutputStream(1024)

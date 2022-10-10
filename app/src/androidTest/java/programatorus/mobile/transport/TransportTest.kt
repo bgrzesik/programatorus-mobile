@@ -13,9 +13,6 @@ import java.util.concurrent.TimeUnit
 
 internal class TransportTest {
 
-    @Before
-    fun mockLog() = TestUtils.mockLog()
-
     @Test
     fun testLoopbackSendReceive1() {
         testLoopbackSendReceive(1)
@@ -32,31 +29,40 @@ internal class TransportTest {
     }
 
     private fun testLoopbackSendReceive(num: Int) {
-        val queue = ArrayBlockingQueue<GenericMessage>(1)
+        val queue = ArrayBlockingQueue<ByteArray>(1)
 
         val client = object : ITransportClient {
-            override fun onMessageReceived(message: GenericMessage) {
-                queue.add(message)
+            override fun onPacketReceived(packet: ByteArray) {
+                println(packet.decodeToString())
+                queue.add(packet)
             }
 
             override fun onError() = Assert.fail()
         }
 
-        val transport = Transport({ client, executor -> LoopbackTransport(client, executor) }, client)
+        val transport = Transport({ c, executor -> LoopbackTransport(c, executor) }, client)
 
-        val messages = mutableListOf<GenericMessage>()
+        val messages = mutableListOf<ByteArray>()
         for (i in 0..num) {
-            messages.add(TestUtils.newTestMessage())
+            val message = "Test $i message".toByteArray()
+            messages.add(message)
+            transport.send(message)
         }
 
         for (message in messages) {
-            transport.send(message)
+//            transport.send(message)
 
-            val received = queue.poll(100, TimeUnit.MILLISECONDS)
+            val received = queue.poll(6000, TimeUnit.MILLISECONDS)
 
             Assert.assertNotNull(received)
-            Assert.assertEquals(message, received)
+
+            println(message.decodeToString() + " = " + received.decodeToString())
+
+            Assert.assertArrayEquals(message, received)
         }
+
+        Assert.assertNull("Received more messages then expected",
+            queue.poll(1000, TimeUnit.MILLISECONDS))
 
         transport.disconnect()
     }

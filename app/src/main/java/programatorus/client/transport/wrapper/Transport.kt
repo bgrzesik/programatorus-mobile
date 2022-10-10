@@ -3,10 +3,9 @@ package programatorus.client.transport.wrapper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.transport.ConnectionState
-import programatorus.client.transport.IOutgoingMessage
+import programatorus.client.transport.IOutgoingPacket
 import programatorus.client.transport.ITransport
 import programatorus.client.transport.ITransportClient
-import programus.proto.GenericMessage
 import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.*
@@ -27,7 +26,7 @@ class Transport(
         private const val TAG = "Transport"
         private const val MAX_ERROR_COUNT = 4
         private const val RESCHEDULE_TIMEOUT = 100L
-        private const val RECONNECT_TIMEOUT = 2000L;
+        private const val RECONNECT_TIMEOUT = 2000L
     }
 
 
@@ -35,7 +34,7 @@ class Transport(
     private var mReconnectFuture: Future<*>? = null
     private var mDisconnectFuture: Future<*>? = null
 
-    private val mPendingMessages: Queue<TransportOutgoingMessage> = ArrayDeque()
+    private val mPendingPacket: Queue<TransportOutgoingPacket> = ArrayDeque()
     private var mErrorCount = 0
 
     private var mClient: TransportClient = TransportClient(weakRefFromThis(), client)
@@ -55,14 +54,17 @@ class Transport(
         mClient.onStateChanged(state)
     }
 
-    override fun send(message: GenericMessage): IOutgoingMessage {
-        Log.d(TAG, "Enqueueing message for sending: $message")
+    override fun send(packet: ByteArray): IOutgoingPacket {
+        Log.d(TAG, "Enqueueing packet for sending size=${packet.size}")
 
-        val transportOutgoingMessage = TransportOutgoingMessage(weakRefFromThis(), message)
-        mPendingMessages.add(transportOutgoingMessage)
-        scheduleTransportTask()
+        val transportOutgoingPacket = TransportOutgoingPacket(weakRefFromThis(), packet)
+        mPendingPacket.add(transportOutgoingPacket)
 
-        return transportOutgoingMessage
+        if (mReconnectFuture == null || mReconnectFuture!!.isDone) {
+            scheduleTransportTask()
+        }
+
+        return transportOutgoingPacket
     }
 
     override fun disconnect() {
@@ -123,89 +125,88 @@ class Transport(
                 scheduleTransportTask(RESCHEDULE_TIMEOUT)
             }
             ConnectionState.DISCONNECTED -> {
-                // Transport is disconnected, reconnect, then send pending messages
+                // Transport is disconnected, reconnect, then send pending packages
                 mErrorCount++
                 if (mErrorCount < MAX_ERROR_COUNT) {
                     reconnect(RECONNECT_TIMEOUT)
                 }
             }
             ConnectionState.CONNECTED -> {
-                pumpPendingMessages()
+                pumpPendingPackets()
             }
         }
     }
 
-    private fun pumpPendingMessages() {
-        Log.d(TAG, "Pumping pending message. pendingCount=${mPendingMessages.size}")
-        if (mPendingMessages.isEmpty()) {
+    private fun pumpPendingPackets() {
+        Log.d(TAG, "Pumping pending packets. pendingCount=${mPendingPacket.size}")
+        if (mPendingPacket.isEmpty()) {
             return
         }
 
-        val outgoingMessage = mPendingMessages.peek()!!
-        if (!outgoingMessage.pending) {
+        val outgoing = mPendingPacket.peek()!!
+        if (!outgoing.mPending) {
             return
         }
 
-        outgoingMessage.pending = true
-        val implOutgoing = mImpl.send(outgoingMessage.message)
-        outgoingMessage.setOutgoingMessage(implOutgoing)
+        outgoing.mPending = true
+        val implOutgoing = mImpl.send(outgoing.packet)
+        outgoing.setOutgoingPacket(implOutgoing)
     }
 
-    private class TransportOutgoingMessage(
+    private class TransportOutgoingPacket(
         private val mWeakTransport: WeakReference<Transport>,
-        override val message: GenericMessage
-    ) : IOutgoingMessage {
+        override val packet: ByteArray
+    ) : IOutgoingPacket {
 
-        var outgoing: IOutgoingMessage? = null
+        var mOutgoing: IOutgoingPacket? = null
             private set
 
-        var pending = true
+        var mPending = true
 
-        private val mCompletableFuture = CompletableFuture<GenericMessage>()
+        private val mCompletableFuture = CompletableFuture<IOutgoingPacket>()
         private var mOnComplete: CompletableFuture<*>? = null
 
-        override val response: CompletableFuture<GenericMessage>
+        override val response: CompletableFuture<IOutgoingPacket>
             get() = mCompletableFuture
 
-        fun setOutgoingMessage(outgoingMessage: IOutgoingMessage?) {
+        fun setOutgoingPacket(outgoing: IOutgoingPacket?) {
             if (mOnComplete != null) {
                 val onComplete: CompletableFuture<*> = mOnComplete!!
                 mOnComplete = null
                 onComplete.cancel(true)
             }
 
-            this.outgoing = outgoingMessage
-            mOnComplete = outgoingMessage?.response?.whenComplete(this::onComplete)
+            this.mOutgoing = outgoing
+            mOnComplete = outgoing?.response?.whenComplete(this::onComplete)
         }
 
-        private fun onComplete(response: GenericMessage?, throwable: Throwable?) {
+        private fun onComplete(outgoing: IOutgoingPacket?, throwable: Throwable?) {
             if (mOnComplete == null) {
                 return
             }
             if (throwable == null) {
-                onMessageDelivered(response!!)
+                onDelivered(outgoing!!)
             } else {
-                onMessageDeliveryFailed(throwable)
+                onDeliveryFailed(throwable)
             }
         }
 
-        private fun onMessageDelivered(response: GenericMessage) {
-            assert(message == response)
-            Log.d(TAG, "Message delivered. message=$message")
-            mCompletableFuture.complete(response)
+        private fun onDelivered(outgoing: IOutgoingPacket?) {
+            assert(outgoing == outgoing)
+            Log.d(TAG, "Packet delivered. packetSize=${packet.size}")
+            mCompletableFuture.complete(outgoing)
 
             val transport = mWeakTransport.get()!!
-            val transportOutgoing = transport.mPendingMessages.poll()!!
+            val transportOutgoing = transport.mPendingPacket.poll()!!
 
-            assert(transportOutgoing.outgoing == outgoing)
+            assert(transportOutgoing.mOutgoing == outgoing)
 
-            transport.mPendingMessages.remove(this)
             transport.mErrorCount = 0
             transport.scheduleTransportTask()
         }
 
-        private fun onMessageDeliveryFailed(throwable: Throwable) {
-            Log.d(TAG, "Message delivery failure. message=$message exception=$throwable")
+        private fun onDeliveryFailed(throwable: Throwable) {
+            Log.d(TAG, "Packet delivery failure. packetSize=${packet.size} exception=$throwable")
             val transport = mWeakTransport.get()!!
             mCompletableFuture.completeExceptionally(throwable)
             transport.mErrorCount++
@@ -234,8 +235,8 @@ class Transport(
             transport.scheduleTransportTask()
         }
 
-        override fun onMessageReceived(message: GenericMessage) =
-            mClient.onMessageReceived(message)
+        override fun onPacketReceived(packet: ByteArray) =
+            mClient.onPacketReceived(packet)
 
         override fun onError() {
             val transport = mWeakTransport.get()!!

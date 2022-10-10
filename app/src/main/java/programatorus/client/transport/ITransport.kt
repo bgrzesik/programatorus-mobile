@@ -1,12 +1,10 @@
 package programatorus.client.transport
 
-import programus.proto.GenericMessage
-
 interface ITransport {
 
     val state: ConnectionState
 
-    fun send(message: GenericMessage): IOutgoingMessage
+    fun send(packet: ByteArray): IOutgoingPacket
 
     // TODO(bgrzesik): Return future
     fun reconnect()

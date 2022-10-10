@@ -12,8 +12,6 @@ import programatorus.client.transport.ConnectionState
 import programatorus.client.transport.ITransportClient
 import programatorus.client.transport.bt.BluetoothTransport
 import programatorus.client.transport.wrapper.Transport
-import programus.proto.GenericMessage
-import programus.proto.TestMessage
 import java.nio.charset.StandardCharsets
 import java.util.*
 
@@ -60,7 +58,7 @@ class SendTextActivity : AppCompatActivity() {
         msgLog = ArrayAdapter<String>(this, R.layout.msg)
         boardFiles = ArrayAdapter<String>(this, R.layout.msg)
         binFiles = ArrayAdapter<String>(this, R.layout.msg)
-        val newint: Intent = getIntent()
+        val newint: Intent = intent
         deviceAddress = newint.getStringExtra(DeviceListActivity.EXTRA_ADDRESS)
         msgEdit = findViewById<View>(R.id.editText) as EditText?
         chosenBoard = findViewById<View>(R.id.boardsText) as TextView?
@@ -83,8 +81,8 @@ class SendTextActivity : AppCompatActivity() {
                 executor
             )
         }, object : ITransportClient {
-            override fun onMessageReceived(message: GenericMessage) {
-                println(message)
+            override fun onPacketReceived(packet: ByteArray) {
+                println(packet)
             }
 
             override fun onError() {
@@ -96,11 +94,8 @@ class SendTextActivity : AppCompatActivity() {
             }
         })
 
-        transport.send(GenericMessage.newBuilder()
-            .setSessionId(0)
-            .setTest(TestMessage.newBuilder()
-                .setValue("Test"))
-            .build())
+        // TODO(bgrzesik): DELETE ME
+        transport.send("Test string".toByteArray())
     }
 
 
@@ -120,12 +115,12 @@ class SendTextActivity : AppCompatActivity() {
 
     private val boardsClickListener: AdapterView.OnItemClickListener =
         AdapterView.OnItemClickListener { av, v, arg2, arg3 ->
-            val filename: String = (v as TextView).getText().toString()
+            val filename: String = (v as TextView).text.toString()
             chosenBoard?.text = filename
         }
     private val binariesClickListener: AdapterView.OnItemClickListener =
         AdapterView.OnItemClickListener { av, v, arg2, arg3 ->
-            val filename: String = (v as TextView).getText().toString()
+            val filename: String = (v as TextView).text.toString()
             chosenBinFile?.text = filename
         }
 

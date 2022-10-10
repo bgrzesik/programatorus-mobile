@@ -32,7 +32,7 @@ class LoopbackTransport(
         outputStream = pipedOutputStream
         inputStream = pipedInputStream
 
-        return true;
+        return true
     }
 
     override fun doDisconnect() {
