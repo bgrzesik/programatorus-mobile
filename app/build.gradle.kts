@@ -12,7 +12,7 @@ plugins {
 android {
 
     defaultConfig {
-        applicationId = "programus.client"
+        applicationId = "programatorus.client"
 
         val compileSdkVer: String by getRootProject()
         compileSdkVersion = compileSdkVer
