@@ -6,24 +6,24 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import programatorus.client.WeakRefFactoryMixin
-import programatorus.client.transport.*
+import programatorus.client.transport.ITransportClient
 import programatorus.client.transport.io.IOTransport
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledThreadPoolExecutor
 
 class BluetoothTransport(
     private val mContext: Context,
     private val mDevice: BluetoothDevice,
     client: ITransportClient,
-    executor: ScheduledExecutorService = ScheduledThreadPoolExecutor(1)
-) : IOTransport<BluetoothTransport>(client, executor),
+    handler: Handler = Handler(Looper.getMainLooper())
+) : IOTransport<BluetoothTransport>(client, handler),
     WeakRefFactoryMixin<BluetoothTransport> {
 
     companion object {

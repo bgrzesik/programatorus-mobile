@@ -1,5 +1,7 @@
 package programatorus.client.transport.wrapper
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.transport.ConnectionState
@@ -9,6 +11,7 @@ import programatorus.client.transport.ITransportClient
 import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.*
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Wrapper class responsible for keeping ITransport logic sane.
@@ -16,10 +19,10 @@ import java.util.concurrent.*
  */
 
 class Transport(
-    implProvider: (ITransportClient, ScheduledExecutorService) -> ITransport,
+    implProvider: (ITransportClient, Handler) -> ITransport,
     client: ITransportClient,
     // TODO(bgrzesik): Consider using looper/handler (idiomatic android way of doing this).
-    private val mExecutor: ScheduledExecutorService = ScheduledThreadPoolExecutor(1)
+    private val mHandler: Handler = Handler(Looper.getMainLooper())
 ) : ITransport, WeakRefFactoryMixin<Transport> {
 
     companion object {
@@ -30,16 +33,16 @@ class Transport(
     }
 
 
-    private var mTransportTaskFuture: Future<*>? = null
-    private var mReconnectFuture: Future<*>? = null
-    private var mDisconnectFuture: Future<*>? = null
+    private var mTransportTaskPending = AtomicBoolean(false)
+    private var mReconnectPending = AtomicBoolean(false)
+    private var mDisconnectPending = AtomicBoolean(false)
 
     private val mPendingPacket: Queue<TransportOutgoingPacket> = ArrayDeque()
     private var mErrorCount = 0
 
     private var mClient: TransportClient = TransportClient(weakRefFromThis(), client)
 
-    private var mImpl: ITransport = implProvider(mClient, mExecutor)
+    private var mImpl: ITransport = implProvider(mClient, mHandler)
 
     override val state: ConnectionState
         get() {
@@ -60,7 +63,7 @@ class Transport(
         val transportOutgoingPacket = TransportOutgoingPacket(weakRefFromThis(), packet)
         mPendingPacket.add(transportOutgoingPacket)
 
-        if (mReconnectFuture == null || mReconnectFuture!!.isDone) {
+        if (!mReconnectPending.get()) {
             scheduleTransportTask()
         }
 
@@ -68,43 +71,56 @@ class Transport(
     }
 
     override fun disconnect() {
-        if (mDisconnectFuture != null && !mDisconnectFuture!!.isDone) {
+        if (!mDisconnectPending.compareAndSet(false, true)) {
             return
         }
+
         Log.d(TAG, "Requesting disconnect")
-        mDisconnectFuture = mExecutor.submit(mImpl::disconnect)
+        assert(mHandler.post(this::disconnectTask))
+    }
+
+    private fun disconnectTask() {
+        mDisconnectPending.set(false)
+        Log.d(TAG, "Disconnecting")
+        mImpl.disconnect()
     }
 
     override fun reconnect() = reconnect(null)
 
     private fun reconnect(timeout: Long? = null) {
-        if (mReconnectFuture != null && !mReconnectFuture!!.isDone) {
+        if (!mReconnectPending.compareAndSet(false, true)) {
             return
         }
+
         Log.d(TAG, "Requesting reconnect")
-        mReconnectFuture = if (timeout != null) {
-            mExecutor.schedule(mImpl::reconnect, timeout, TimeUnit.MILLISECONDS)
+        assert(if (timeout != null) {
+            mHandler.postDelayed(this::reconnectTask, timeout)
         } else {
-            mExecutor.submit(mImpl::reconnect)
-        }
+            mHandler.post(this::reconnectTask)
+        })
+    }
+
+    private fun reconnectTask() {
+        mReconnectPending.set(false)
+        mImpl.reconnect()
     }
 
     fun scheduleTransportTask(timeout: Long? = null) {
-        if (mTransportTaskFuture != null && !mTransportTaskFuture!!.isDone) {
+        if (!mTransportTaskPending.compareAndSet(false, true)) {
             return
         }
-        Log.d(TAG, "Scheduling transport task")
 
-        mTransportTaskFuture = if (timeout != null) {
-            mExecutor.schedule(this::transportTask, timeout, TimeUnit.MILLISECONDS)
+        Log.d(TAG, "Scheduling transport task")
+        assert(if (timeout != null) {
+            mHandler.postDelayed(this::transportTask, timeout)
         } else {
-            mExecutor.submit(this::transportTask)
-        }
+            mHandler.post(this::transportTask)
+        })
     }
 
     private fun transportTask() {
         // Avoid not being able to schedule task if it's running
-        mTransportTaskFuture = null
+        mTransportTaskPending.set(false)
 
         val state = state
         Log.d(TAG, "Transport task running. state=$state")

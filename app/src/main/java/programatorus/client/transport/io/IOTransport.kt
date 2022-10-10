@@ -1,5 +1,7 @@
 package programatorus.client.transport.io
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.transport.AbstractTransport
@@ -13,7 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class IOTransport<T : IOTransport<T>>(
     client: ITransportClient,
-    private val mExecutor: ScheduledExecutorService = ScheduledThreadPoolExecutor(1)
+    private val mHandler: Handler = Handler(Looper.getMainLooper())
 ) : AbstractTransport(client), WeakRefFactoryMixin<T> {
 
     companion object {
@@ -40,7 +42,7 @@ abstract class IOTransport<T : IOTransport<T>>(
 
     override fun send(packet: ByteArray): OutgoingPacket {
         val outgoing = OutgoingPacket(packet)
-        mExecutor.submit { sendTask(outgoing) }
+        mHandler.post { sendTask(outgoing) }
         return outgoing
     }
 
@@ -105,7 +107,7 @@ abstract class IOTransport<T : IOTransport<T>>(
         }
         Log.d(TAG, "Received packet size=$size")
 
-        mExecutor.submit { client.onPacketReceived(buffer) }
+        mHandler.post { client.onPacketReceived(buffer) }
     }
 
     /**
@@ -124,7 +126,7 @@ abstract class IOTransport<T : IOTransport<T>>(
 
             outputStream?.flush()
 
-            mExecutor.submit { outgoing.response.complete(outgoing) }
+            mHandler.post { outgoing.response.complete(outgoing) }
         } catch (th: Throwable) {
             outgoing.response.completeExceptionally(th)
         }

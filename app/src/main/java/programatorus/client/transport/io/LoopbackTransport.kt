@@ -1,19 +1,19 @@
 package programatorus.client.transport.io
 
+import android.os.Handler
+import android.os.Looper
 import programatorus.client.transport.ITransportClient
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
 import java.io.PipedOutputStream
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.ScheduledThreadPoolExecutor
 
 /**
  * Mostly for testing purposes
  */
 class LoopbackTransport(
     client: ITransportClient,
-    executor: ScheduledExecutorService = ScheduledThreadPoolExecutor(1)
+    executor: Handler = Handler(Looper.getMainLooper())
 ) : IOTransport<LoopbackTransport>(client, executor) {
 
     override var inputStream: InputStream? = null
