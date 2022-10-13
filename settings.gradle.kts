@@ -13,6 +13,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "BluetoothClient"
+rootProject.name = "Programatorus"
 include(":app")
-include(":lib_obex")
