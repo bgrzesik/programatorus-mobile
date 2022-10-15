@@ -8,10 +8,10 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import programatorus.client.R
-import programatorus.client.transport.ConnectionState
-import programatorus.client.transport.ITransportClient
-import programatorus.client.transport.bt.BluetoothTransport
-import programatorus.client.transport.wrapper.Transport
+import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.bt.BluetoothTransport
+import programatorus.client.comm.transport.wrapper.Transport
 import java.nio.charset.StandardCharsets
 import java.util.*
 

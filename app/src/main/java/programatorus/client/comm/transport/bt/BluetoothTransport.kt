@@ -1,4 +1,4 @@
-package programatorus.client.transport.bt
+package programatorus.client.comm.transport.bt
 
 import android.Manifest
 import android.bluetooth.BluetoothDevice
@@ -11,8 +11,8 @@ import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import programatorus.client.WeakRefFactoryMixin
-import programatorus.client.transport.ITransportClient
-import programatorus.client.transport.io.IOTransport
+import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.io.StreamingTransport
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -23,7 +23,7 @@ class BluetoothTransport(
     private val mDevice: BluetoothDevice,
     client: ITransportClient,
     handler: Handler = Handler(Looper.getMainLooper())
-) : IOTransport<BluetoothTransport>(client, handler),
+) : StreamingTransport<BluetoothTransport>(client, handler),
     WeakRefFactoryMixin<BluetoothTransport> {
 
     companion object {

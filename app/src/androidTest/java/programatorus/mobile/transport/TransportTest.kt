@@ -1,14 +1,13 @@
 package programatorus.mobile.transport
 
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
-import programatorus.client.transport.ConnectionState
-import programatorus.client.transport.ITransportClient
-import programatorus.client.transport.io.LoopbackTransport
-import programatorus.client.transport.wrapper.Transport
-import programus.proto.GenericMessage
+import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.io.PipedTransport
+import programatorus.client.comm.transport.wrapper.Transport
 import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 internal class TransportTest {
@@ -29,7 +28,7 @@ internal class TransportTest {
     }
 
     private fun testLoopbackSendReceive(num: Int) {
-        val queue = ArrayBlockingQueue<ByteArray>(1)
+        val queue = LinkedBlockingQueue<ByteArray>()
 
         val client = object : ITransportClient {
             override fun onPacketReceived(packet: ByteArray) {
@@ -40,7 +39,7 @@ internal class TransportTest {
             override fun onError() = Assert.fail()
         }
 
-        val transport = Transport({ c, executor -> LoopbackTransport(c, executor) }, client)
+        val transport = Transport(::PipedTransport, client)
 
         val messages = mutableListOf<ByteArray>()
         for (i in 0..num) {
@@ -69,7 +68,7 @@ internal class TransportTest {
 
     @Test
     fun testStateMachine() {
-        val queue = ArrayBlockingQueue<ConnectionState>(1)
+        val queue = LinkedBlockingQueue<ConnectionState>()
 
         val client = object : ITransportClient {
             override fun onStateChanged(state: ConnectionState) {
@@ -79,7 +78,7 @@ internal class TransportTest {
             override fun onError() = Assert.fail()
         }
 
-        val transport = Transport(::LoopbackTransport, client)
+        val transport = Transport(::PipedTransport, client)
 
         var state = queue.poll(100, TimeUnit.MILLISECONDS)
         Assert.assertEquals(state, ConnectionState.DISCONNECTED)
@@ -99,6 +98,9 @@ internal class TransportTest {
 
         state = queue.poll(100, TimeUnit.MILLISECONDS)
         Assert.assertEquals(state, ConnectionState.DISCONNECTED)
+
+        Assert.assertNull("The transport should not change state",
+            queue.poll(1000, TimeUnit.MILLISECONDS))
     }
 
 }

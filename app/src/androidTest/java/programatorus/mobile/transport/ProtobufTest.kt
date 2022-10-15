@@ -1,8 +1,7 @@
 package programatorus.mobile.transport
 
-import org.junit.Before
 import org.junit.Test
-import programus.proto.GenericMessage
+import programus.proto.Protocol
 import java.io.*
 
 
@@ -16,7 +15,7 @@ class ProtobufTest {
         message.writeTo(outputStream)
 
         val inputStream = ByteArrayInputStream(outputStream.toByteArray())
-        val received = GenericMessage.parseFrom(inputStream)
+        val received = Protocol.GenericMessage.parseFrom(inputStream)
 
         assert(message == received)
     }

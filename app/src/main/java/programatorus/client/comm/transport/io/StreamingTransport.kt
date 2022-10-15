@@ -1,19 +1,19 @@
-package programatorus.client.transport.io
+package programatorus.client.comm.transport.io
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
-import programatorus.client.transport.AbstractTransport
-import programatorus.client.transport.ConnectionState
-import programatorus.client.transport.ITransportClient
-import programatorus.client.transport.wrapper.OutgoingPacket
+import programatorus.client.comm.transport.AbstractTransport
+import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
 import java.lang.ref.WeakReference
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 
-abstract class IOTransport<T : IOTransport<T>>(
+abstract class StreamingTransport<T : StreamingTransport<T>>(
     client: ITransportClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper())
 ) : AbstractTransport(client), WeakRefFactoryMixin<T> {
@@ -148,7 +148,7 @@ abstract class IOTransport<T : IOTransport<T>>(
         state = ConnectionState.DISCONNECTED
     }
 
-    class IOThread<T : IOTransport<T>>(
+    class IOThread<T : StreamingTransport<T>>(
         private val mWeakTransport: WeakReference<T>,
         private val mIoOperation: () -> Unit
     ) : Thread() {

@@ -1,4 +1,4 @@
-package programatorus.client.transport
+package programatorus.client.comm.transport
 
 enum class ConnectionState {
     CONNECTING,

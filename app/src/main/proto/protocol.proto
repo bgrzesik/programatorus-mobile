@@ -1,6 +1,5 @@
 
 syntax = "proto3";
-option java_multiple_files = true;
 
 package programus.proto;
 
@@ -13,7 +12,10 @@ message TestMessage {
 message GenericMessage {
   uint64 sessionId = 1;
 
+  // Ordinal
+  uint64 requestId = 2;
+
   oneof payload {
-    TestMessage test = 2;
+    TestMessage test = 100;
   }
 }

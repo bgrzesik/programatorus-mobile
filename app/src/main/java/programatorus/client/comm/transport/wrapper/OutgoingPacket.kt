@@ -1,6 +1,6 @@
-package programatorus.client.transport.wrapper
+package programatorus.client.comm.transport.wrapper
 
-import programatorus.client.transport.IOutgoingPacket
+import programatorus.client.comm.transport.IOutgoingPacket
 import java.util.concurrent.CompletableFuture
 
 class OutgoingPacket (

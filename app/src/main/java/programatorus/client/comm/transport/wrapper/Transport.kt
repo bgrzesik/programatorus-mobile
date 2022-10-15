@@ -1,13 +1,13 @@
-package programatorus.client.transport.wrapper
+package programatorus.client.comm.transport.wrapper
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
-import programatorus.client.transport.ConnectionState
-import programatorus.client.transport.IOutgoingPacket
-import programatorus.client.transport.ITransport
-import programatorus.client.transport.ITransportClient
+import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.IOutgoingPacket
+import programatorus.client.comm.transport.ITransport
+import programatorus.client.comm.transport.ITransportClient
 import java.lang.ref.WeakReference
 import java.util.*
 import java.util.concurrent.*
@@ -37,7 +37,7 @@ class Transport(
     private var mReconnectPending = AtomicBoolean(false)
     private var mDisconnectPending = AtomicBoolean(false)
 
-    private val mPendingPacket: Queue<TransportOutgoingPacket> = ArrayDeque()
+    private val mPendingPacket: BlockingQueue<TransportOutgoingPacket> = LinkedBlockingQueue()
     private var mErrorCount = 0
 
     private var mClient: TransportClient = TransportClient(weakRefFromThis(), client)
