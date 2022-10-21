@@ -1,7 +1,6 @@
-package programatorus.mobile.transport
+package programatorus.client.comm.transport
 
 import org.junit.Test
-import programatorus.mobile.transport.TestUtils
 import programus.proto.Protocol
 import java.io.*
 

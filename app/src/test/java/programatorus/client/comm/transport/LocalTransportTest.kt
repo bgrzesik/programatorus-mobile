@@ -1,4 +1,4 @@
-package programatorus.mobile.transport
+package programatorus.client.comm.transport
 
 import org.hamcrest.CoreMatchers.not
 import org.junit.Assume
@@ -8,12 +8,10 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(Parameterized::class)
-class LocalSendLoopbackTest(
-    @Suppress("unused")
+class LocalTransportTest(
     testName: String,
-    provider: TransportProvider,
-    count: Int
-): SendLoopbackTest(testName, provider, count) {
+    provider: TransportProvider
+) : TransportTest(testName, provider) {
     @get:Rule
     val androidMocker = AndroidMocker()
 

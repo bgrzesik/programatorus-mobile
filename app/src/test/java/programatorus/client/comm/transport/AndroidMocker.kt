@@ -1,4 +1,4 @@
-package programatorus.mobile.transport
+package programatorus.client.comm.transport
 
 import android.os.Handler
 import android.os.Looper

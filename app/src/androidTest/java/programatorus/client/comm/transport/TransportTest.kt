@@ -1,4 +1,4 @@
-package programatorus.mobile.transport
+package programatorus.client.comm.transport
 
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
@@ -7,8 +7,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.io.PipedTransport
 import programatorus.client.comm.transport.mock.LoopbackTransport
 import programatorus.client.comm.transport.wrapper.Transport

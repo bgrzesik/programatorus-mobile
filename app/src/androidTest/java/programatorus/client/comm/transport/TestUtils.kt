@@ -1,7 +1,5 @@
-package programatorus.mobile.transport
+package programatorus.client.comm.transport
 
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
 import programus.proto.Protocol
 
 typealias TransportProvider = (ITransportClient) -> ITransport
