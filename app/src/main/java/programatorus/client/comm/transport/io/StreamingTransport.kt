@@ -19,11 +19,11 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 ) : AbstractTransport(client), WeakRefFactoryMixin<T> {
 
     companion object {
-        private const val TAG = "IOTransport"
+        private const val TAG = "StreamingTransport"
         private const val MAX_SIZE = 1024
     }
 
-    private var mOutputQueue: BlockingQueue<OutgoingPacket> = ArrayBlockingQueue(16)
+    private var mOutputQueue: BlockingQueue<OutgoingPacket> = LinkedBlockingQueue()
     private var mRunning: AtomicBoolean = AtomicBoolean(false)
 
     private var mInputThread: IOThread<T>? = null
@@ -41,23 +41,28 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
     protected abstract fun doDisconnect()
 
     override fun send(packet: ByteArray): OutgoingPacket {
+        Log.d(TAG, "send()")
         val outgoing = OutgoingPacket(packet)
-        mHandler.post { sendTask(outgoing) }
+
+        mOutputQueue.add(outgoing)
+
+        if (state != ConnectionState.CONNECTED) {
+            reconnect()
+        }
+
         return outgoing
     }
 
-    private fun sendTask(outgoing: OutgoingPacket) {
-        mOutputQueue.add(outgoing)
-    }
-
     override fun reconnect() {
+        Log.d(TAG, "reconnect()")
         if (isConnected) {
             disconnect()
         }
         connect()
     }
 
-    private fun connect(): Boolean {
+    private fun connect() {
+        Log.d(TAG, "connect()")
         if (isConnected || inputStream != null || outputStream != null) {
             disconnect()
         }
@@ -67,7 +72,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         if (!doConnect() || !isConnected) {
             disconnect()
             state = ConnectionState.DISCONNECTED
-            return false
+            return
         }
 
         mInputThread = IOThread(weakRefFromThis(), this::inputThreadTask)
@@ -77,7 +82,6 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         mOutputThread?.start()
 
         state = ConnectionState.CONNECTED
-        return true
     }
 
     /**
@@ -133,6 +137,8 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
     }
 
     override fun disconnect() {
+        Log.d(TAG, "disconnect()")
+        Log.d(TAG, "disconnectTask()")
         state = ConnectionState.DISCONNECTING
 
         mRunning.set(false)

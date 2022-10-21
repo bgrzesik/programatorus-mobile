@@ -1,6 +1,10 @@
 package programatorus.mobile.transport
 
+import programatorus.client.comm.transport.ITransport
+import programatorus.client.comm.transport.ITransportClient
 import programus.proto.Protocol
+
+typealias TransportProvider = (ITransportClient) -> ITransport
 
 object TestUtils {
     fun newTestMessage() = Protocol.GenericMessage.newBuilder()
@@ -9,5 +13,4 @@ object TestUtils {
             value = "Test 1234"
         })
         .build()
-
 }

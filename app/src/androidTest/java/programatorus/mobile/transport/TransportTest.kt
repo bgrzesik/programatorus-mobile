@@ -1,72 +1,50 @@
 package programatorus.mobile.transport
 
+import org.hamcrest.CoreMatchers
 import org.junit.Assert
+import org.junit.Assume
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.io.PipedTransport
+import programatorus.client.comm.transport.mock.LoopbackTransport
 import programatorus.client.comm.transport.wrapper.Transport
-import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
-internal class TransportTest {
+@RunWith(Parameterized::class)
+open class TransportTest(
+    @Suppress("unused")
+    private var mTestName: String,
+    private var mProvider: TransportProvider
+) {
 
-    @Test
-    fun testLoopbackSendReceive1() {
-        testLoopbackSendReceive(1)
+    companion object {
+        private fun p(v: TransportProvider) = v
+
+        @JvmStatic
+        @Parameterized.Parameters(name="{0}")
+        fun parameters(): Array<Array<Any>> = arrayOf(
+            arrayOf("Transport(Piped)", p { Transport(::PipedTransport, it) }),
+            arrayOf("Piped", p { PipedTransport(it) }),
+            arrayOf("Transport(Loopback)", p { Transport(::LoopbackTransport, it) }),
+            arrayOf("Loopback", p { LoopbackTransport(it) }),
+        )
     }
 
-    @Test
-    fun testLoopbackSendReceive10() {
-        testLoopbackSendReceive(10)
+    @Before
+    open fun assumeRunOnAndroid() {
+        Assume.assumeThat(
+            "Those tests should be ran on Android",
+            System.getProperty("java.specification.vendor"),
+            CoreMatchers.`is`("The Android Project")
+        )
     }
 
-    @Test
-    fun testLoopbackSendReceive100() {
-        testLoopbackSendReceive(100)
-    }
-
-    private fun testLoopbackSendReceive(num: Int) {
-        val queue = LinkedBlockingQueue<ByteArray>()
-
-        val client = object : ITransportClient {
-            override fun onPacketReceived(packet: ByteArray) {
-                println(packet.decodeToString())
-                queue.add(packet)
-            }
-
-            override fun onError() = Assert.fail()
-        }
-
-        val transport = Transport(::PipedTransport, client)
-
-        val messages = mutableListOf<ByteArray>()
-        for (i in 0..num) {
-            val message = "Test $i message".toByteArray()
-            messages.add(message)
-            transport.send(message)
-        }
-
-        for (message in messages) {
-//            transport.send(message)
-
-            val received = queue.poll(6000, TimeUnit.MILLISECONDS)
-
-            Assert.assertNotNull(received)
-
-            println(message.decodeToString() + " = " + received.decodeToString())
-
-            Assert.assertArrayEquals(message, received)
-        }
-
-        Assert.assertNull("Received more messages then expected",
-            queue.poll(1000, TimeUnit.MILLISECONDS))
-
-        transport.disconnect()
-    }
-
-    @Test
+    @Test(timeout = 5000)
     fun testStateMachine() {
         val queue = LinkedBlockingQueue<ConnectionState>()
 
@@ -75,32 +53,34 @@ internal class TransportTest {
                 queue.add(state)
             }
 
-            override fun onError() = Assert.fail()
+            override fun onError() = Assert.fail("Transport Client caught error")
         }
 
-        val transport = Transport(::PipedTransport, client)
+        val transport = mProvider(client)
 
-        var state = queue.poll(100, TimeUnit.MILLISECONDS)
+        var state = transport.state
         Assert.assertEquals(state, ConnectionState.DISCONNECTED)
 
         transport.reconnect()
 
-        state = queue.poll(100, TimeUnit.MILLISECONDS)
+        state = queue.poll(Long.MAX_VALUE, TimeUnit.DAYS)
         Assert.assertEquals(state, ConnectionState.CONNECTING)
 
-        state = queue.poll(100, TimeUnit.MILLISECONDS)
+        state = queue.poll(Long.MAX_VALUE, TimeUnit.DAYS)
         Assert.assertEquals(state, ConnectionState.CONNECTED)
 
         transport.disconnect()
 
-        state = queue.poll(100, TimeUnit.MILLISECONDS)
+        state = queue.poll(Long.MAX_VALUE, TimeUnit.DAYS)
         Assert.assertEquals(state, ConnectionState.DISCONNECTING)
 
-        state = queue.poll(100, TimeUnit.MILLISECONDS)
+        state = queue.poll(Long.MAX_VALUE, TimeUnit.DAYS)
         Assert.assertEquals(state, ConnectionState.DISCONNECTED)
 
-        Assert.assertNull("The transport should not change state",
-            queue.poll(1000, TimeUnit.MILLISECONDS))
+        Assert.assertNull(
+            "The programatorus.local.transport should not change state",
+            queue.poll(1000, TimeUnit.MILLISECONDS)
+        )
     }
 
 }

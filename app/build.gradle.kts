@@ -45,15 +45,16 @@ android {
 
     sourceSets {
         getByName("main") {
-            java {
-
-            }
             proto {
                 srcDir("src/main/proto")
                 include("**/*.proto")
             }
         }
         getByName("test") {
+            java {
+                srcDir("src/androidTest/java")
+                srcDir("src/test/java")
+            }
             proto {
                 srcDir("src/test/proto")
                 include("**/*.proto")
@@ -69,13 +70,14 @@ dependencies {
     implementation("com.google.android.material:material:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     testImplementation("junit:junit:4.13.2")
-    testImplementation("org.junit.jupiter:junit-jupiter:+")
     testImplementation("io.mockk:mockk:+")
+    testImplementation(project(mapOf("path" to ":app")))
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation(kotlin("stdlib-jdk7", kotlinVersion))
     implementation("com.google.protobuf:protobuf-kotlin:3.19.4")
+
 }
 
 val grpcVersion = "1.24.0"

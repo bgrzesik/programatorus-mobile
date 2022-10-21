@@ -53,10 +53,6 @@ class Transport(
             }
         }
 
-    init {
-        mClient.onStateChanged(state)
-    }
-
     override fun send(packet: ByteArray): IOutgoingPacket {
         Log.d(TAG, "Enqueueing packet for sending size=${packet.size}")
 
