@@ -1,8 +1,7 @@
-package programatorus.client.comm.transport
+package programatorus.client.comm
 
 import programus.proto.Protocol
 
-typealias TransportProvider = (ITransportClient) -> ITransport
 
 object TestUtils {
     fun newTestMessage() = Protocol.GenericMessage.newBuilder()

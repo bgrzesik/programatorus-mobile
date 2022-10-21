@@ -4,8 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
-import programatorus.client.comm.transport.AbstractTransport
+import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 abstract class StreamingTransport<T : StreamingTransport<T>>(
     client: ITransportClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper())
-) : AbstractTransport(client), WeakRefFactoryMixin<T> {
+) : AbstractConnection(client), ITransport, WeakRefFactoryMixin<T> {
 
     companion object {
         private const val TAG = "StreamingTransport"
@@ -138,7 +139,6 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
     override fun disconnect() {
         Log.d(TAG, "disconnect()")
-        Log.d(TAG, "disconnectTask()")
         state = ConnectionState.DISCONNECTING
 
         mRunning.set(false)

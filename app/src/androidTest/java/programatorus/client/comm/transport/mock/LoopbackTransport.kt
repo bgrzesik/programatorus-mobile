@@ -9,7 +9,7 @@ class LoopbackTransport(
     handler: Handler = Handler(Looper.getMainLooper())
 ) : MockTransport(Endpoint(), client, handler) {
 
-    private class Endpoint : MockTransportEndpoint {
+    private class Endpoint : IMockTransportEndpoint {
         override fun onPacket(packet: ByteArray): ByteArray = packet
     }
 

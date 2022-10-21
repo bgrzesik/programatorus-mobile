@@ -1,6 +1,6 @@
 package programatorus.client.comm.transport.mock
 
-interface MockTransportEndpoint {
+interface IMockTransportEndpoint {
 
     fun onPacket(packet: ByteArray): ByteArray?
 

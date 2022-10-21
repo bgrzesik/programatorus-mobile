@@ -1,11 +1,13 @@
-package programatorus.client.comm.transport
+package programatorus.client.comm
 
 import android.util.Log
+import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransportClient
 
-abstract class AbstractTransport(
+abstract class AbstractConnection(
     protected val client: ITransportClient,
     private var mState: ConnectionState = ConnectionState.DISCONNECTED
-) : ITransport {
+) : IConnection {
     companion object {
         private const val TAG = "AbstractTransport"
     }

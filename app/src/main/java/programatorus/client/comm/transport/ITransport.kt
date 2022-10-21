@@ -1,15 +1,9 @@
 package programatorus.client.comm.transport
 
-interface ITransport {
+import programatorus.client.comm.IConnection
 
-    val state: ConnectionState
+interface ITransport : IConnection {
 
     fun send(packet: ByteArray): IOutgoingPacket
-
-    // TODO(bgrzesik): Return future
-    fun reconnect()
-
-    // TODO(bgrzesik): Return future
-    fun disconnect()
 
 }

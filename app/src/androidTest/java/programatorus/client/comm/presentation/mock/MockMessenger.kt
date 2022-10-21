@@ -1,26 +1,37 @@
-package programatorus.client.comm.transport.mock
+package programatorus.client.comm.presentation.mock
 
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import programatorus.client.comm.AbstractConnection
+import programatorus.client.comm.presentation.IMessageClient
+import programatorus.client.comm.presentation.IMessenger
+import programatorus.client.comm.presentation.IOutgoingMessage
 import programatorus.client.comm.transport.*
+import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
-open class MockTransport(
-    private val mMockTransportEndpoint: IMockTransportEndpoint,
-    private val mClient: ITransportClient,
+open class MockMessenger(
+    private val mMockMessengerEndpoint: IMockMessengerEndpoint,
+    private val mClient: IMessageClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper())
-) : AbstractConnection(mClient), ITransport {
+) : IMessenger {
 
-    private val mMessageQueue = ArrayDeque<PendingPacket>()
+    private val mMessageQueue = ArrayDeque<PendingMessage>()
 
     companion object {
-        const val TAG = "MockTransport"
+        const val TAG = "MockMessenger"
     }
 
-    override fun send(packet: ByteArray): IOutgoingPacket {
-        val pending = PendingPacket(packet)
+    override var state: ConnectionState = ConnectionState.DISCONNECTED
+        set(value) {
+            if (field != value) {
+                mClient.onStateChanged(value)
+                field = value
+            }
+        }
+
+    override fun send(message: Protocol.GenericMessage): IOutgoingMessage {
+        val pending = PendingMessage(message)
         mHandler.post {
             mMessageQueue.addLast(pending)
             pumpPendingMessages()
@@ -42,6 +53,7 @@ open class MockTransport(
             packet.send()
         }
     }
+
 
     override fun reconnect() {
         Log.d(TAG, "reconnect()")
@@ -76,13 +88,13 @@ open class MockTransport(
         }
     }
 
-    fun mockPacket(packet: ByteArray) {
+    fun mockPacket(packet: Protocol.GenericMessage) {
         Log.d(TAG, "mockPacket()")
         mHandler.post {
             Log.d(TAG, "mock packet task")
 
             assert(state == ConnectionState.CONNECTED)
-            mClient.onPacketReceived(packet)
+            mClient.onMessageReceived(packet)
         }
     }
 
@@ -96,22 +108,22 @@ open class MockTransport(
         }
     }
 
-    private inner class PendingPacket(
-        override val packet: ByteArray
-    ) : IOutgoingPacket {
-        override val response: CompletableFuture<IOutgoingPacket> = CompletableFuture()
+    private inner class PendingMessage(
+        override val message: Protocol.GenericMessage
+    ) : IOutgoingMessage {
+        override val response: CompletableFuture<IOutgoingMessage> = CompletableFuture()
 
         fun send() {
             assert(state == ConnectionState.CONNECTED)
 
             Log.d(TAG, "Sending to mocked endpoint")
-            val endpointResponse = mMockTransportEndpoint.onPacket(packet)
+            val endpointResponse = mMockMessengerEndpoint.onMessage(message)
 
             response.complete(this)
 
             if (endpointResponse != null) {
                 Log.d(TAG, "Mocked endpoint response")
-                mClient.onPacketReceived(endpointResponse)
+                mClient.onMessageReceived(endpointResponse)
             }
         }
     }

@@ -1,11 +1,8 @@
 package programatorus.client.comm.transport
 
-interface ITransportClient {
+import programatorus.client.comm.IConnectionClient
 
-    fun onStateChanged(state: ConnectionState) {}
-
-    // TODO(bgrzesik): Remove this in favor of onStateChanged(ConnectionState::ERROR)
-    fun onError() {}
+interface ITransportClient : IConnectionClient {
 
     fun onPacketReceived(packet: ByteArray) {}
 

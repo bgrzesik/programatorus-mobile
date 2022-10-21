@@ -14,37 +14,37 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 @RunWith(Parameterized::class)
-open class SendLoopbackTest(
+open class PacketLoopbackTest(
     @Suppress("unused")
     private var mTestName: String,
-    private var mProvider: TransportProvider,
+    private var mProvider: (ITransportClient) -> ITransport,
     private var mCount: Int
 ) {
     companion object {
-        private fun p(v: TransportProvider) = v
+        private fun p(v: (ITransportClient) -> ITransport) = v
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0} x {2}")
         internal fun parameters(): Array<Array<Any>> = arrayOf(
-            arrayOf("Transport(Piped)", p { Transport(::PipedTransport, it) }, 100),
-            arrayOf("Transport(Piped)", p { Transport(::PipedTransport, it) }, 10),
-            arrayOf("Transport(Piped)", p { Transport(::PipedTransport, it) }, 1),
-            arrayOf("Transport(Piped)", p { Transport(::PipedTransport, it) }, 0),
+            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 100),
+            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 10),
+            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 1),
+            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 0),
 
-            arrayOf("Piped", p { PipedTransport(it) }, 100),
-            arrayOf("Piped", p { PipedTransport(it) }, 10),
-            arrayOf("Piped", p { PipedTransport(it) }, 1),
-            arrayOf("Piped", p { PipedTransport(it) }, 0),
+            arrayOf("PipedTransport", p { PipedTransport(it) }, 100),
+            arrayOf("PipedTransport", p { PipedTransport(it) }, 10),
+            arrayOf("PipedTransport", p { PipedTransport(it) }, 1),
+            arrayOf("PipedTransport", p { PipedTransport(it) }, 0),
 
-            arrayOf("Transport(Loopback)", p { Transport(::LoopbackTransport, it) }, 100),
-            arrayOf("Transport(Loopback)", p { Transport(::LoopbackTransport, it) }, 10),
-            arrayOf("Transport(Loopback)", p { Transport(::LoopbackTransport, it) }, 1),
-            arrayOf("Transport(Loopback)", p { Transport(::LoopbackTransport, it) }, 0),
+            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 100),
+            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 10),
+            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 1),
+            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 0),
 
-            arrayOf("Loopback", p { LoopbackTransport(it) }, 100),
-            arrayOf("Loopback", p { LoopbackTransport(it) }, 10),
-            arrayOf("Loopback", p { LoopbackTransport(it) }, 1),
-            arrayOf("Loopback", p { LoopbackTransport(it) }, 0),
+            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 100),
+            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 10),
+            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 1),
+            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 0),
         )
     }
 
