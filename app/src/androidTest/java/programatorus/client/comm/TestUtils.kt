@@ -13,6 +13,10 @@ import programus.proto.Protocol
 
 
 object TestUtils {
+
+    val isAndroid: Boolean
+        get() = System.getProperty("java.specification.vendor") == "The Android Project"
+
     fun newTestMessage() = Protocol.GenericMessage.newBuilder()
         .setSessionId(10)
         .setTest(Protocol.TestMessage.newBuilder().apply {
@@ -20,22 +24,22 @@ object TestUtils {
         })
         .build()
 
-    fun getMessengerName(v: (IMessageClient) -> IMessenger): String {
+    private fun <T> mockLooper(f: () -> T): T {
+        if (isAndroid)
+            return f()
+
         mockkStatic(Looper::class)
         every { Looper.getMainLooper() } returns mockk("")
-        val name = v(object : IMessageClient {}).toString()
+        val t = f()
         unmockkAll()
 
-        return name;
+        return t
     }
 
-    fun getTransportName(v: (ITransportClient) -> ITransport): String {
-        mockkStatic(Looper::class)
-        every { Looper.getMainLooper() } returns mockk("")
-        val name = v(object : ITransportClient {}).toString()
-        unmockkAll()
+    fun getMessengerName(v: (IMessageClient) -> IMessenger): String =
+        mockLooper { v(object : IMessageClient {}).toString() }
 
-        return name;
-    }
+    fun getTransportName(v: (ITransportClient) -> ITransport): String =
+        mockLooper { v(object : ITransportClient {}).toString() }
 
 }
