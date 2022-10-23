@@ -10,6 +10,8 @@ class LoopbackMessenger(
     handler: Handler = Handler(Looper.getMainLooper())
 ) : MockMessenger(Endpoint(), client, handler) {
 
+    override fun toString(): String = "LoopbackMessenger"
+
     private class Endpoint : IMockMessengerEndpoint {
         override fun onMessage(packet: Protocol.GenericMessage): Protocol.GenericMessage = packet
     }

@@ -1,5 +1,6 @@
 package programatorus.client.comm.presentation
 
+import android.util.Log
 import org.hamcrest.CoreMatchers
 import org.junit.Assert
 import org.junit.Assume
@@ -7,9 +8,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import programatorus.client.comm.TestUtils
 import programatorus.client.comm.presentation.mock.LoopbackMessenger
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.io.PipedTransport
 import programatorus.client.comm.transport.mock.LoopbackTransport
 import programatorus.client.comm.transport.wrapper.Transport
@@ -25,38 +25,30 @@ open class MessageLoopbackTest(
 ) {
 
     companion object {
-        private fun p(v: (ITransportClient) -> ITransport): (IMessageClient) -> IMessenger =
-            { Messenger(v, it) }
+        private const val TAG = "MessageLoopbackTest"
 
-        private fun m(v: (IMessageClient) -> IMessenger) = v
+        private fun test(v: (IMessageClient) -> IMessenger): Array<Array<Any>> {
+            val counts = arrayOf(0, 1, 10, 100)
+            val name = TestUtils.getMessengerName(v)
+            return counts.map { arrayOf(name, v, it) }.toTypedArray()
+        }
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0} x {2}")
+        @Suppress("NestedLambdaShadowedImplicitParameter")
         internal fun parameters(): Array<Array<Any>> = arrayOf(
-            arrayOf("Messenger(Transport(PipedTransport))", p { Transport(::PipedTransport, it) }, 100),
-            arrayOf("Messenger(Transport(PipedTransport))", p { Transport(::PipedTransport, it) }, 10),
-            arrayOf("Messenger(Transport(PipedTransport))", p { Transport(::PipedTransport, it) }, 1),
-            arrayOf("Messenger(Transport(PipedTransport))", p { Transport(::PipedTransport, it) }, 0),
-
-            arrayOf("Messenger(PipedTransport)", p { PipedTransport(it) }, 100),
-            arrayOf("Messenger(PipedTransport)", p { PipedTransport(it) }, 10),
-            arrayOf("Messenger(PipedTransport)", p { PipedTransport(it) }, 1),
-            arrayOf("Messenger(PipedTransport)", p { PipedTransport(it) }, 0),
-
-            arrayOf("Messenger(Transport(LoopbackTransport))", p { Transport(::LoopbackTransport, it) }, 100),
-            arrayOf("Messenger(Transport(LoopbackTransport))", p { Transport(::LoopbackTransport, it) }, 10),
-            arrayOf("Messenger(Transport(LoopbackTransport))", p { Transport(::LoopbackTransport, it) }, 1),
-            arrayOf("Messenger(Transport(LoopbackTransport))", p { Transport(::LoopbackTransport, it) }, 0),
-
-            arrayOf("Messenger(LoopbackTransport)", p { LoopbackTransport(it) }, 100),
-            arrayOf("Messenger(LoopbackTransport)", p { LoopbackTransport(it) }, 10),
-            arrayOf("Messenger(LoopbackTransport)", p { LoopbackTransport(it) }, 1),
-            arrayOf("Messenger(LoopbackTransport)", p { LoopbackTransport(it) }, 0),
-
-            arrayOf("LoopbackMessenger", m { LoopbackMessenger(it) }, 100),
-            arrayOf("LoopbackMessenger", m { LoopbackMessenger(it) }, 10),
-            arrayOf("LoopbackMessenger", m { LoopbackMessenger(it) }, 1),
-            arrayOf("LoopbackMessenger", m { LoopbackMessenger(it) }, 0),
+            // @formatter:off
+            *test { ProtocolMessenger({ Transport(::PipedTransport, it) }, it) },
+            *test { ProtocolMessenger({ PipedTransport(it) }, it) },
+            *test { ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) },
+            *test { ProtocolMessenger({ LoopbackTransport(it) }, it) },
+            *test { LoopbackMessenger(it) },
+            *test { Messenger({ ProtocolMessenger({ Transport(::PipedTransport, it) }, it) }, it) },
+            *test { Messenger({ ProtocolMessenger({ PipedTransport(it) }, it) }, it) },
+            *test { Messenger({ ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) }, it) },
+            *test { Messenger({ ProtocolMessenger({ LoopbackTransport(it) }, it) }, it) },
+            *test { Messenger({ LoopbackMessenger(it) }, it) },
+            // @formatter:on
         )
     }
 
@@ -69,12 +61,13 @@ open class MessageLoopbackTest(
         )
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 8000)
     fun testLoopbackSendReceive() {
         val queue = LinkedBlockingQueue<Protocol.GenericMessage>()
 
         val client = object : IMessageClient {
             override fun onMessageReceived(message: Protocol.GenericMessage) {
+                Log.i(TAG, "onMessageReceived(): message.payloadCase=${message.payloadCase}")
                 queue.add(message)
             }
 
@@ -84,12 +77,14 @@ open class MessageLoopbackTest(
         val transport = mProvider(client)
 
         val messages = mutableListOf<Protocol.GenericMessage>()
-        for (i in 0..mCount) {
+        for (i in 0 until mCount) {
             val message = Protocol.GenericMessage.newBuilder()
                 .setRequestId(i.toLong())
                 .setSessionId(i.toLong())
-                .setTest(Protocol.TestMessage.newBuilder()
-                    .setValue("Test Message $i"))
+                .setTest(
+                    Protocol.TestMessage.newBuilder()
+                        .setValue("Test Message $i")
+                )
                 .build()
 
             messages.add(message)

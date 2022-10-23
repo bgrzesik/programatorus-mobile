@@ -1,13 +1,12 @@
 package programatorus.client.comm.transport.mock
 
-import android.os.Handler
-import android.os.Looper
 import programatorus.client.comm.transport.ITransportClient
 
 class LoopbackTransport(
-    client: ITransportClient,
-    handler: Handler = Handler(Looper.getMainLooper())
-) : MockTransport(Endpoint(), client, handler) {
+    client: ITransportClient
+) : MockTransport(Endpoint(), client) {
+
+    override fun toString(): String = "LoopbackTransport"
 
     private class Endpoint : IMockTransportEndpoint {
         override fun onPacket(packet: ByteArray): ByteArray = packet

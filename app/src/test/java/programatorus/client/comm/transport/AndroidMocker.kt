@@ -15,13 +15,21 @@ import java.util.concurrent.TimeUnit
 
 class AndroidMocker : TestWatcher() {
     private var mScheduler: ScheduledExecutorService? = null
+    private var mGoodThread: ThreadLocal<Boolean>? = null
 
     private val isAndroid : Boolean
         get() = "The Android Project" == System.getProperty("java.specification.vendor")
 
     private fun mock() {
         mockkStatic(Looper::class)
-        every { Looper.getMainLooper() } returns mockk()
+
+        val looper = mockk<Looper>()
+
+        every { Looper.getMainLooper() } returns looper
+
+        every { looper.isCurrentThread } answers {
+            mGoodThread!!.get() ?: false
+        }
 
         mockkStatic(Log::class)
 
@@ -30,6 +38,8 @@ class AndroidMocker : TestWatcher() {
         every { Log.i(any(), any()) } answers { println("I/${args[0]}: ${args[1]}"); 1 }
 
         mockkConstructor(Handler::class)
+
+        every { anyConstructed<Handler>().looper } returns looper
 
         every { anyConstructed<Handler>().post(any()) } answers {
             mScheduler!!.submit(arg(0))
@@ -44,11 +54,17 @@ class AndroidMocker : TestWatcher() {
     override fun starting(description: Description) {
         super.starting(description)
 
-        mScheduler = Executors.newScheduledThreadPool(1)
-
         if (isAndroid) {
             return
         }
+
+        mScheduler = Executors.newScheduledThreadPool(1)
+        mGoodThread = ThreadLocal.withInitial { false }
+
+        mScheduler!!.submit {
+            mock()
+            mGoodThread!!.set(true)
+        }.get(Long.MAX_VALUE, TimeUnit.DAYS)
 
         mock()
     }

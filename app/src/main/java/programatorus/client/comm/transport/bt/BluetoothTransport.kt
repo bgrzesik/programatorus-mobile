@@ -6,8 +6,6 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import androidx.core.content.ContextCompat
 import programatorus.client.WeakRefFactoryMixin
@@ -22,9 +20,7 @@ class BluetoothTransport(
     private val mContext: Context,
     private val mDevice: BluetoothDevice,
     client: ITransportClient,
-    handler: Handler = Handler(Looper.getMainLooper())
-) : StreamingTransport<BluetoothTransport>(client, handler),
-    WeakRefFactoryMixin<BluetoothTransport> {
+) : StreamingTransport<BluetoothTransport>(client) {
 
     companion object {
         private const val TAG = "BluetoothTransport"
@@ -76,5 +72,7 @@ class BluetoothTransport(
         outputStream?.close()
         outputStream = null
     }
+
+    override fun toString(): String = "BluetoothTransport"
 
 }
