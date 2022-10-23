@@ -108,6 +108,8 @@ open class MockMessenger(
         }
     }
 
+    override fun toString(): String = "MockMessenger[$mMockMessengerEndpoint]"
+
     private inner class PendingMessage(
         override val message: Protocol.GenericMessage
     ) : IOutgoingMessage {

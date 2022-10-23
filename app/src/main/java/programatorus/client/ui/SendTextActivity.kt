@@ -73,26 +73,21 @@ class SendTextActivity : AppCompatActivity() {
         val adapter = BluetoothAdapter.getDefaultAdapter()
         val device = adapter.getRemoteDevice(deviceAddress)
 
-        val transport = Transport({ client, executor ->
-            BluetoothTransport(
-                this@SendTextActivity,
-                device,
-                client,
-                executor
-            )
-        }, object : ITransportClient {
-            override fun onPacketReceived(packet: ByteArray) {
-                println(packet)
-            }
+        val transport =
+            Transport({ client -> BluetoothTransport(this@SendTextActivity, device, client) },
+                object : ITransportClient {
+                    override fun onPacketReceived(packet: ByteArray) {
+                        println(packet)
+                    }
 
-            override fun onError() {
-                println("onError")
-            }
+                    override fun onError() {
+                        println("onError")
+                    }
 
-            override fun onStateChanged(state: ConnectionState) {
-                println(state)
-            }
-        })
+                    override fun onStateChanged(state: ConnectionState) {
+                        println(state)
+                    }
+                })
 
         // TODO(bgrzesik): DELETE ME
         transport.send("Test string".toByteArray())

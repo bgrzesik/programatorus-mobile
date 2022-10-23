@@ -1,7 +1,5 @@
 package programatorus.client.comm.transport.io
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.comm.AbstractConnection
@@ -11,13 +9,14 @@ import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
 import java.lang.ref.WeakReference
-import java.util.concurrent.*
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class StreamingTransport<T : StreamingTransport<T>>(
     client: ITransportClient,
-    private val mHandler: Handler = Handler(Looper.getMainLooper())
-) : AbstractConnection(client), ITransport, WeakRefFactoryMixin<T> {
+) : AbstractConnection(client), ITransport {
 
     companion object {
         private const val TAG = "StreamingTransport"
@@ -76,10 +75,10 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
             return
         }
 
-        mInputThread = IOThread(weakRefFromThis(), this::inputThreadTask)
+        mInputThread = IOThread(this::inputThreadTask)
         mInputThread?.start()
 
-        mOutputThread = IOThread(weakRefFromThis(), this::outputThreadTask)
+        mOutputThread = IOThread(this::outputThreadTask)
         mOutputThread?.start()
 
         state = ConnectionState.CONNECTED
@@ -112,7 +111,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         }
         Log.d(TAG, "Received packet size=$size")
 
-        mHandler.post { client.onPacketReceived(buffer) }
+        client.onPacketReceived(buffer)
     }
 
     /**
@@ -131,7 +130,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
             outputStream?.flush()
 
-            mHandler.post { outgoing.response.complete(outgoing) }
+            outgoing.response.complete(outgoing)
         } catch (th: Throwable) {
             outgoing.response.completeExceptionally(th)
         }
@@ -154,28 +153,21 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         state = ConnectionState.DISCONNECTED
     }
 
-    class IOThread<T : StreamingTransport<T>>(
-        private val mWeakTransport: WeakReference<T>,
+    private inner class IOThread<T : StreamingTransport<T>>(
         private val mIoOperation: () -> Unit
     ) : Thread() {
 
-        private val isRunning: Boolean
-            get() {
-                val comm = mWeakTransport.get()
-                return comm?.isConnected ?: false
-            }
-
         override fun run() {
             try {
-                while (isRunning) {
+                while (isConnected) {
                     try {
                         mIoOperation()
                     } catch (th: InterruptedIOException) {
-                        if (!isRunning)
+                        if (!isConnected)
                             return
                         Log.e(TAG, "", th)
                     } catch (th: InterruptedException) {
-                        if (!isRunning)
+                        if (!isConnected)
                             return
                         Log.e(TAG, "", th)
                     }

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidTestResultsUserPreferences">
+    <option name="androidTestResultsTableState">
+      <map>
+        <entry key="-566240064">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="BH904Q7Q56" value="120" />
+                  <entry key="Duration" value="90" />
+                  <entry key="Sony" value="120" />
+                  <entry key="Sony&#10; F5121" value="120" />
+                  <entry key="Tests" value="456" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="28629151">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="BH904Q7Q56" value="120" />
+                  <entry key="Duration" value="138" />
+                  <entry key="Sony" value="120" />
+                  <entry key="Sony&#10; F5121" value="168" />
+                  <entry key="Tests" value="628" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+        <entry key="1810843072">
+          <value>
+            <AndroidTestResultsTableState>
+              <option name="preferredColumnWidths">
+                <map>
+                  <entry key="BH904Q7Q56" value="120" />
+                  <entry key="Duration" value="90" />
+                  <entry key="Sony&#10; F5121" value="120" />
+                  <entry key="Tests" value="466" />
+                </map>
+              </option>
+            </AndroidTestResultsTableState>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

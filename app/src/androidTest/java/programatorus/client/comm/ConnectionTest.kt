@@ -9,8 +9,8 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
-import programatorus.client.comm.presentation.MessageLoopbackTest
 import programatorus.client.comm.presentation.Messenger
+import programatorus.client.comm.presentation.ProtocolMessenger
 import programatorus.client.comm.presentation.mock.LoopbackMessenger
 import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.comm.transport.ITransport
@@ -22,35 +22,47 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 @RunWith(Parameterized::class)
-public open class ConnectionTest(
+open class ConnectionTest(
     @Suppress("unused")
     private var mTestName: String,
     private var mProvider: (IConnectionClient) -> IConnection
 ) {
 
     companion object {
-        private fun pt(v: (ITransportClient) -> ITransport): (IConnectionClient) -> ITransport =
-            { v(object : ConnectionClientDelegate(it), ITransportClient {}) }
+        private fun t(v: (ITransportClient) -> ITransport): Array<Any> {
+            return arrayOf(TestUtils.getTransportName(v), { client: IConnectionClient ->
+                v(object : ConnectionClientDelegate(client), ITransportClient {})
+            })
+        }
 
-        private fun pm(v: (ITransportClient) -> ITransport): (IConnectionClient) -> Messenger =
-            { Messenger(v, object : ConnectionClientDelegate(it), IMessageClient {}) }
-
-        private fun m(v: (IMessageClient) -> IMessenger): (IConnectionClient) -> IMessenger =
-            { v(object : ConnectionClientDelegate(it), IMessageClient {}) }
+        private fun m(v: (IMessageClient) -> IMessenger): Array<Any> {
+            return arrayOf(TestUtils.getMessengerName(v), { client: IConnectionClient ->
+                v(object : ConnectionClientDelegate(client), IMessageClient {})
+            })
+        }
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
+        @Suppress("NestedLambdaShadowedImplicitParameter")
         fun parameters(): Array<Array<Any>> = arrayOf(
-            arrayOf("Transport(PipedTransport)", pt { Transport(::PipedTransport, it) }),
-            arrayOf("PipedTransport", pt { PipedTransport(it) }),
-            arrayOf("Transport(LoopbackTransport)", pt { Transport(::LoopbackTransport, it) }),
-            arrayOf("LoopbackTransport", pt { LoopbackTransport(it) }),
+            // @formatter:off
+            t { Transport(::PipedTransport, it) },
+            t { PipedTransport(it) },
+            t { Transport(::LoopbackTransport, it) },
+            t { LoopbackTransport(it) },
 
-            arrayOf("Messenger(Transport(PipedTransport))", pm { Transport(::PipedTransport, it) }),
-            arrayOf("Messenger(PipedTransport)", pm { PipedTransport(it) }),
-            arrayOf("Messenger(Transport(LoopbackTransport))", pm { Transport(::LoopbackTransport, it) }),
-            arrayOf("Messenger(LoopbackTransport)", pm { LoopbackTransport(it) }),
-            arrayOf("LoopbackMessenger", m { LoopbackMessenger(it) })
+            m { ProtocolMessenger({ Transport(::PipedTransport, it) }, it) },
+            m { ProtocolMessenger({ PipedTransport(it) }, it) },
+            m { ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) },
+            m { ProtocolMessenger({ LoopbackTransport(it) }, it) },
+            m { LoopbackMessenger(it) },
+
+            m { Messenger({ ProtocolMessenger({ Transport(::PipedTransport, it) }, it) }, it) },
+            m { Messenger({ ProtocolMessenger({ PipedTransport(it) }, it) }, it) },
+            m { Messenger({ ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) }, it) },
+            m { Messenger({ ProtocolMessenger({ LoopbackTransport(it) }, it) }, it) },
+            m { Messenger({ LoopbackMessenger(it) }, it) },
+            // @formatter:on
         )
     }
 

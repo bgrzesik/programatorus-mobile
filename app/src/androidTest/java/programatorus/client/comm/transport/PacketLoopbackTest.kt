@@ -1,5 +1,6 @@
 package programatorus.client.comm.transport
 
+import android.util.Log
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert
 import org.junit.Assume
@@ -7,6 +8,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import programatorus.client.comm.TestUtils
 import programatorus.client.comm.transport.io.PipedTransport
 import programatorus.client.comm.transport.mock.LoopbackTransport
 import programatorus.client.comm.transport.wrapper.Transport
@@ -21,30 +23,24 @@ open class PacketLoopbackTest(
     private var mCount: Int
 ) {
     companion object {
-        private fun p(v: (ITransportClient) -> ITransport) = v
+        private const val TAG = "PacketLoopbackTest"
+
+        private fun test(v: (ITransportClient) -> ITransport): Array<Array<Any>> {
+            val counts = arrayOf(0, 1, 10, 100)
+            val name = TestUtils.getTransportName(v)
+            return counts.map { arrayOf(name, v, it) }.toTypedArray()
+        }
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0} x {2}")
+        @Suppress("NestedLambdaShadowedImplicitParameter")
         internal fun parameters(): Array<Array<Any>> = arrayOf(
-            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 100),
-            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 10),
-            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 1),
-            arrayOf("Transport(PipedTransport)", p { Transport(::PipedTransport, it) }, 0),
-
-            arrayOf("PipedTransport", p { PipedTransport(it) }, 100),
-            arrayOf("PipedTransport", p { PipedTransport(it) }, 10),
-            arrayOf("PipedTransport", p { PipedTransport(it) }, 1),
-            arrayOf("PipedTransport", p { PipedTransport(it) }, 0),
-
-            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 100),
-            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 10),
-            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 1),
-            arrayOf("Transport(LoopbackTransport)", p { Transport(::LoopbackTransport, it) }, 0),
-
-            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 100),
-            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 10),
-            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 1),
-            arrayOf("LoopbackTransport", p { LoopbackTransport(it) }, 0),
+            // @formatter:off
+            *test { Transport(::PipedTransport, it) },
+            *test { PipedTransport(it) },
+            *test { Transport(::LoopbackTransport, it) },
+            *test { LoopbackTransport(it) }
+            // @formatter:on
         )
     }
 
@@ -57,13 +53,13 @@ open class PacketLoopbackTest(
         )
     }
 
-    @Test(timeout = 5000)
+    @Test(timeout = 8000)
     fun testLoopbackSendReceive() {
         val queue = LinkedBlockingQueue<ByteArray>()
 
         val client = object : ITransportClient {
             override fun onPacketReceived(packet: ByteArray) {
-                println(packet.decodeToString())
+                Log.i(TAG, "onPacketReceived(): packet=${packet.decodeToString()}")
                 queue.add(packet)
             }
 
@@ -73,14 +69,16 @@ open class PacketLoopbackTest(
         val transport = mProvider(client)
 
         val messages = mutableListOf<ByteArray>()
-        for (i in 0..mCount) {
+        for (i in 0 until mCount) {
             val message = "Test $i message".toByteArray()
             messages.add(message)
             transport.send(message)
+            Log.i(TAG, "sent packet=${message.decodeToString()}")
         }
 
         for (message in messages) {
             val received = queue.poll(Long.MAX_VALUE, TimeUnit.DAYS)
+            Log.i(TAG, "dequeued packet=${received.decodeToString()}")
             Assert.assertNotNull(received)
             Assert.assertArrayEquals(message, received)
         }

@@ -1,7 +1,5 @@
 package programatorus.client.comm.transport.io
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import programatorus.client.comm.transport.ITransportClient
 import java.io.InputStream
@@ -14,8 +12,7 @@ import java.io.PipedOutputStream
  */
 class PipedTransport(
     client: ITransportClient,
-    executor: Handler = Handler(Looper.getMainLooper())
-) : StreamingTransport<PipedTransport>(client, executor) {
+) : StreamingTransport<PipedTransport>(client) {
     companion object {
         const val TAG = "PipedTransport"
     }
@@ -49,4 +46,5 @@ class PipedTransport(
         outputStream = null
     }
 
+    override fun toString(): String = "PipedTransport"
 }
