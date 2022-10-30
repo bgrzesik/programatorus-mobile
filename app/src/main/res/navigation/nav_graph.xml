@@ -8,21 +8,31 @@
     <fragment
         android:id="@+id/ChooseDeviceFragment"
         android:name="programatorus.client.screens.choosedevice.ChooseDeviceFragment"
-        android:label="@string/first_fragment_label"
+        android:label="@string/choose_device_fragment_label"
         tools:layout="@layout/fragment_choose_device">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_chooseDevice_to_home"
+            app:destination="@id/HomeFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="programatorus.client.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/HomeFragment"
+        android:name="programatorus.client.screens.home.HomeFragment"
+        android:label="@string/home_fragment_label"
+        tools:layout="@layout/fragment_home">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/ChooseDeviceFragment" />
+            android:id="@+id/action_home_to_manageBoards"
+            app:destination="@id/ManageBoardsFragment"
+            app:popUpTo="@id/HomeFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/ManageBoardsFragment"
+        android:name="programatorus.client.screens.boards.ManageBoardsFragment"
+        android:label="@string/manage_boards_fragment_label"
+        tools:layout="@layout/fragment_manage_boards">
+
+    </fragment>
+
 </navigation>
