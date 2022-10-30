@@ -20,6 +20,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import programatorus.client.R
 import programatorus.client.databinding.FragmentChooseDeviceBinding
 
 @SuppressLint("MissingPermission")
@@ -47,6 +49,7 @@ class ChooseDeviceFragment :
 
         binding.pairedDevices.setClickListener {
             Toast.makeText(activity, "clicked $it", Toast.LENGTH_LONG).show()
+            navigateToHome()
         }
 
         requireContext().registerReceiver(discoveryHandler, IntentFilter(BluetoothDevice.ACTION_FOUND))
@@ -180,6 +183,10 @@ class ChooseDeviceFragment :
 
     override fun setPairedDevices(bondedDevices: MutableSet<BluetoothDevice>) {
 
+    }
+
+    fun navigateToHome() {
+        findNavController().navigate(R.id.action_chooseDevice_to_home)
     }
 
     companion object {
