@@ -2,6 +2,7 @@ package programatorus.client.screens.boards.all
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.RadioGroup
 import androidx.recyclerview.widget.*
 import programatorus.client.databinding.AllBoardsListItemBinding
 
@@ -51,19 +52,24 @@ class BoardListAdapter():
         return differ.currentList
     }
 
-    fun moveItem(from: Int, to: Int) {
-        val list = differ.currentList.toMutableList()
-        val item = list[from]
-        list.removeAt(from)
-        list.add(to, item)
-        differ.submitList(list)
-    }
+//    fun toggleFavorite(item: AllBoardsListItem) {
+//        differ.submitList(
+//            differ.currentList.map {
+//                if (it == item) item.toggle() else it
+//            }
+//        )
+//    }
 
     inner class BoardItemViewHolder(private val binding: AllBoardsListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: AllBoardsListItem, onItemClickListener: ClickListener) {
             binding.filename.text = item.name
+            binding.checkbox.isChecked = item.isSelected.get()
+
+            binding.checkbox.setOnClickListener {
+                item.toggle()
+            }
 
             binding.root.setOnClickListener {
                 onItemClickListener(item)

@@ -26,35 +26,42 @@
 <!--        android:id="@+id/boards"-->
 <!--        app:layout_constraintTop_toTopOf="parent"/>-->
 
+    <com.google.android.material.tabs.TabLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tabs"
+        app:layout_constraintTop_toBottomOf="@id/btn">
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="All"/>
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Favorite"/>
+
+
+    </com.google.android.material.tabs.TabLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/btn"
+        app:layout_constraintTop_toBottomOf="@id/tabs"
         android:orientation="vertical">
 
-<!--        <include-->
-<!--            layout="@layout/fragment_all_boards_list"-->
-<!--            android:id="@+id/all_boards"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            />-->
+        <programatorus.client.screens.boards.favorites.FavBoardsListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/fav_boards"
+            android:visibility="gone"/>
 
-<!--        <include-->
-<!--            layout="@layout/fragment_fav_boards_list"-->
-<!--            android:id="@+id/fav_boards"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            />-->
-
-            <programatorus.client.screens.boards.favorites.FavBoardsListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/fav_boards" />
-
-            <programatorus.client.screens.boards.all.AllBoardsListView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/all_boards" />
+        <programatorus.client.screens.boards.all.AllBoardsListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/all_boards"
+            android:visibility="visible"/>
 
     </LinearLayout>
 
