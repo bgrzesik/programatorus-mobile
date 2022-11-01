@@ -35,8 +35,15 @@ class ManageBoardsFragment : Fragment() {
     }
 
     fun useFavorites() {
-        binding.allBoards.visibility = View.GONE
-        binding.favBoards.visibility = View.VISIBLE
+        with(binding) {
+            allBoards.visibility = View.GONE
+            favBoards.setBoards(
+                allBoards.getBoards()
+                    .filter { it.isFavorite() }
+                    .map { FavBoardsListItem(it.name) }
+            )
+            binding.favBoards.visibility = View.VISIBLE
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
