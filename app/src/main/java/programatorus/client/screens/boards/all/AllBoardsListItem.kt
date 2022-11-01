@@ -11,6 +11,9 @@ data class AllBoardsListItem(val name: String, var isSelected: AtomicBoolean = A
         } while (!isSelected.compareAndSet(temp, !temp))
     }
 
+    fun isFavorite(): Boolean = isSelected.get()
+
+
     companion object {
         fun from(name: String, value: Boolean): AllBoardsListItem =
             AllBoardsListItem(name, AtomicBoolean(value))
