@@ -1,4 +1,4 @@
-package programatorus.client.screens.boards
+package programatorus.client.screens.boards.favorites
 
 import android.content.Context
 import android.util.AttributeSet
@@ -7,20 +7,20 @@ import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import programatorus.client.databinding.ComponentManageBoardsListBinding
+import programatorus.client.databinding.ComponentFavBoardsListBinding
 
-class BoardListView @JvmOverloads constructor(
+class FavBoardsListView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet,
     defStyleAttr: Int = 0
 ): LinearLayout(context, attrs, defStyleAttr){
 
-    private val binding: ComponentManageBoardsListBinding
+    private val binding: ComponentFavBoardsListBinding
 
     private val boardsAdapter: BoardListAdapter
 
     init {
-        binding = ComponentManageBoardsListBinding.inflate(
+        binding = ComponentFavBoardsListBinding.inflate(
             LayoutInflater.from(context),
             this
         )
@@ -30,8 +30,6 @@ class BoardListView @JvmOverloads constructor(
             layoutManager = LinearLayoutManager(context)
             adapter = boardsAdapter
         }
-
-
     }
 
     fun enableTouch(){
@@ -42,11 +40,11 @@ class BoardListView @JvmOverloads constructor(
         boardsAdapter.setClickListener(clickListener)
     }
 
-    fun setBoards(boards: List<BoardListItem>) {
+    fun setBoards(boards: List<FavBoardsListItem>) {
         boardsAdapter.setItems(boards)
     }
 
-    fun getBoards(): List<BoardListItem> = boardsAdapter.getItems()
+    fun getBoards(): List<FavBoardsListItem> = boardsAdapter.getItems()
 
     private val itemTouchHelper by lazy {
         val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END, 0) {
@@ -58,7 +56,6 @@ class BoardListView @JvmOverloads constructor(
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
                 adapter.moveItem(from, to)
-//                adapter.notifyItemMoved(from, to)
 
                 return true
             }

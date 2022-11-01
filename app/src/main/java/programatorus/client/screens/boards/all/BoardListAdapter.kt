@@ -1,29 +1,29 @@
-package programatorus.client.screens.boards
+package programatorus.client.screens.boards.all
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
-import programatorus.client.databinding.BoardListItemBinding
+import programatorus.client.databinding.AllBoardsListItemBinding
 
-typealias ClickListener = (target: BoardListItem) -> Unit
+typealias ClickListener = (target: AllBoardsListItem) -> Unit
 
 class BoardListAdapter():
     RecyclerView.Adapter<BoardListAdapter.BoardItemViewHolder>() {
 
     val differ = AsyncListDiffer(
         this,
-        object : DiffUtil.ItemCallback<BoardListItem>() {
-            override fun areItemsTheSame(item: BoardListItem, other: BoardListItem): Boolean =
+        object : DiffUtil.ItemCallback<AllBoardsListItem>() {
+            override fun areItemsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
                 item == other
 
-            override fun areContentsTheSame(item: BoardListItem, other: BoardListItem): Boolean =
+            override fun areContentsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
                 item == other
         })
 
     private var onItemClickListener: ClickListener = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardItemViewHolder {
-        val binding = BoardListItemBinding.inflate(
+        val binding = AllBoardsListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false)
@@ -42,13 +42,12 @@ class BoardListAdapter():
 
     override fun getItemCount() = differ.currentList.size
 
-    fun setItems(boards: List<BoardListItem>) {
+    fun setItems(boards: List<AllBoardsListItem>) {
         differ.submitList(boards)
         notifyDataSetChanged()
     }
 
-    fun getItems(): MutableList<BoardListItem> {
-//        notifyDataSetChanged()
+    fun getItems(): MutableList<AllBoardsListItem> {
         return differ.currentList
     }
 
@@ -56,15 +55,14 @@ class BoardListAdapter():
         val list = differ.currentList.toMutableList()
         val item = list[from]
         list.removeAt(from)
-        val target = if (to < from) to + 1 else to - 1
-        list.add(target, item)
+        list.add(to, item)
         differ.submitList(list)
     }
 
-    inner class BoardItemViewHolder(private val binding: BoardListItemBinding)
+    inner class BoardItemViewHolder(private val binding: AllBoardsListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: BoardListItem, onItemClickListener: ClickListener) {
+        fun bind(item: AllBoardsListItem, onItemClickListener: ClickListener) {
             binding.filename.text = item.name
 
             binding.root.setOnClickListener {
