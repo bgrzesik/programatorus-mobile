@@ -7,14 +7,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
-import programatorus.client.comm.presentation.Messenger
-import programatorus.client.comm.presentation.ProtocolMessenger
+import programatorus.client.comm.presentation.*
 import programatorus.client.comm.presentation.mock.LoopbackMessenger
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.*
 import programatorus.client.comm.transport.io.PipedTransport
 import programatorus.client.comm.transport.mock.LoopbackTransport
 import programatorus.client.comm.transport.wrapper.Transport
@@ -29,40 +24,64 @@ open class ConnectionTest(
 ) {
 
     companion object {
-        private fun t(v: (ITransportClient) -> ITransport): Array<Any> {
-            return arrayOf(TestUtils.getTransportName(v), { client: IConnectionClient ->
-                v(object : ConnectionClientDelegate(client), ITransportClient {})
+        private fun test(t: ITransportProvider): Array<Any> =
+            arrayOf(TestUtils.getTransportName(t), { client: IConnectionClient ->
+                t.build(object : ConnectionClientDelegate(client), ITransportClient {})
             })
-        }
 
-        private fun m(v: (IMessageClient) -> IMessenger): Array<Any> {
-            return arrayOf(TestUtils.getMessengerName(v), { client: IConnectionClient ->
-                v(object : ConnectionClientDelegate(client), IMessageClient {})
+        private fun test(m: IMessengerProvider): Array<Any> =
+            arrayOf(TestUtils.getMessengerName(m), { client: IConnectionClient ->
+                m.build(object : ConnectionClientDelegate(client), IMessageClient {})
             })
-        }
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         @Suppress("NestedLambdaShadowedImplicitParameter")
         fun parameters(): Array<Array<Any>> = arrayOf(
-            // @formatter:off
-            t { Transport(::PipedTransport, it) },
-            t { PipedTransport(it) },
-            t { Transport(::LoopbackTransport, it) },
-            t { LoopbackTransport(it) },
-
-            m { ProtocolMessenger({ Transport(::PipedTransport, it) }, it) },
-            m { ProtocolMessenger({ PipedTransport(it) }, it) },
-            m { ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) },
-            m { ProtocolMessenger({ LoopbackTransport(it) }, it) },
-            m { LoopbackMessenger(it) },
-
-            m { Messenger({ ProtocolMessenger({ Transport(::PipedTransport, it) }, it) }, it) },
-            m { Messenger({ ProtocolMessenger({ PipedTransport(it) }, it) }, it) },
-            m { Messenger({ ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) }, it) },
-            m { Messenger({ ProtocolMessenger({ LoopbackTransport(it) }, it) }, it) },
-            m { Messenger({ LoopbackMessenger(it) }, it) },
-            // @formatter:on
+            test(Transport.Builder().setTransport(PipedTransport.Builder())),
+            test(PipedTransport.Builder()),
+            test(Transport.Builder().setTransport(LoopbackTransport.Builder())),
+            test(LoopbackTransport.Builder()),
+            test(
+                ProtocolMessenger.Builder()
+                    .setTransport(Transport.Builder().setTransport(PipedTransport.Builder()))
+            ),
+            test(
+                ProtocolMessenger.Builder().setTransport(PipedTransport.Builder())
+            ),
+            test(
+                ProtocolMessenger.Builder()
+                    .setTransport(Transport.Builder().setTransport(LoopbackTransport.Builder()))
+            ),
+            test(
+                ProtocolMessenger.Builder().setTransport(LoopbackTransport.Builder())
+            ),
+            test(LoopbackMessenger.Builder()),
+            test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder()
+                        .setTransport(Transport.Builder().setTransport(PipedTransport.Builder()))
+                )
+            ),
+            test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder().setTransport(PipedTransport.Builder())
+                )
+            ),
+            test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder()
+                        .setTransport(Transport.Builder().setTransport(LoopbackTransport.Builder()))
+                )
+            ),
+            test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder().setTransport(LoopbackTransport.Builder())
+                )
+            ),
+            test(
+                Messenger.Builder().setMessenger(LoopbackMessenger.Builder())
+            ),
         )
     }
 

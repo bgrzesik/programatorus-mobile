@@ -3,13 +3,17 @@ package programatorus.client.comm.presentation
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.comm.transport.ITransport
+import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.utils.HandlerActor
 import programus.proto.Protocol
+import programus.proto.Protocol.GenericMessage
 import java.util.concurrent.CompletableFuture
 
-class Messenger(
-    messengerProvider: (IMessageClient) -> IMessenger,
+class Messenger private constructor (
+    messenger: IMessengerProvider,
     client: IMessageClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper()),
     private val mClientHandler: Handler = Handler(Looper.getMainLooper())
@@ -20,7 +24,7 @@ class Messenger(
     }
 
     private val mClient = Client(client)
-    private val mImpl: IMessenger = messengerProvider(mClient)
+    private val mImpl: IMessenger = messenger.build(mClient, mHandler, mClientHandler)
 
     override val handler: Handler
         get() = mHandler
@@ -112,6 +116,21 @@ class Messenger(
             runOnLooper(null, false, mClientHandler) {
                 mClient.onError()
             }
+    }
+
+    class Builder : AbstractMessengerBuilder<Builder> () {
+        private var mMessenger: IMessengerProvider? = null
+
+        fun setMessenger(messenger: IMessengerProvider): Builder {
+            mMessenger = messenger
+            return this
+        }
+
+        override fun construct(
+            client: IMessageClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): IMessenger = Messenger(mMessenger!!, client, handler, clientHandler)
     }
 
 }

@@ -1,16 +1,20 @@
 package programatorus.client.comm.presentation.mock
 
+import android.bluetooth.BluetoothDevice
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import programatorus.client.comm.presentation.AbstractMessengerBuilder
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
 import programatorus.client.comm.presentation.IOutgoingMessage
 import programatorus.client.comm.transport.*
+import programatorus.client.comm.transport.bt.BluetoothTransport
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
-open class MockMessenger(
+open class MockMessenger internal constructor(
     private val mMockMessengerEndpoint: IMockMessengerEndpoint,
     private val mClient: IMessageClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper())
@@ -128,6 +132,22 @@ open class MockMessenger(
                 mClient.onMessageReceived(endpointResponse)
             }
         }
+    }
+
+
+    class Builder : AbstractMessengerBuilder<Builder>() {
+        private var mEndpoint: IMockMessengerEndpoint? = null
+
+        fun setEndpoint(endpoint: IMockMessengerEndpoint): Builder {
+            mEndpoint = endpoint
+            return this
+        }
+
+        override fun construct(
+            client: IMessageClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): IMessenger = MockMessenger(mEndpoint!!, client, handler)
     }
 
 }
