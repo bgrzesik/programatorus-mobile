@@ -1,7 +1,11 @@
 package programatorus.client.comm.transport.io
 
+import android.os.Handler
 import android.util.Log
+import programatorus.client.comm.transport.AbstractTransportBuilder
+import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.bt.BluetoothTransport
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream
@@ -47,4 +51,13 @@ class PipedTransport(
     }
 
     override fun toString(): String = "PipedTransport"
+
+
+    class Builder : AbstractTransportBuilder<Builder>() {
+        override fun construct(
+            client: ITransportClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): ITransport = PipedTransport(client)
+    }
 }

@@ -3,12 +3,8 @@ package programatorus.client.comm.transport.wrapper
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.IOutgoingPacket
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.*
 import programatorus.client.utils.HandlerActor
-import java.util.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -17,8 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean
  * TODO(bgrzesik) wrap mImpl method calls with try/catch
  */
 
-class Transport(
-    implProvider: (ITransportClient) -> ITransport,
+class Transport private constructor(
+    transport: ITransportProvider,
     client: ITransportClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper()),
     private val mClientHandler: Handler = mHandler
@@ -41,9 +37,9 @@ class Transport(
     private val mPendingPacket = LinkedBlockingQueue<TransportOutgoingPacket>()
     private var mErrorCount = 0
 
-    private var mClient: TransportClient = TransportClient(client)
+    private var mClient: Client = Client(client)
 
-    private var mImpl: ITransport = implProvider(mClient)
+    private var mImpl: ITransport = transport.build(mClient, mHandler, mClientHandler)
 
     override val state: ConnectionState
         get() {
@@ -118,18 +114,18 @@ class Transport(
     private fun pumpPendingPackets() = assertLooper {
         Log.d(
             TAG,
-            "pumpPendingPackets() Pumping pending packets. pendingCount=${mPendingPacket.size}"
+            "pumpPendingPackets(): Pumping pending packets. pendingCount=${mPendingPacket.size}"
         )
         if (mPendingPacket.isEmpty()) {
             return@assertLooper
         }
 
         val outgoing = mPendingPacket.peek()!!
-        if (!outgoing.mPending) {
+        if (!outgoing.mPending) { // TODO(bgrzesik): check
             return@assertLooper
         }
 
-        Log.d(TAG, "pumpPendingPackets() Sending packet and marking as pending")
+        Log.d(TAG, "pumpPendingPackets(): Sending packet and marking as pending")
         outgoing.mPending = true
         val implOutgoing = mImpl.send(outgoing.packet)
         outgoing.setOutgoingPacket(implOutgoing)
@@ -200,7 +196,7 @@ class Transport(
         }
     }
 
-    private inner class TransportClient(
+    private inner class Client(
         private val mClient: ITransportClient
     ) : ITransportClient {
 
@@ -228,5 +224,20 @@ class Transport(
 
             mClientHandler.post { mClient.onError() }
         }
+    }
+
+    class Builder : AbstractTransportBuilder<Builder>() {
+        private var mTransport: ITransportProvider? = null
+
+        fun setTransport(transport: ITransportProvider): Builder {
+            mTransport = transport
+            return this
+        }
+
+        override fun construct(
+            client: ITransportClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): ITransport = Transport(mTransport!!, client, handler, clientHandler)
     }
 }

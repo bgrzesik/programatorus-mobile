@@ -6,9 +6,12 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Handler
 import android.util.Log
 import androidx.core.content.ContextCompat
 import programatorus.client.WeakRefFactoryMixin
+import programatorus.client.comm.transport.AbstractTransportBuilder
+import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.io.StreamingTransport
 import java.io.IOException
@@ -24,14 +27,13 @@ class BluetoothTransport(
 
     companion object {
         private const val TAG = "BluetoothTransport"
-        private val BT_SERVICE_UUID: UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
+        private val BT_SERVICE_UUID: UUID = UUID.fromString("0446eb5c-d775-11ec-9d64-0242ac120002")
     }
 
     private var mSocket: BluetoothSocket? = null
 
     override var inputStream: InputStream? = null
         private set
-
     override var outputStream: OutputStream? = null
         private set
 
@@ -75,4 +77,24 @@ class BluetoothTransport(
 
     override fun toString(): String = "BluetoothTransport"
 
+    class Builder : AbstractTransportBuilder<Builder>() {
+        private var mContext: Context? = null
+        private var mDevice: BluetoothDevice? = null
+
+        fun setContext(context: Context): Builder {
+            mContext = context
+            return this
+        }
+
+        fun setDevice(device: BluetoothDevice): Builder {
+            mDevice = device
+            return this
+        }
+
+        override fun construct(
+            client: ITransportClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): ITransport = BluetoothTransport(mContext!!, mDevice!!, client)
+    }
 }

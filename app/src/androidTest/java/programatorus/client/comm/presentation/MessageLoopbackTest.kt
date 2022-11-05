@@ -20,35 +20,56 @@ import java.util.concurrent.TimeUnit
 @RunWith(Parameterized::class)
 open class MessageLoopbackTest(
     private var mTestName: String,
-    private var mProvider: (IMessageClient) -> IMessenger,
+    private var mProvider: IMessengerProvider,
     private var mCount: Int
 ) {
 
     companion object {
         private const val TAG = "MessageLoopbackTest"
 
-        private fun test(v: (IMessageClient) -> IMessenger): Array<Array<Any>> {
+        private fun test(messenger: IMessengerProvider): Array<Array<Any>> {
             val counts = arrayOf(0, 1, 10, 100)
-            val name = TestUtils.getMessengerName(v)
-            return counts.map { arrayOf(name, v, it) }.toTypedArray()
+            val name = TestUtils.getMessengerName(messenger)
+            return counts.map { arrayOf(name, messenger, it) }.toTypedArray()
         }
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0} x {2}")
-        @Suppress("NestedLambdaShadowedImplicitParameter")
         internal fun parameters(): Array<Array<Any>> = arrayOf(
-            // @formatter:off
-            *test { ProtocolMessenger({ Transport(::PipedTransport, it) }, it) },
-            *test { ProtocolMessenger({ PipedTransport(it) }, it) },
-            *test { ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) },
-            *test { ProtocolMessenger({ LoopbackTransport(it) }, it) },
-            *test { LoopbackMessenger(it) },
-            *test { Messenger({ ProtocolMessenger({ Transport(::PipedTransport, it) }, it) }, it) },
-            *test { Messenger({ ProtocolMessenger({ PipedTransport(it) }, it) }, it) },
-            *test { Messenger({ ProtocolMessenger({ Transport(::LoopbackTransport, it) }, it) }, it) },
-            *test { Messenger({ ProtocolMessenger({ LoopbackTransport(it) }, it) }, it) },
-            *test { Messenger({ LoopbackMessenger(it) }, it) },
-            // @formatter:on
+            *test(
+                ProtocolMessenger.Builder()
+                    .setTransport(Transport.Builder().setTransport(PipedTransport.Builder()))
+            ),
+            *test(ProtocolMessenger.Builder().setTransport(PipedTransport.Builder())),
+            *test(
+                ProtocolMessenger.Builder()
+                    .setTransport(Transport.Builder().setTransport(LoopbackTransport.Builder()))
+            ),
+            *test(ProtocolMessenger.Builder().setTransport(LoopbackTransport.Builder())),
+            *test(LoopbackMessenger.Builder()),
+            *test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder()
+                        .setTransport(Transport.Builder().setTransport(PipedTransport.Builder()))
+                )
+            ),
+            *test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder().setTransport(PipedTransport.Builder())
+                )
+            ),
+            *test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder()
+                        .setTransport(Transport.Builder().setTransport(LoopbackTransport.Builder()))
+                )
+            ),
+            *test(
+                Messenger.Builder().setMessenger(
+                    ProtocolMessenger.Builder().setTransport(LoopbackTransport.Builder())
+                )
+            ),
+            *test(Messenger.Builder().setMessenger(LoopbackMessenger.Builder())),
         )
     }
 
@@ -74,7 +95,7 @@ open class MessageLoopbackTest(
             override fun onError() = Assert.fail("Transport Client caught error")
         }
 
-        val transport = mProvider(client)
+        val transport = mProvider.build(client)
 
         val messages = mutableListOf<Protocol.GenericMessage>()
         for (i in 0 until mCount) {

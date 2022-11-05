@@ -1,14 +1,17 @@
 package programatorus.client.comm.transport.mock
 
+import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.IOutgoingPacket
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.presentation.AbstractMessengerBuilder
+import programatorus.client.comm.presentation.IMessageClient
+import programatorus.client.comm.presentation.IMessenger
+import programatorus.client.comm.presentation.mock.IMockMessengerEndpoint
+import programatorus.client.comm.presentation.mock.MockMessenger
+import programatorus.client.comm.transport.*
 import java.util.concurrent.CompletableFuture
 
-open class MockTransport(
+open class MockTransport internal constructor(
     private val mMockTransportEndpoint: IMockTransportEndpoint,
     private val mClient: ITransportClient,
 ) : AbstractConnection(mClient), ITransport {
@@ -43,6 +46,8 @@ open class MockTransport(
         Log.d(TAG, "reconnect()")
         if (state == ConnectionState.CONNECTED) {
             Log.d(TAG, "already connected")
+            state = ConnectionState.DISCONNECTING
+            state = ConnectionState.DISCONNECTED
         }
 
         assert(state == ConnectionState.DISCONNECTED)
@@ -83,17 +88,32 @@ open class MockTransport(
         fun send() {
             assert(state == ConnectionState.CONNECTED)
 
-            Log.d(TAG, "Sending to mocked endpoint")
+            Log.d(TAG, "send(): Sending to mocked endpoint")
             val endpointResponse = mMockTransportEndpoint.onPacket(packet)
 
             response.complete(this)
 
             if (endpointResponse != null) {
-                Log.d(TAG, "Mocked endpoint response")
+                Log.d(TAG, "send(): Mocked endpoint response")
                 mockPacket(endpointResponse)
             }
         }
     }
 
     override fun toString(): String = "MockTransport[$mMockTransportEndpoint]"
+
+    class Builder : AbstractTransportBuilder<Builder>() {
+        private var mEndpoint: IMockTransportEndpoint? = null
+
+        fun setEndpoint(endpoint: IMockTransportEndpoint): Builder {
+            mEndpoint = endpoint
+            return this
+        }
+
+        override fun construct(
+            client: ITransportClient,
+            handler: Handler,
+            clientHandler: Handler
+        ): ITransport = MockTransport(mEndpoint!!, client)
+    }
 }

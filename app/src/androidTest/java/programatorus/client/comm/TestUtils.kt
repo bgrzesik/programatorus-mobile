@@ -7,8 +7,10 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
+import programatorus.client.comm.presentation.IMessengerProvider
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.ITransportProvider
 import programus.proto.Protocol
 
 
@@ -36,10 +38,10 @@ object TestUtils {
         return t
     }
 
-    fun getMessengerName(v: (IMessageClient) -> IMessenger): String =
-        mockLooper { v(object : IMessageClient {}).toString() }
+    fun getMessengerName(v: IMessengerProvider): String =
+        mockLooper { v.build(object : IMessageClient {}).toString() }
 
-    fun getTransportName(v: (ITransportClient) -> ITransport): String =
-        mockLooper { v(object : ITransportClient {}).toString() }
+    fun getTransportName(v: ITransportProvider): String =
+        mockLooper { v.build(object : ITransportClient {}).toString() }
 
 }
