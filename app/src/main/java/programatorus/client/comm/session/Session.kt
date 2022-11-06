@@ -76,9 +76,9 @@ class Session private constructor(
     override val state: ConnectionState
         get() = mMessenger.state
 
-    override fun reconnect() = mMessenger.reconnect()
+    override fun reconnect() = runOnLooper { mMessenger.reconnect() }
 
-    override fun disconnect() = mMessenger.disconnect()
+    override fun disconnect() = runOnLooper { mMessenger.disconnect() }
 
     private fun processControlRequests(message: GenericMessage): GenericMessage? = assertLooper {
         Log.d(TAG, "processControlRequests(): payLoadCase=${message.payloadCase}")
