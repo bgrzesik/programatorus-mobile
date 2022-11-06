@@ -9,8 +9,10 @@ import android.view.ViewGroup
 import androidx.core.view.get
 import com.google.android.material.tabs.TabLayout
 import programatorus.client.databinding.FragmentManageBoardsBinding
+import programatorus.client.model.Board
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
+import programatorus.client.shared.ConfigurationsManager
 
 
 class ManageBoardsFragment : Fragment() {
@@ -18,6 +20,13 @@ class ManageBoardsFragment : Fragment() {
     private var _binding: FragmentManageBoardsBinding? = null
 
     private val binding get() = _binding!!
+
+    private val configurationsManager = ConfigurationsManager<Board>(
+        (1..12).map { Board(it.toString(), false) },
+        (1..12).map { Board(it.toString(), false) }
+    )
+
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,20 +62,25 @@ class ManageBoardsFragment : Fragment() {
         binding.allBoards.visibility = View.VISIBLE
 
         binding.favBoards.enableTouch()
-        binding.favBoards.setBoards(
-            (1..12).map { FavBoardsListItem(it.toString()) }
-        )
-
+//        binding.favBoards.setBoards(
+//            (1..12).map { FavBoardsListItem(it.toString()) }
+//        )
+//
+//
+//        binding.allBoards.setBoards(
+//            (1..12).map { AllBoardsListItem(it.toString()) }
+//        )
 
         binding.allBoards.setBoards(
-            (1..12).map { AllBoardsListItem(it.toString()) }
+            configurationsManager.getAll().map { AllBoardsListItem.from(it) }
         )
 
-        Log.d("TABS", binding.tabs[0].toString())
+        binding.favBoards.setBoards(
+            configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
+        )
 
-
-        binding.tabs.getTabAt(0)?.view?.setOnClickListener{ useAll() }
-        binding.tabs.getTabAt(1)?.view?.setOnClickListener{ useFavorites() }
+        binding.tabs.getTabAt(ALL)?.view?.setOnClickListener{ useAll() }
+        binding.tabs.getTabAt(FAVORITES)?.view?.setOnClickListener{ useFavorites() }
 
         binding.btn.setOnClickListener {
             Log.d("fav list:", "fav ${binding.favBoards.getBoards()} \n all ${binding.allBoards.getBoards()}")
@@ -77,5 +91,10 @@ class ManageBoardsFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        val ALL = 0
+        val FAVORITES = 1
     }
 }

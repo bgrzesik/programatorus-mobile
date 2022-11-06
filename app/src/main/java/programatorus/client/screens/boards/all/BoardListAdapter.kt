@@ -48,17 +48,9 @@ class BoardListAdapter():
         notifyDataSetChanged()
     }
 
-    fun getItems(): MutableList<AllBoardsListItem> {
+    fun getItems(): List<AllBoardsListItem> {
         return differ.currentList
     }
-
-//    fun toggleFavorite(item: AllBoardsListItem) {
-//        differ.submitList(
-//            differ.currentList.map {
-//                if (it == item) item.toggle() else it
-//            }
-//        )
-//    }
 
     inner class BoardItemViewHolder(private val binding: AllBoardsListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
