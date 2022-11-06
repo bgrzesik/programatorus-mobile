@@ -2,6 +2,7 @@ import com.google.protobuf.gradle.*
 import org.gradle.kotlin.dsl.protobuf
 import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 plugins {
     id("com.android.application")

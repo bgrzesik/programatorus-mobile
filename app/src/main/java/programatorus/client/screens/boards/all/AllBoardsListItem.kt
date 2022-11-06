@@ -1,5 +1,6 @@
 package programatorus.client.screens.boards.all
 
+import programatorus.client.model.Board
 import java.util.concurrent.atomic.AtomicBoolean
 
 data class AllBoardsListItem(val name: String, var isSelected: AtomicBoolean = AtomicBoolean(false)){
@@ -17,6 +18,9 @@ data class AllBoardsListItem(val name: String, var isSelected: AtomicBoolean = A
     companion object {
         fun from(name: String, value: Boolean): AllBoardsListItem =
             AllBoardsListItem(name, AtomicBoolean(value))
+
+        fun from(board: Board): AllBoardsListItem =
+            AllBoardsListItem(board.name, AtomicBoolean(board.isFavorite))
     }
 }
 
