@@ -43,6 +43,9 @@ open class SessionPairTest(
 
     }
 
+    @Before
+    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
+
     private fun testPair(
         leftClient: ISessionClient,
         rightClient: ISessionClient,
@@ -63,9 +66,6 @@ open class SessionPairTest(
         left.disconnect()
         right.disconnect()
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 3000)
     fun testConnected() {
