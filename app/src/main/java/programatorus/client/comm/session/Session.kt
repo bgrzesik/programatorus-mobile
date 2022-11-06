@@ -63,7 +63,7 @@ class Session private constructor(
             GenericMessage.newBuilder(message)
                 .setSessionId(
                     mSessionId ?: -1
-                ) // TODO(bgrzesik): Initialize the session and assign a session ID
+                )
                 .setRequestId(mNextRequestId.incrementAndGet())
                 .build()
         )

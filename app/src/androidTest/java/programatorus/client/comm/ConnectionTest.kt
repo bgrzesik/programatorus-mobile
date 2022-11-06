@@ -34,7 +34,6 @@ open class ConnectionTest(
 
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        @Suppress("NestedLambdaShadowedImplicitParameter")
         fun parameters(): Array<Array<Any>> = arrayOf(
             test(Transport.Builder().setTransport(PipedTransport.Builder())),
             test(PipedTransport.Builder()),
