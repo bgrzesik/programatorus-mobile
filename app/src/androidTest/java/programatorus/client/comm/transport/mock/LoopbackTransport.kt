@@ -1,17 +1,14 @@
 package programatorus.client.comm.transport.mock
 
 import android.os.Handler
-import programatorus.client.comm.presentation.AbstractMessengerBuilder
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
-import programatorus.client.comm.presentation.mock.LoopbackMessenger
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
 
 class LoopbackTransport private constructor(
-    client: ITransportClient
-) : MockTransport(Endpoint(), client) {
+    client: ITransportClient,
+    disconnectOnReconnect: Boolean
+) : MockTransport(Endpoint(), client, disconnectOnReconnect) {
 
     override fun toString(): String = "LoopbackTransport"
 
@@ -20,11 +17,18 @@ class LoopbackTransport private constructor(
     }
 
     class Builder : AbstractTransportBuilder<Builder>() {
+        private var mDisconnectOnReconnect: Boolean = false
+
+        fun setDisconnectOnReconnect(disconnectOnReconnect: Boolean): Builder {
+            mDisconnectOnReconnect = disconnectOnReconnect
+            return this
+        }
+
         override fun construct(
             client: ITransportClient,
             handler: Handler,
             clientHandler: Handler
-        ): ITransport = LoopbackTransport(client)
+        ): ITransport = LoopbackTransport(client, mDisconnectOnReconnect)
     }
 
 }

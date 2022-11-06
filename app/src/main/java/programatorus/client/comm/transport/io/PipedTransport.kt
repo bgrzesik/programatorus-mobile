@@ -5,7 +5,6 @@ import android.util.Log
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
-import programatorus.client.comm.transport.bt.BluetoothTransport
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.PipedInputStream

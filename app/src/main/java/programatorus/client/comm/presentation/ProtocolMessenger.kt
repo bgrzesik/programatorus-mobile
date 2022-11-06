@@ -16,7 +16,7 @@ class ProtocolMessenger private constructor(
     private val mTransport: ITransport = transport.build(mTransportClient)
 
     companion object {
-        const val TAG = "Messenger"
+        const val TAG = "ProtocolMessenger"
     }
 
     override val state: ConnectionState
@@ -49,8 +49,13 @@ class ProtocolMessenger private constructor(
     }
 
     private inner class Client : ConnectionClientDelegate(mClient), ITransportClient {
-        override fun onPacketReceived(packet: ByteArray) =
-            mClient.onMessageReceived(Protocol.GenericMessage.parseFrom(packet))
+        override fun onPacketReceived(packet: ByteArray) {
+            try {
+                mClient.onMessageReceived(Protocol.GenericMessage.parseFrom(packet))
+            } catch (th: Throwable) {
+                Log.e(TAG, "onPacketReceived():", th)
+            }
+        }
     }
 
     class Builder : AbstractMessengerBuilder<Builder>() {

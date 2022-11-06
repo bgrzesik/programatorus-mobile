@@ -5,8 +5,9 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
+import org.hamcrest.CoreMatchers
+import org.junit.Assume
 import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
 import programatorus.client.comm.presentation.IMessengerProvider
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
@@ -19,7 +20,23 @@ object TestUtils {
     val isAndroid: Boolean
         get() = System.getProperty("java.specification.vendor") == "The Android Project"
 
-    fun newTestMessage() = Protocol.GenericMessage.newBuilder()
+    fun assumeAndroid() {
+        Assume.assumeThat(
+            "Those tests should not be ran on Android",
+            System.getProperty("java.specification.vendor"),
+            CoreMatchers.`is`("The Android Project")
+        )
+    }
+
+    fun assumeNotAndroid() {
+        Assume.assumeThat(
+            "Those tests should not be ran on Android",
+            System.getProperty("java.specification.vendor"),
+            CoreMatchers.not("The Android Project")
+        )
+    }
+
+    fun newTestMessage() = GenericMessage.newBuilder()
         .setSessionId(10)
         .setTest(Protocol.TestMessage.newBuilder().apply {
             value = "Test 1234"

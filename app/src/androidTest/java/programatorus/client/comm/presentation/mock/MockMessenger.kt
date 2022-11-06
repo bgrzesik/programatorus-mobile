@@ -1,24 +1,21 @@
 package programatorus.client.comm.presentation.mock
 
-import android.bluetooth.BluetoothDevice
-import android.content.Context
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
+import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.presentation.AbstractMessengerBuilder
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
 import programatorus.client.comm.presentation.IOutgoingMessage
-import programatorus.client.comm.transport.*
-import programatorus.client.comm.transport.bt.BluetoothTransport
+import programatorus.client.comm.transport.ConnectionState
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
 open class MockMessenger internal constructor(
     private val mMockMessengerEndpoint: IMockMessengerEndpoint,
     private val mClient: IMessageClient,
-    private val mHandler: Handler = Handler(Looper.getMainLooper())
-) : IMessenger {
+    private val mDisconnectOnReconnect: Boolean,
+) : AbstractConnection(mClient), IMessenger {
 
     private val mMessageQueue = ArrayDeque<PendingMessage>()
 
@@ -26,20 +23,10 @@ open class MockMessenger internal constructor(
         const val TAG = "MockMessenger"
     }
 
-    override var state: ConnectionState = ConnectionState.DISCONNECTED
-        set(value) {
-            if (field != value) {
-                mClient.onStateChanged(value)
-                field = value
-            }
-        }
-
     override fun send(message: Protocol.GenericMessage): IOutgoingMessage {
         val pending = PendingMessage(message)
-        mHandler.post {
-            mMessageQueue.addLast(pending)
-            pumpPendingMessages()
-        }
+        mMessageQueue.addLast(pending)
+        pumpPendingMessages()
         return pending
     }
 
@@ -48,8 +35,8 @@ open class MockMessenger internal constructor(
 
         if (state != ConnectionState.CONNECTED) {
             reconnect()
-            mHandler.post(this::pumpPendingMessages)
-            return;
+            this.pumpPendingMessages()
+            return
         }
 
         while (!mMessageQueue.isEmpty()) {
@@ -61,55 +48,45 @@ open class MockMessenger internal constructor(
 
     override fun reconnect() {
         Log.d(TAG, "reconnect()")
-        mHandler.post {
-            Log.d(TAG, "reconnect task")
-            if (state == ConnectionState.CONNECTED) {
-                Log.d(TAG, "already connected")
-                return@post
+        if (state == ConnectionState.CONNECTED) {
+            Log.d(TAG, "already connected")
+            if (!mDisconnectOnReconnect) {
+                return
             }
-
-            assert(state == ConnectionState.DISCONNECTED)
-
-            state = ConnectionState.CONNECTING
-            state = ConnectionState.CONNECTED
+            disconnect()
         }
+
+        assert(state == ConnectionState.DISCONNECTED)
+
+        state = ConnectionState.CONNECTING
+        state = ConnectionState.CONNECTED
     }
 
     override fun disconnect() {
         Log.d(TAG, "disconnect()")
-        mHandler.post {
-            Log.d(TAG, "disconnect task")
 
-            if (state == ConnectionState.DISCONNECTED) {
-                Log.d(TAG, "already disconnected")
-                return@post
-            }
-
-            assert(state == ConnectionState.CONNECTED)
-
-            state = ConnectionState.DISCONNECTING
-            state = ConnectionState.DISCONNECTED
+        if (state == ConnectionState.DISCONNECTED) {
+            Log.d(TAG, "already disconnected")
+            return
         }
+
+        assert(state == ConnectionState.CONNECTED)
+
+        state = ConnectionState.DISCONNECTING
+        state = ConnectionState.DISCONNECTED
     }
 
     fun mockPacket(packet: Protocol.GenericMessage) {
         Log.d(TAG, "mockPacket()")
-        mHandler.post {
-            Log.d(TAG, "mock packet task")
 
-            assert(state == ConnectionState.CONNECTED)
-            mClient.onMessageReceived(packet)
-        }
+        assert(state == ConnectionState.CONNECTED)
+        mClient.onMessageReceived(packet)
     }
 
     fun mockError() {
         Log.d(TAG, "mockError()")
 
-        mHandler.post {
-            Log.d(TAG, "mock error task")
-
-            mClient.onError()
-        }
+        mClient.onError()
     }
 
     override fun toString(): String = "MockMessenger[$mMockMessengerEndpoint]"
@@ -129,7 +106,7 @@ open class MockMessenger internal constructor(
 
             if (endpointResponse != null) {
                 Log.d(TAG, "Mocked endpoint response")
-                mClient.onMessageReceived(endpointResponse)
+                mockPacket(endpointResponse)
             }
         }
     }
@@ -137,9 +114,15 @@ open class MockMessenger internal constructor(
 
     class Builder : AbstractMessengerBuilder<Builder>() {
         private var mEndpoint: IMockMessengerEndpoint? = null
+        private var mDisconnectOnReconnect: Boolean = false
 
         fun setEndpoint(endpoint: IMockMessengerEndpoint): Builder {
             mEndpoint = endpoint
+            return this
+        }
+
+        fun setDisconnectOnReconnect(disconnectOnReconnect: Boolean): Builder {
+            mDisconnectOnReconnect = disconnectOnReconnect
             return this
         }
 
@@ -147,7 +130,7 @@ open class MockMessenger internal constructor(
             client: IMessageClient,
             handler: Handler,
             clientHandler: Handler
-        ): IMessenger = MockMessenger(mEndpoint!!, client, handler)
+        ): IMessenger = MockMessenger(mEndpoint!!, client, mDisconnectOnReconnect)
     }
 
 }

@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Handler
 import android.util.Log
 import androidx.core.content.ContextCompat
-import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient

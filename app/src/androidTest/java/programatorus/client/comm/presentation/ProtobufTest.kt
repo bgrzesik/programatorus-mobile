@@ -3,7 +3,8 @@ package programatorus.client.comm.presentation
 import org.junit.Test
 import programatorus.client.comm.TestUtils
 import programus.proto.Protocol
-import java.io.*
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 
 
 class ProtobufTest {

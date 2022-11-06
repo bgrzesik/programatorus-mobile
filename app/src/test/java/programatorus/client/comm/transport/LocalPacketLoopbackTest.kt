@@ -6,22 +6,18 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import programatorus.AndroidMocker
+import programatorus.client.comm.TestUtils
 
 @RunWith(Parameterized::class)
 class LocalPacketLoopbackTest(
     testName: String,
-    provider: (ITransportClient) -> ITransport,
+    provider: ITransportProvider,
     count: Int
 ): PacketLoopbackTest(testName, provider, count) {
     @get:Rule
     val androidMocker = AndroidMocker()
 
     @Before
-    override fun assumeRunOnAndroid() {
-        Assume.assumeThat(
-            "Those tests should not be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            not("The Android Project")
-        )
-    }
+    override fun assumeRunOnAndroid() = TestUtils.assumeNotAndroid()
 }

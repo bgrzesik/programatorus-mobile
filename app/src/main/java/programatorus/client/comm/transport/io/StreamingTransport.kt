@@ -1,22 +1,20 @@
 package programatorus.client.comm.transport.io
 
 import android.util.Log
-import programatorus.client.WeakRefFactoryMixin
 import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
-import java.lang.ref.WeakReference
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 abstract class StreamingTransport<T : StreamingTransport<T>>(
-    client: ITransportClient,
-) : AbstractConnection(client), ITransport {
+    private val mClient: ITransportClient,
+) : AbstractConnection(mClient), ITransport {
 
     companion object {
         private const val TAG = "StreamingTransport"
@@ -40,6 +38,9 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
     protected abstract fun doDisconnect()
 
+    protected open val disconnectOnReconnect: Boolean
+        get() = true
+
     override fun send(packet: ByteArray): OutgoingPacket {
         Log.d(TAG, "send()")
         val outgoing = OutgoingPacket(packet)
@@ -55,7 +56,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
     override fun reconnect() {
         Log.d(TAG, "reconnect()")
-        if (isConnected) {
+        if (isConnected && disconnectOnReconnect) {
             disconnect()
         }
         connect()
@@ -63,7 +64,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
     private fun connect() {
         Log.d(TAG, "connect()")
-        if (isConnected || inputStream != null || outputStream != null) {
+        if ((isConnected || inputStream != null || outputStream != null) && disconnectOnReconnect) {
             disconnect()
         }
 
@@ -75,10 +76,10 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
             return
         }
 
-        mInputThread = IOThread(this::inputThreadTask)
+        mInputThread = IOThread("input", this::inputThreadTask)
         mInputThread?.start()
 
-        mOutputThread = IOThread(this::outputThreadTask)
+        mOutputThread = IOThread("output", this::outputThreadTask)
         mOutputThread?.start()
 
         state = ConnectionState.CONNECTED
@@ -88,13 +89,14 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
      * This function is ran on mInputThread, NOT ON mExecutor
      */
     private fun inputThreadTask() {
-        Log.d(TAG, "Trying to parse from input stream")
+        Log.d(TAG, "inputThreadTask(): Trying to parse from input stream")
 
         val dataInputStream = DataInputStream(inputStream!!)
         val size = dataInputStream.readInt()
 
         if (size > MAX_SIZE) {
-            throw IOException("Too big packet requested")
+            // TODO(bgrzesik): ignore those bytes
+            throw IOException("inputThreadTask(): Too big packet requested")
         }
 
         val buffer = ByteArray(size)
@@ -109,26 +111,27 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
             pos += read
         }
-        Log.d(TAG, "Received packet size=$size")
+        Log.d(TAG, "inputThreadTask(): Received packet size=$size")
 
-        client.onPacketReceived(buffer)
+        mClient.onPacketReceived(buffer)
     }
 
     /**
-     * This function is ran on mOutputThread, NOT ON mExecutor
+     * This function is ran on mOutputThread
      */
     private fun outputThreadTask() {
-        Log.d(TAG, "Dequeueing from output queue")
+        Log.d(TAG, "outputThreadTask(): Dequeueing from output queue")
         val outgoing = mOutputQueue.poll(Long.MAX_VALUE, TimeUnit.HOURS) ?: return
 
         try {
-            Log.d(TAG, "Trying to write to output stream")
+            Log.d(TAG, "outputThreadTask(): Trying to write to output stream")
 
             val dataOutgoingStream = DataOutputStream(outputStream!!)
             dataOutgoingStream.writeInt(outgoing.packet.size)
             dataOutgoingStream.write(outgoing.packet, 0, outgoing.packet.size)
 
             outputStream?.flush()
+            Log.d(TAG, "outputThreadTask(): Successfully sent packet size=${outgoing.packet.size}")
 
             outgoing.response.complete(outgoing)
         } catch (th: Throwable) {
@@ -142,8 +145,11 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
         mRunning.set(false)
 
-        mInputThread?.interrupt()
-        mOutputThread?.interrupt()
+        try {
+            mInputThread?.interrupt()
+            mOutputThread?.interrupt()
+        } catch (_: Throwable) {
+        }
 
         mInputThread = null
         mOutputThread = null
@@ -154,8 +160,9 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
     }
 
     private inner class IOThread<T : StreamingTransport<T>>(
+        name: String,
         private val mIoOperation: () -> Unit
-    ) : Thread() {
+    ) : Thread("IO Thread - $name") {
 
         override fun run() {
             try {
@@ -163,17 +170,23 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
                     try {
                         mIoOperation()
                     } catch (th: InterruptedIOException) {
-                        if (!isConnected)
+                        if (!mRunning.get())
                             return
-                        Log.e(TAG, "", th)
+                        Log.e(TAG, "run(): ", th)
                     } catch (th: InterruptedException) {
-                        if (!isConnected)
+                        if (!mRunning.get())
                             return
-                        Log.e(TAG, "", th)
+                        Log.e(TAG, "run(): ", th)
                     }
                 }
             } catch (th: Throwable) {
-                Log.e(TAG, "IO thread dead", th)
+                if (!mRunning.get())
+                    return
+                try {
+                    Log.e(TAG, "run(): IO thread dead", th)
+                } catch (_: RuntimeException) {
+                    th.printStackTrace()
+                }
             }
         }
     }

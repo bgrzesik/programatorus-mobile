@@ -1,7 +1,6 @@
 package programatorus.client.comm.presentation.mock
 
 import android.os.Handler
-import android.os.Looper
 import programatorus.client.comm.presentation.AbstractMessengerBuilder
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
@@ -9,8 +8,8 @@ import programus.proto.Protocol
 
 class LoopbackMessenger private constructor(
     client: IMessageClient,
-    handler: Handler = Handler(Looper.getMainLooper())
-) : MockMessenger(Endpoint(), client, handler) {
+    disconnectOnReconnect: Boolean,
+) : MockMessenger(Endpoint(), client, disconnectOnReconnect) {
 
     override fun toString(): String = "LoopbackMessenger"
 
@@ -19,11 +18,18 @@ class LoopbackMessenger private constructor(
     }
 
     class Builder : AbstractMessengerBuilder<Builder>() {
+        private var mDisconnectOnReconnect: Boolean = false
+
+        fun setDisconnectOnReconnect(disconnectOnReconnect: Boolean): Builder {
+            mDisconnectOnReconnect = disconnectOnReconnect
+            return this
+        }
+
         override fun construct(
             client: IMessageClient,
             handler: Handler,
             clientHandler: Handler
-        ): IMessenger = LoopbackMessenger(client, handler)
+        ): IMessenger = LoopbackMessenger(client, mDisconnectOnReconnect)
     }
 
 }
