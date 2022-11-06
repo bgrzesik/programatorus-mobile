@@ -1,8 +1,6 @@
 package programatorus.client.comm
 
-import org.hamcrest.CoreMatchers
 import org.junit.Assert
-import org.junit.Assume
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,13 +84,7 @@ open class ConnectionTest(
     }
 
     @Before
-    open fun assumeRunOnAndroid() {
-        Assume.assumeThat(
-            "Those tests should be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            CoreMatchers.`is`("The Android Project")
-        )
-    }
+    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 5000)
     fun testStateMachine() {

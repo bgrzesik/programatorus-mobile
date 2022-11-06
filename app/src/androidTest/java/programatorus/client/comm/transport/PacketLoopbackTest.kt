@@ -1,9 +1,7 @@
 package programatorus.client.comm.transport
 
 import android.util.Log
-import org.hamcrest.CoreMatchers.`is`
 import org.junit.Assert
-import org.junit.Assume
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -43,13 +41,7 @@ open class PacketLoopbackTest(
     }
 
     @Before
-    open fun assumeRunOnAndroid() {
-        Assume.assumeThat(
-            "Those tests should be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            `is`("The Android Project")
-        )
-    }
+    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 8000)
     fun testLoopbackSendReceive() {

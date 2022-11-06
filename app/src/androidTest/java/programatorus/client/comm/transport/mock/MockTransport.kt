@@ -3,17 +3,13 @@ package programatorus.client.comm.transport.mock
 import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
-import programatorus.client.comm.presentation.AbstractMessengerBuilder
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
-import programatorus.client.comm.presentation.mock.IMockMessengerEndpoint
-import programatorus.client.comm.presentation.mock.MockMessenger
 import programatorus.client.comm.transport.*
 import java.util.concurrent.CompletableFuture
 
 open class MockTransport internal constructor(
     private val mMockTransportEndpoint: IMockTransportEndpoint,
     private val mClient: ITransportClient,
+    private val mDisconnectOnReconnect: Boolean,
 ) : AbstractConnection(mClient), ITransport {
 
     private val mMessageQueue = ArrayDeque<PendingPacket>()
@@ -46,6 +42,9 @@ open class MockTransport internal constructor(
         Log.d(TAG, "reconnect()")
         if (state == ConnectionState.CONNECTED) {
             Log.d(TAG, "already connected")
+            if (!mDisconnectOnReconnect) {
+                return
+            }
             state = ConnectionState.DISCONNECTING
             state = ConnectionState.DISCONNECTED
         }
@@ -104,9 +103,15 @@ open class MockTransport internal constructor(
 
     class Builder : AbstractTransportBuilder<Builder>() {
         private var mEndpoint: IMockTransportEndpoint? = null
+        private var mDisconnectOnReconnect: Boolean = false
 
         fun setEndpoint(endpoint: IMockTransportEndpoint): Builder {
             mEndpoint = endpoint
+            return this
+        }
+
+        fun setDisconnectOnReconnect(disconnectOnReconnect: Boolean): Builder {
+            mDisconnectOnReconnect = disconnectOnReconnect
             return this
         }
 
@@ -114,6 +119,6 @@ open class MockTransport internal constructor(
             client: ITransportClient,
             handler: Handler,
             clientHandler: Handler
-        ): ITransport = MockTransport(mEndpoint!!, client)
+        ): ITransport = MockTransport(mEndpoint!!, client, mDisconnectOnReconnect)
     }
 }

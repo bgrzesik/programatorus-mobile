@@ -1,4 +1,4 @@
-package programatorus.client.comm.transport
+package programatorus
 
 import android.os.Handler
 import android.os.Looper
@@ -11,6 +11,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
 
 class AndroidMocker : TestWatcher() {
@@ -58,7 +59,11 @@ class AndroidMocker : TestWatcher() {
             return
         }
 
-        mScheduler = Executors.newScheduledThreadPool(1)
+        mScheduler = Executors.newScheduledThreadPool(1) { r ->
+            Thread(r).apply {
+                name = "Mock Looper Thread"
+            }
+        }
         mGoodThread = ThreadLocal.withInitial { false }
 
         mScheduler!!.submit {

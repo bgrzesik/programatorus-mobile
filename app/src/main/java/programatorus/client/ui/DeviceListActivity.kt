@@ -1,18 +1,20 @@
 package programatorus.client.ui
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.os.Bundle
 import android.content.Intent
-import androidx.core.app.ActivityCompat
 import android.content.pm.PackageManager
-import android.widget.AdapterView.OnItemClickListener
+import android.os.Bundle
 import android.view.View
-import android.widget.*
+import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import programatorus.client.R
-import java.util.ArrayList
 
 class DeviceListActivity : AppCompatActivity() {
     var mDeviceList: ListView? = null

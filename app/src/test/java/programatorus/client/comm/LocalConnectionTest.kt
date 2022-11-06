@@ -6,9 +6,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
-import programatorus.client.comm.transport.AndroidMocker
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.AndroidMocker
 
 @RunWith(Parameterized::class)
 class LocalConnectionTest(
@@ -19,11 +17,5 @@ class LocalConnectionTest(
     val androidMocker = AndroidMocker()
 
     @Before
-    override fun assumeRunOnAndroid() {
-        Assume.assumeThat(
-            "Those tests should not be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            not("The Android Project")
-        )
-    }
+    override fun assumeRunOnAndroid() = TestUtils.assumeNotAndroid()
 }

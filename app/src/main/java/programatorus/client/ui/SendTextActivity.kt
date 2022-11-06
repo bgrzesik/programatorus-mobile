@@ -8,12 +8,14 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import programatorus.client.R
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.presentation.IMessageClient
+import programatorus.client.comm.presentation.Messenger
+import programatorus.client.comm.presentation.ProtocolMessenger
 import programatorus.client.comm.transport.bt.BluetoothTransport
-import programatorus.client.comm.transport.wrapper.Transport
+import programus.proto.Protocol
+import programus.proto.Protocol.GenericMessage
+import programus.proto.Protocol.TestMessage
 import java.nio.charset.StandardCharsets
-import java.util.*
 
 class SendTextActivity : AppCompatActivity() {
     var chosenBoard: TextView? = null
@@ -72,25 +74,44 @@ class SendTextActivity : AppCompatActivity() {
     private fun startTransport() {
         val adapter = BluetoothAdapter.getDefaultAdapter()
         val device = adapter.getRemoteDevice(deviceAddress)
+        Log.d(TAG, "startTransport(): $deviceAddress")
 
-        val transport =
-            Transport({ client -> BluetoothTransport(this@SendTextActivity, device, client) },
-                object : ITransportClient {
-                    override fun onPacketReceived(packet: ByteArray) {
-                        println(packet)
-                    }
+        // TODO DELETE ME
+        val messenger = Messenger.Builder()
+            .setMessenger(
+                ProtocolMessenger.Builder()
+                    .setTransport(
+                        BluetoothTransport.Builder()
+                            .setContext(this@SendTextActivity)
+                    )
+            )
+            .build(object : IMessageClient {
+                override fun onMessageReceived(message: Protocol.GenericMessage) {
+                    Log.d(TAG, "$message")
+                }
+            })
 
-                    override fun onError() {
-                        println("onError")
-                    }
+//        val messenger = Messenger({
+//            ProtocolMessenger(
+//                { BluetoothTransport(this@SendTextActivity, device, it) },
+//                it
+//            )
+//        }, object : IMessageClient {
+//            override fun onMessageReceived(message: Protocol.GenericMessage) {
+//                Log.d(TAG, "$message")
+//            }
+//        })
 
-                    override fun onStateChanged(state: ConnectionState) {
-                        println(state)
-                    }
-                })
-
-        // TODO(bgrzesik): DELETE ME
-        transport.send("Test string".toByteArray())
+        messenger.send(
+            GenericMessage.newBuilder()
+                .setRequestId(30)
+                .setSessionId(30)
+                .setTest(
+                    TestMessage.newBuilder()
+                        .setValue("LOL")
+                )
+                .build()
+        )
     }
 
 

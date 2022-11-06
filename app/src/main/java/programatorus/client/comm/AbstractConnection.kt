@@ -5,7 +5,7 @@ import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.comm.transport.ITransportClient
 
 abstract class AbstractConnection(
-    protected val client: ITransportClient,
+    private val client: IConnectionClient,
     private var mState: ConnectionState = ConnectionState.DISCONNECTED
 ) : IConnection {
     companion object {

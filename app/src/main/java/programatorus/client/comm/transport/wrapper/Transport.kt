@@ -5,7 +5,8 @@ import android.os.Looper
 import android.util.Log
 import programatorus.client.comm.transport.*
 import programatorus.client.utils.HandlerActor
-import java.util.concurrent.*
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -121,7 +122,7 @@ class Transport private constructor(
         }
 
         val outgoing = mPendingPacket.peek()!!
-        if (!outgoing.mPending) { // TODO(bgrzesik): check
+        if (outgoing.mPending) {
             return@assertLooper
         }
 
@@ -140,7 +141,7 @@ class Transport private constructor(
         var mOutgoing: IOutgoingPacket? = null
             private set
 
-        var mPending = true
+        var mPending = false
 
         private val mCompletableFuture = CompletableFuture<IOutgoingPacket>()
         private var mOnComplete: CompletableFuture<IOutgoingPacket>? = null
@@ -176,7 +177,10 @@ class Transport private constructor(
             assert(mOutgoing == outgoing)
 
             Log.d(TAG, "onDelivered(): Packet delivered.")
-            mClientHandler.post { mCompletableFuture.complete(outgoing) }
+
+            runOnLooper(targetHandler = mClientHandler) {
+                mCompletableFuture.complete(outgoing)
+            }
 
             val transportOutgoing = mPendingPacket.poll()!!
 
@@ -189,7 +193,9 @@ class Transport private constructor(
         private fun onDeliveryFailed(throwable: Throwable) = assertLooper {
             Log.e(TAG, "onDeliveryFailed(): Packet delivery failure", throwable)
 
-            mClientHandler.post { mCompletableFuture.completeExceptionally(throwable) }
+            runOnLooper(targetHandler = mClientHandler) {
+                mCompletableFuture.completeExceptionally(throwable)
+            }
 
             mErrorCount++
             scheduleTransportTask()
@@ -211,18 +217,24 @@ class Transport private constructor(
             mLastState = state
 
             scheduleTransportTask()
-            mClientHandler.post { mClient.onStateChanged(state) }
+            runOnLooper(targetHandler = mClientHandler) {
+                mClient.onStateChanged(state)
+            }
         }
 
         override fun onPacketReceived(packet: ByteArray) = runOnLooper {
-            mClientHandler.post { mClient.onPacketReceived(packet) }
+            runOnLooper(targetHandler = mClientHandler) {
+                mClient.onPacketReceived(packet)
+            }
         }
 
         override fun onError() = runOnLooper {
             mErrorCount++
             scheduleTransportTask()
 
-            mClientHandler.post { mClient.onError() }
+            runOnLooper(targetHandler = mClientHandler) {
+                mClient.onError()
+            }
         }
     }
 

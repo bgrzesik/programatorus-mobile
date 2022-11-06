@@ -2,8 +2,6 @@ package programatorus.client
 
 import android.os.Handler
 import programatorus.client.comm.IConnectionBuilder
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
 
 abstract class AbstractConnectionBuilder<B : AbstractConnectionBuilder<B>> : IConnectionBuilder<B> {
 

@@ -3,16 +3,12 @@ package programatorus.client.comm.presentation
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.utils.HandlerActor
 import programus.proto.Protocol
-import programus.proto.Protocol.GenericMessage
 import java.util.concurrent.CompletableFuture
 
-class Messenger private constructor (
+class Messenger private constructor(
     messenger: IMessengerProvider,
     client: IMessageClient,
     private val mHandler: Handler = Handler(Looper.getMainLooper()),
@@ -82,14 +78,14 @@ class Messenger private constructor (
         }
 
         private fun onDelivered(outgoing: IOutgoingMessage?) =
-            runOnLooper(null, false, mClientHandler) {
+            runOnLooper(targetHandler = mClientHandler) {
                 assert(mOutgoing == outgoing)
                 Log.d(TAG, "onDelivered(): Packet delivered.")
-                mClientHandler.post { response.complete(mOutgoing) }
+                response.complete(mOutgoing)
             }
 
         private fun onDeliveryFailed(throwable: Throwable) =
-            runOnLooper(null, false, mClientHandler) {
+            runOnLooper(targetHandler = mClientHandler) {
                 Log.e(TAG, "onDeliveryFailed(): Packet delivery failure", throwable)
                 response.completeExceptionally(throwable)
             }
@@ -103,22 +99,22 @@ class Messenger private constructor (
     ) : IMessageClient {
 
         override fun onMessageReceived(message: Protocol.GenericMessage) =
-            runOnLooper(null, false, mClientHandler) {
-                mClientHandler.post { mClient.onMessageReceived(message) }
+            runOnLooper(targetHandler = mClientHandler) {
+                mClient.onMessageReceived(message)
             }
 
         override fun onStateChanged(state: ConnectionState) =
-            runOnLooper(null, false, mClientHandler) {
+            runOnLooper(targetHandler = mClientHandler) {
                 mClient.onStateChanged(state)
             }
 
         override fun onError() =
-            runOnLooper(null, false, mClientHandler) {
+            runOnLooper(targetHandler = mClientHandler) {
                 mClient.onError()
             }
     }
 
-    class Builder : AbstractMessengerBuilder<Builder> () {
+    class Builder : AbstractMessengerBuilder<Builder>() {
         private var mMessenger: IMessengerProvider? = null
 
         fun setMessenger(messenger: IMessengerProvider): Builder {
