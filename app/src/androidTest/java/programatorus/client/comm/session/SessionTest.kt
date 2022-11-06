@@ -1,13 +1,18 @@
 package programatorus.client.comm.session
 
+import org.junit.Before
 import org.junit.Test
+import programatorus.client.comm.TestUtils
 import programatorus.client.comm.presentation.mock.IMockMessengerEndpoint
 import programatorus.client.comm.presentation.mock.MockMessenger
 import programatorus.client.comm.transport.ConnectionState
 import programus.proto.Protocol
 import java.util.concurrent.CountDownLatch
 
-class SessionTest {
+open class SessionTest {
+
+    @Before
+    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 5000)
     fun testKeepAliveDisconnect() {
