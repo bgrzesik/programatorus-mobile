@@ -23,8 +23,10 @@ message GenericMessage {
   uint64 sessionId = 1;
 
   // Ordinal
-  uint64 requestId = 2;
-  uint64 responseId = 3;
+  oneof id {
+    uint64 request = 2;
+    uint64 response = 3;
+  }
 
   oneof payload {
     SetSessionId setSessionId = 100;

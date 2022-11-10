@@ -29,14 +29,6 @@ class Session private constructor(
 
         const val HEARTBEAT_MS: Long = 500
         const val TIMEOUT_MS: Long = 8 * HEARTBEAT_MS
-
-        val REQUEST_ID_FIELD: Descriptors.FieldDescriptor =
-            GenericMessage.getDescriptor()
-                .findFieldByNumber(GenericMessage.REQUESTID_FIELD_NUMBER)
-
-        val RESPONSE_ID_FIELD: Descriptors.FieldDescriptor =
-            GenericMessage.getDescriptor()
-                .findFieldByNumber(GenericMessage.RESPONSEID_FIELD_NUMBER)
     }
 
 
@@ -59,12 +51,13 @@ class Session private constructor(
         Log.d(TAG, "request():")
 
         val pending = PendingMessage(
-            true,
             GenericMessage.newBuilder(message)
-                .setSessionId(
-                    mSessionId ?: -1
-                )
-                .setRequestId(mNextRequestId.incrementAndGet())
+                .apply {
+                    if (mSessionId != null) {
+                        sessionId = mSessionId!!
+                    }
+                    request = mNextRequestId.incrementAndGet()
+                }
                 .build()
         )
 
@@ -91,8 +84,8 @@ class Session private constructor(
             }
 
             GenericMessage.PayloadCase.SETSESSIONID -> {
-                Log.i(TAG, "processControlRequests(): Setting sessionId=$mSessionId")
                 mSessionId = message.setSessionId.sessionId
+                Log.i(TAG, "processControlRequests(): Setting sessionId=$mSessionId")
 
                 GenericMessage.newBuilder()
                     .setOk(Empty.getDefaultInstance())
@@ -114,8 +107,12 @@ class Session private constructor(
         if (exception != null) {
             Log.e(TAG, "onRequest(): ")
             response = GenericMessage.newBuilder()
-                .setResponseId(requestId)
-                .setSessionId(mSessionId ?: -1)
+                .setResponse(requestId)
+                .apply {
+                    if (mSessionId != null) {
+                        sessionId = mSessionId!!
+                    }
+                }
                 .setError( // TODO(bgrzesik): proper error mapping
                     Protocol.ErrorMessage.newBuilder()
                         .setDescription(exception.message)
@@ -123,14 +120,21 @@ class Session private constructor(
                 .build()
         } else {
             response = GenericMessage.newBuilder(response)
-                .clearRequestId()
-                .setResponseId(requestId)
-                .setSessionId(mSessionId ?: -1)
+                .clearId()
+                .setResponse(requestId)
+                .apply {
+                    if (mSessionId != null) {
+                        sessionId = mSessionId!!
+                    }
+                }
                 .build()
         }
 
-        Log.d(TAG, "onRequestDone(): requestId=$requestId responsePayloadCase=${response!!.payloadCase}")
-        mQueue.add(PendingMessage(false, response))
+        Log.d(
+            TAG,
+            "onRequestDone(): requestId=$requestId responsePayloadCase=${response!!.payloadCase}"
+        )
+        mQueue.add(PendingMessage(response))
         pumpMessages()
     }
 
@@ -183,17 +187,19 @@ class Session private constructor(
     }
 
     private inner class PendingMessage(
-        val isRequest: Boolean,
         val message: GenericMessage,
     ) {
         val future = CompletableFuture<GenericMessage>()
         private var mOutgoing: IOutgoingMessage? = null
 
+        val isRequest: Boolean
+            get() = message.idCase == GenericMessage.IdCase.REQUEST
+
         val id: Long
             get() = if (isRequest) {
-                message.requestId
+                message.request
             } else {
-                message.responseId
+                message.response
             }
 
         fun setOutgoingMessage(outgoing: IOutgoingMessage) {
@@ -218,23 +224,29 @@ class Session private constructor(
     ) : IMessageClient {
 
         private fun onResponse(response: GenericMessage) = assertLooper {
-            Log.d(TAG, "onResponse(): id = ${response.responseId}")
-            val pendingMessage = mWaitingForResponse.remove(response.responseId)
+            Log.d(TAG, "onResponse(): id=${response.response}")
+            assert(response.hasResponse())
+            val pendingMessage = mWaitingForResponse.remove(response.response)
             if (pendingMessage == null) {
-                Log.w(TAG, "Received a response for non existing request id=${response.responseId}")
+                Log.w(
+                    TAG,
+                    "onResponse(): Received a response for non existing request id=${response.response}"
+                )
                 return@assertLooper
             }
-            Log.d(TAG, "onResponse(): completing request id=${response.responseId}")
+            Log.d(TAG, "onResponse(): Completing request id=${response.response}")
+            // TODO(bgrzesik): Ensure proper order.
             pendingMessage.future.complete(response)
         }
 
         private fun onRequest(request: GenericMessage) = assertLooper {
-            Log.d(TAG, "onRequest(): received request id=${request.requestId}")
+            Log.d(TAG, "onRequest(): Received request id=${request.request}")
+            assert(request.hasRequest())
 
             val response = processControlRequests(request)
             if (response != null) {
                 Log.d(TAG, "onRequest(): Control request processed")
-                onRequestDone(request.requestId, response, null)
+                onRequestDone(request.request, response, null)
                 return@assertLooper
             }
 
@@ -242,7 +254,7 @@ class Session private constructor(
             runOnLooper(targetHandler = mClientHandler) {
                 mUserClient.onRequest(request)
                     .whenComplete { response, exception ->
-                        onRequestDone(request.requestId, response, exception)
+                        onRequestDone(request.request, response, exception)
                     }
             }
         }
@@ -256,12 +268,14 @@ class Session private constructor(
             }
 
             updateLastTransfer()
-            if (message.hasField(REQUEST_ID_FIELD) && !message.hasField(RESPONSE_ID_FIELD)) {
-                onRequest(message)
-            } else if (message.hasField(RESPONSE_ID_FIELD) && !message.hasField(REQUEST_ID_FIELD)) {
-                onResponse(message)
-            } else {
-                Log.w(TAG, "onMessageReceived(): Received a message that is not a request nor a response")
+            when (message.idCase) {
+                GenericMessage.IdCase.REQUEST -> onRequest(message)
+                GenericMessage.IdCase.RESPONSE -> onResponse(message)
+                else ->
+                    Log.w(
+                        TAG,
+                        "onMessageReceived(): Received a message that is not a request nor a response"
+                    )
             }
         }
 

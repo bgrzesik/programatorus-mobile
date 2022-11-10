@@ -92,7 +92,7 @@ open class MessageLoopbackTest(
         val messages = mutableListOf<Protocol.GenericMessage>()
         for (i in 0 until mCount) {
             val message = Protocol.GenericMessage.newBuilder()
-                .setRequestId(i.toLong())
+                .setRequest(i.toLong())
                 .setSessionId(i.toLong())
                 .setTest(
                     Protocol.TestMessage.newBuilder()
