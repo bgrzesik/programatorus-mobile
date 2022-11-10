@@ -2,6 +2,7 @@ package programatorus.client.comm.transport
 
 import android.os.Handler
 import android.os.Looper
+import androidx.core.os.HandlerCompat
 import programatorus.client.AbstractConnectionBuilder
 
 abstract class AbstractTransportBuilder<T: AbstractTransportBuilder<T>> : AbstractConnectionBuilder<T>(), ITransportBuilder<T> {
@@ -16,10 +17,12 @@ abstract class AbstractTransportBuilder<T: AbstractTransportBuilder<T>> : Abstra
         client: ITransportClient,
         handler: Handler?,
         clientHandler: Handler?
-    ): ITransport =
-        construct(
+    ): ITransport {
+        val theHandler = mHandler ?: handler?: HandlerCompat.createAsync(Looper.getMainLooper())
+        return construct(
             client,
-            mHandler ?: handler ?: Handler(Looper.getMainLooper()),
-            mClientHandler ?: clientHandler ?: Handler(Looper.getMainLooper())
+            theHandler,
+            mClientHandler ?: clientHandler ?: theHandler
         )
+    }
 }
