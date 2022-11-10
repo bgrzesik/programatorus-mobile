@@ -32,8 +32,10 @@ class Session private constructor(
     }
 
 
+    private val mTimeoutGuard = AtomicBoolean(false)
     private var mSessionId: Long? = null
     private var mLastTransferMs = System.currentTimeMillis()
+    private var mLastHeartbeatMs = System.currentTimeMillis()
     private var mPostedHeartbeat: CompletableFuture<GenericMessage>? = null
     private val mNextRequestId = AtomicLong(0)
     private val mPumpPending = AtomicBoolean(false)
@@ -69,9 +71,17 @@ class Session private constructor(
     override val state: ConnectionState
         get() = mMessenger.state
 
-    override fun reconnect() = runOnLooper { mMessenger.reconnect() }
+    override fun reconnect() = runOnLooper {
+        mPostedHeartbeat?.cancel(true)
+        mPostedHeartbeat = null
+        mMessenger.reconnect()
+    }
 
-    override fun disconnect() = runOnLooper { mMessenger.disconnect() }
+    override fun disconnect() = runOnLooper {
+        mPostedHeartbeat?.cancel(true)
+        mPostedHeartbeat = null
+        mMessenger.disconnect()
+    }
 
     private fun processControlRequests(message: GenericMessage): GenericMessage? = assertLooper {
         Log.d(TAG, "processControlRequests(): payLoadCase=${message.payloadCase}")
@@ -152,32 +162,40 @@ class Session private constructor(
         }
     }
 
-    private fun timeoutSession(): Unit = runOnLooper(timeout = HEARTBEAT_MS, enforcePost = true) {
-        if (state != ConnectionState.CONNECTED) {
-            return@runOnLooper
+    private fun timeoutSession(): Unit =
+        runGuardedOnLooper(mTimeoutGuard, timeout = HEARTBEAT_MS, enforcePost = true) {
+            if (state != ConnectionState.CONNECTED) {
+                return@runGuardedOnLooper
+            }
+
+            val duration = System.currentTimeMillis() - mLastTransferMs
+            Log.d(TAG, "timeoutSession(): state=$state duration=$duration")
+
+            if (duration > TIMEOUT_MS) {
+                Log.e(TAG, "timeoutSession(): Session timeout")
+                disconnect()
+                return@runGuardedOnLooper
+            }
+
+            timeoutSession()
+
+            if (duration < HEARTBEAT_MS) {
+                return@runGuardedOnLooper
+            }
+
+            val sinceLastHeartbeat = System.currentTimeMillis() - mLastHeartbeatMs
+            if (sinceLastHeartbeat <= HEARTBEAT_MS && mPostedHeartbeat != null && mPostedHeartbeat?.isDone == false) {
+                return@runGuardedOnLooper
+            }
+
+            Log.d(TAG, "timeoutSession(): Sending heartbeat")
+            mPostedHeartbeat = request(
+                GenericMessage.newBuilder()
+                    .setHeartbeat(Empty.getDefaultInstance())
+                    .build()
+            )
+            mLastHeartbeatMs = System.currentTimeMillis()
         }
-
-        val duration = System.currentTimeMillis() - mLastTransferMs
-        Log.d(TAG, "timeoutSession(): state=$state duration=$duration")
-
-        if (duration > TIMEOUT_MS) {
-            Log.e(TAG, "timeout(): Session timeout")
-            reconnect()
-            return@runOnLooper
-        }
-
-        timeoutSession()
-
-        if (duration < HEARTBEAT_MS || mPostedHeartbeat?.isDone == false) {
-            return@runOnLooper
-        }
-
-        mPostedHeartbeat = request(
-            GenericMessage.newBuilder()
-                .setHeartbeat(Empty.getDefaultInstance())
-                .build()
-        )
-    }
 
     private fun updateLastTransfer() = runOnLooper {
         val currentTimeMs = System.currentTimeMillis()
