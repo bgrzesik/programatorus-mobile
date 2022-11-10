@@ -39,6 +39,8 @@ class BluetoothTransport(
     override val isConnected: Boolean
         get() = (mSocket != null && inputStream != null && outputStream != null) && mSocket!!.isConnected
 
+    override val disconnectOnReconnect: Boolean
+        get() = true
 
     override fun doConnect(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ContextCompat.checkSelfPermission(
