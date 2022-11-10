@@ -88,6 +88,7 @@ open class MessageLoopbackTest(
         }
 
         val transport = mProvider.build(client)
+        transport.reconnect()
 
         val messages = mutableListOf<Protocol.GenericMessage>()
         for (i in 0 until mCount) {

@@ -57,6 +57,7 @@ open class PacketLoopbackTest(
         }
 
         val transport = mProvider.build(client)
+        transport.reconnect()
 
         val messages = mutableListOf<ByteArray>()
         for (i in 0 until mCount) {
