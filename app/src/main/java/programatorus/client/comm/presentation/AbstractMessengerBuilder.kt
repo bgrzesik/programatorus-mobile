@@ -2,6 +2,7 @@ package programatorus.client.comm.presentation
 
 import android.os.Handler
 import android.os.Looper
+import androidx.core.os.HandlerCompat
 import programatorus.client.AbstractConnectionBuilder
 
 abstract class AbstractMessengerBuilder<M : AbstractMessengerBuilder<M>> : AbstractConnectionBuilder<M>(), IMessengerBuilder<M> {
@@ -16,10 +17,12 @@ abstract class AbstractMessengerBuilder<M : AbstractMessengerBuilder<M>> : Abstr
         client: IMessageClient,
         handler: Handler?,
         clientHandler: Handler?
-    ): IMessenger =
-        construct(
+    ): IMessenger {
+        val theHandler = mHandler ?: handler?: HandlerCompat.createAsync(Looper.getMainLooper())
+        return construct(
             client,
-            mHandler ?: handler ?: Handler(Looper.getMainLooper()),
-            mClientHandler ?: clientHandler ?: Handler(Looper.getMainLooper())
+            theHandler,
+            mClientHandler ?: clientHandler ?: theHandler
         )
+    }
 }

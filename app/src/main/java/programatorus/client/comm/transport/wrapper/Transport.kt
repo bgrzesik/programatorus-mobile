@@ -17,8 +17,8 @@ import java.util.concurrent.atomic.AtomicBoolean
 class Transport private constructor(
     transport: ITransportProvider,
     client: ITransportClient,
-    private val mHandler: Handler = Handler(Looper.getMainLooper()),
-    private val mClientHandler: Handler = mHandler
+    private val mHandler: Handler,
+    private val mClientHandler: Handler
 ) : ITransport, HandlerActor {
 
     companion object {

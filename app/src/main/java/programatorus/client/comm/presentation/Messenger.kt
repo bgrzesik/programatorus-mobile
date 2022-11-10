@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture
 class Messenger private constructor(
     messenger: IMessengerProvider,
     client: IMessageClient,
-    private val mHandler: Handler = Handler(Looper.getMainLooper()),
-    private val mClientHandler: Handler = Handler(Looper.getMainLooper())
+    private val mHandler: Handler,
+    private val mClientHandler: Handler
 ) : IMessenger, HandlerActor {
 
     companion object {

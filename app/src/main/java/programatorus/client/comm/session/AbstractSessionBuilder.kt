@@ -2,6 +2,7 @@ package programatorus.client.comm.session
 
 import android.os.Handler
 import android.os.Looper
+import androidx.core.os.HandlerCompat
 import programatorus.client.AbstractConnectionBuilder
 
 abstract class AbstractSessionBuilder<S: AbstractSessionBuilder<S>> : AbstractConnectionBuilder<S>(), ISessionBuilder<S> {
@@ -16,10 +17,12 @@ abstract class AbstractSessionBuilder<S: AbstractSessionBuilder<S>> : AbstractCo
         client: ISessionClient,
         handler: Handler?,
         clientHandler: Handler?
-    ): ISession =
-        construct(
+    ): ISession {
+        val theHandler = mHandler ?: handler?: HandlerCompat.createAsync(Looper.getMainLooper())
+        return construct(
             client,
-            mHandler ?: handler ?: Handler(Looper.getMainLooper()),
-            mClientHandler ?: clientHandler ?: Handler(Looper.getMainLooper())
+            theHandler,
+            mClientHandler ?: clientHandler ?: theHandler
         )
+    }
 }

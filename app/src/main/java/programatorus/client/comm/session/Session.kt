@@ -20,8 +20,8 @@ import java.util.concurrent.atomic.AtomicLong
 class Session private constructor(
     messenger: IMessengerProvider,
     client: ISessionClient,
-    private val mHandler: Handler = Handler(Looper.getMainLooper()),
-    private val mClientHandler: Handler = Handler(Looper.getMainLooper())
+    private val mHandler: Handler,
+    private val mClientHandler: Handler
 ) : ISession, HandlerActor {
 
     private companion object {

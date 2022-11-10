@@ -9,11 +9,13 @@ import java.util.concurrent.CompletableFuture
 
 class ProtocolMessenger private constructor(
     transport: ITransportProvider,
+    handler: Handler? = null,
+    clientHandler: Handler? = null,
     private val mClient: IMessageClient
 ) : IMessenger {
 
     private val mTransportClient = Client()
-    private val mTransport: ITransport = transport.build(mTransportClient)
+    private val mTransport: ITransport = transport.build(mTransportClient, handler, clientHandler)
 
     companion object {
         const val TAG = "ProtocolMessenger"
@@ -70,7 +72,7 @@ class ProtocolMessenger private constructor(
             client: IMessageClient,
             handler: Handler,
             clientHandler: Handler
-        ): IMessenger = ProtocolMessenger(mTransport!!, client)
+        ): IMessenger = ProtocolMessenger(mTransport!!, handler, clientHandler, client)
 
     }
 }
