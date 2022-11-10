@@ -10,4 +10,6 @@ data class FavBoardsListItem(
         fun from(board: Board): FavBoardsListItem =
             FavBoardsListItem(board.name)
     }
+
+    fun asBoard(): Board = Board(name, true)
 }

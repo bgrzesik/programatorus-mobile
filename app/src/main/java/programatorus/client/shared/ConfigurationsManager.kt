@@ -6,14 +6,21 @@ class ConfigurationsManager<T>(
 ) {
 
 
-    fun updateFavorites(boards: List<T>) {
-        allItems=boards
+    fun updateState(all: List<T>, favorites: List<T>) {
+        allItems=all
 
-        val favorites = favItems.toSet()
-        favItems = favItems + boards.filter { !favorites.contains(it) }
+        val old = favItems.toSet()
+        val new = favorites.toSet()
+
+        favItems = favItems.filter { new.contains(it) } + favorites.filter { !old.contains(it) }
     }
 
-    fun updateOrder(boards: List<T>) {
+    fun setState(all: List<T>, favorites: List<T>) {
+        allItems=all
+        favItems = favorites
+    }
+
+    fun setOrderedFavorites(boards: List<T>) {
         favItems = boards as MutableList<T>
     }
 

@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 data class AllBoardsListItem(val name: String, var isSelected: AtomicBoolean = AtomicBoolean(false)){
 
-    fun toggle(): Unit {
+    fun toggle() {
         var temp: Boolean
         do {
             temp = isSelected.get()
@@ -22,6 +22,8 @@ data class AllBoardsListItem(val name: String, var isSelected: AtomicBoolean = A
         fun from(board: Board): AllBoardsListItem =
             AllBoardsListItem(board.name, AtomicBoolean(board.isFavorite))
     }
+
+    fun asBoard(): Board = Board(name, isFavorite())
 }
 
 
