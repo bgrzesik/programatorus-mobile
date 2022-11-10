@@ -6,13 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.get
-import com.google.android.material.tabs.TabLayout
+import programatorus.client.SharedData
 import programatorus.client.databinding.FragmentManageBoardsBinding
-import programatorus.client.model.Board
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
-import programatorus.client.shared.ConfigurationsManager
 
 
 class ManageBoardsFragment : Fragment() {
@@ -21,11 +18,7 @@ class ManageBoardsFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val configurationsManager = ConfigurationsManager<Board>(
-        (1..12).map { Board(it.toString(), false) },
-        (1..12).map { Board(it.toString(), false) }
-    )
-
+    private val configurationsManager = SharedData.boardManager
 
 
     override fun onCreateView(
@@ -40,19 +33,44 @@ class ManageBoardsFragment : Fragment() {
 
     fun useAll() {
         binding.favBoards.visibility = View.GONE
+        configurationsManager.setOrderedFavorites(
+            favorites()
+        )
         binding.allBoards.visibility = View.VISIBLE
     }
 
     fun useFavorites() {
+        configurationsManager.updateState(
+            all(),
+            extractFavorites()
+        )
         with(binding) {
             allBoards.visibility = View.GONE
             favBoards.setBoards(
-                allBoards.getBoards()
-                    .filter { it.isFavorite() }
-                    .map { FavBoardsListItem(it.name) }
+                configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
             )
             binding.favBoards.visibility = View.VISIBLE
         }
+    }
+
+    private fun extractFavorites() =
+        binding.allBoards.getBoards()
+            .filter { it.isFavorite() }
+            .map { it.asBoard() }
+
+    private fun all() =
+        binding.allBoards.getBoards()
+            .map { it.asBoard() }
+
+    private fun favorites() =
+        binding.favBoards.getBoards()
+            .map { it.asBoard() }
+
+    fun updateConfigurations() {
+        configurationsManager.setState(
+            binding.favBoards.getBoards().map { it.asBoard() },
+            binding.allBoards.getBoards().map { it.asBoard() }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -62,14 +80,6 @@ class ManageBoardsFragment : Fragment() {
         binding.allBoards.visibility = View.VISIBLE
 
         binding.favBoards.enableTouch()
-//        binding.favBoards.setBoards(
-//            (1..12).map { FavBoardsListItem(it.toString()) }
-//        )
-//
-//
-//        binding.allBoards.setBoards(
-//            (1..12).map { AllBoardsListItem(it.toString()) }
-//        )
 
         binding.allBoards.setBoards(
             configurationsManager.getAll().map { AllBoardsListItem.from(it) }
@@ -79,16 +89,20 @@ class ManageBoardsFragment : Fragment() {
             configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
         )
 
-        binding.tabs.getTabAt(ALL)?.view?.setOnClickListener{ useAll() }
-        binding.tabs.getTabAt(FAVORITES)?.view?.setOnClickListener{ useFavorites() }
+        binding.tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
+        binding.tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
 
         binding.btn.setOnClickListener {
-            Log.d("fav list:", "fav ${binding.favBoards.getBoards()} \n all ${binding.allBoards.getBoards()}")
+            Log.d(
+                "fav list:",
+                "fav ${binding.favBoards.getBoards()} \n all ${binding.allBoards.getBoards()}"
+            )
         }
-        
+
     }
 
     override fun onDestroyView() {
+        updateConfigurations()
         super.onDestroyView()
         _binding = null
     }
