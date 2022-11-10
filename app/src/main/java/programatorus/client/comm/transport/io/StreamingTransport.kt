@@ -2,15 +2,15 @@ package programatorus.client.comm.transport.io
 
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
-import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransport
-import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.comm.transport.*
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
+import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+
 
 abstract class StreamingTransport<T : StreamingTransport<T>>(
     private val mClient: ITransportClient,
@@ -19,6 +19,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
     companion object {
         private const val TAG = "StreamingTransport"
         private const val MAX_SIZE = 1024
+        private const val PREAMBLE = 0b1010_1010
     }
 
     private var mOutputQueue: BlockingQueue<OutgoingPacket> = LinkedBlockingQueue()
@@ -91,28 +92,8 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
     private fun inputThreadTask() {
         Log.d(TAG, "inputThreadTask(): Trying to parse from input stream")
 
-        val dataInputStream = DataInputStream(inputStream!!)
-        val size = dataInputStream.readInt()
-
-        if (size > MAX_SIZE) {
-            // TODO(bgrzesik): ignore those bytes
-            throw IOException("inputThreadTask(): Too big packet requested")
-        }
-
-        val buffer = ByteArray(size)
-        var pos = 0
-
-        while (pos < size) {
-            val read = dataInputStream.read(buffer, pos, size - pos)
-
-            if (read == -1) {
-                throw IOException("Unexpected EOF")
-            }
-
-            pos += read
-        }
-        Log.d(TAG, "inputThreadTask(): Received packet size=$size")
-
+        val frameDecoder = FrameDecoder(inputStream!!)
+        val buffer = frameDecoder.readFrame() ?: return
         mClient.onPacketReceived(buffer)
     }
 
@@ -126,9 +107,10 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         try {
             Log.d(TAG, "outputThreadTask(): Trying to write to output stream")
 
-            val dataOutgoingStream = DataOutputStream(outputStream!!)
-            dataOutgoingStream.writeInt(outgoing.packet.size)
-            dataOutgoingStream.write(outgoing.packet, 0, outgoing.packet.size)
+            val frameEncoder = FrameEncoder(outputStream!!)
+            frameEncoder.startFrame()
+            frameEncoder.write(outgoing.packet)
+            frameEncoder.finishFrame()
 
             outputStream?.flush()
             Log.d(TAG, "outputThreadTask(): Successfully sent packet size=${outgoing.packet.size}")
