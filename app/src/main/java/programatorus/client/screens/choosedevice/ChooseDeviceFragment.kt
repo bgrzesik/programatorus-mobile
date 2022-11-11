@@ -17,7 +17,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -48,7 +47,6 @@ class ChooseDeviceFragment :
         binding = FragmentChooseDeviceBinding.inflate(inflater, container, false)
 
         binding.pairedDevices.setClickListener {
-            Toast.makeText(activity, "clicked $it", Toast.LENGTH_LONG).show()
             navigateToHome()
         }
 
@@ -73,7 +71,7 @@ class ChooseDeviceFragment :
             PackageManager.PERMISSION_DENIED -> {
                 requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_ADMIN)
             }
-            PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "BT admin permission granted", Toast.LENGTH_LONG).show()}
+            PackageManager.PERMISSION_GRANTED -> {}
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             when(checkSelfPermission(
@@ -82,7 +80,7 @@ class ChooseDeviceFragment :
                 PackageManager.PERMISSION_DENIED -> {
                     requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_SCAN)
                 }
-                PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "BT admin permission granted", Toast.LENGTH_LONG).show()}
+                PackageManager.PERMISSION_GRANTED -> {}
             }
             when(checkSelfPermission(
                 requireContext(), Manifest.permission.BLUETOOTH_CONNECT
@@ -90,7 +88,7 @@ class ChooseDeviceFragment :
                 PackageManager.PERMISSION_DENIED -> {
                     requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_CONNECT)
                 }
-                PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "BT admin permission granted", Toast.LENGTH_LONG).show()}
+                PackageManager.PERMISSION_GRANTED -> {}
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -100,7 +98,7 @@ class ChooseDeviceFragment :
                 PackageManager.PERMISSION_DENIED -> {
                     requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_COARSE_LOCATION)
                 }
-                PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "ACCESS_COARSE_LOCATION permission granted", Toast.LENGTH_LONG).show()}
+                PackageManager.PERMISSION_GRANTED -> {}
             }
             when(checkSelfPermission(
                 requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
@@ -108,7 +106,7 @@ class ChooseDeviceFragment :
                 PackageManager.PERMISSION_DENIED -> {
                     requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_FINE_LOCATION)
                 }
-                PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "ACCESS_FINE_LOCATION permission granted", Toast.LENGTH_LONG).show()}
+                PackageManager.PERMISSION_GRANTED -> {}
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -118,7 +116,7 @@ class ChooseDeviceFragment :
                 PackageManager.PERMISSION_DENIED -> {
                     requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_BACKGROUND_LOCATION)
                 }
-                PackageManager.PERMISSION_GRANTED -> {Toast.makeText(requireContext(), "ACCESS_BACKGROUND_LOCATION permission granted", Toast.LENGTH_LONG).show()}
+                PackageManager.PERMISSION_GRANTED -> {}
             }
         }
     }
@@ -153,7 +151,6 @@ class ChooseDeviceFragment :
     private val discoveryHandler: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val action = intent.action
-            Toast.makeText(activity, "device discovered", Toast.LENGTH_LONG).show()
 
             if (BluetoothDevice.ACTION_FOUND == action) {
                 val device =
