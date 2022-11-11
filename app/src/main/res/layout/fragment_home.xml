@@ -16,4 +16,9 @@
         android:id="@+id/btn_firmware"
         android:text="@string/show_firmware" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_upload_file"
+        android:text="@string/upload_file" />
+
 </LinearLayout>

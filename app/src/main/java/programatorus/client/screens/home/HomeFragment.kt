@@ -36,6 +36,10 @@ class HomeFragment : Fragment() {
         binding.btnFirmware.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_manageBoards)
         }
+
+        binding.btnUploadFile.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_uploadFile)
+        }
     }
 
     override fun onDestroyView() {
