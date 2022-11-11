@@ -1,10 +1,10 @@
 package programatorus.client.comm.transport.wrapper
 
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import programatorus.client.comm.transport.*
-import programatorus.client.utils.HandlerActor
+import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.TaskRunner
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -17,9 +17,10 @@ import java.util.concurrent.atomic.AtomicBoolean
 class Transport private constructor(
     transport: ITransportProvider,
     client: ITransportClient,
-    private val mHandler: Handler,
-    private val mClientHandler: Handler
-) : ITransport, HandlerActor {
+    private val mTaskRunner: TaskRunner,
+    // TODO(bgrzesik): Remove client TaskRunners in favour of ProxyTransportClient
+    private val mClientTaskRunner: TaskRunner
+) : ITransport, ActiveObject {
 
     companion object {
         private const val TAG = "Transport"
@@ -28,8 +29,8 @@ class Transport private constructor(
         private const val RECONNECT_TIMEOUT = 2000L
     }
 
-    override val handler: Handler
-        get() = mHandler
+    override val taskRunner: TaskRunner
+        get() = mTaskRunner
 
     private var mTransportTaskPending = AtomicBoolean(false)
     private var mReconnectPending = AtomicBoolean(false)
@@ -40,7 +41,7 @@ class Transport private constructor(
 
     private var mClient: Client = Client(client)
 
-    private var mImpl: ITransport = transport.build(mClient, mHandler, mClientHandler)
+    private var mImpl: ITransport = transport.build(mClient, mTaskRunner, mClientTaskRunner)
 
     override val state: ConnectionState
         get() {
@@ -178,7 +179,7 @@ class Transport private constructor(
 
             Log.d(TAG, "onDelivered(): Packet delivered.")
 
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mCompletableFuture.complete(outgoing)
             }
 
@@ -193,7 +194,7 @@ class Transport private constructor(
         private fun onDeliveryFailed(throwable: Throwable) = assertLooper {
             Log.e(TAG, "onDeliveryFailed(): Packet delivery failure", throwable)
 
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mCompletableFuture.completeExceptionally(throwable)
             }
 
@@ -217,13 +218,13 @@ class Transport private constructor(
             mLastState = state
 
             scheduleTransportTask()
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onStateChanged(state)
             }
         }
 
         override fun onPacketReceived(packet: ByteArray) = runOnLooper {
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onPacketReceived(packet)
             }
         }
@@ -232,7 +233,7 @@ class Transport private constructor(
             mErrorCount++
             scheduleTransportTask()
 
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onError()
             }
         }
@@ -248,8 +249,8 @@ class Transport private constructor(
 
         override fun construct(
             client: ITransportClient,
-            handler: Handler,
-            clientHandler: Handler
-        ): ITransport = Transport(mTransport!!, client, handler, clientHandler)
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
+        ): ITransport = Transport(mTransport!!, client, taskRunner, clientTaskRunner)
     }
 }

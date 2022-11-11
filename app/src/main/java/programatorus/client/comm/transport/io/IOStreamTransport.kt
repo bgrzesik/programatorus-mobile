@@ -1,10 +1,10 @@
 package programatorus.client.comm.transport.io
 
-import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.utils.TaskRunner
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -62,8 +62,8 @@ class IOStreamTransport private constructor(
 
         override fun construct(
             client: ITransportClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): ITransport = IOStreamTransport(client, mInputStream!!, mOutputStream!!)
     }
 }

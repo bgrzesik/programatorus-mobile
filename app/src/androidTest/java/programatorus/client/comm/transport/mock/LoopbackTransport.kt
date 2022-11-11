@@ -1,9 +1,9 @@
 package programatorus.client.comm.transport.mock
 
-import android.os.Handler
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
+import programatorus.client.utils.TaskRunner
 
 class LoopbackTransport private constructor(
     client: ITransportClient,
@@ -26,8 +26,8 @@ class LoopbackTransport private constructor(
 
         override fun construct(
             client: ITransportClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): ITransport = LoopbackTransport(client, mDisconnectOnReconnect)
     }
 

@@ -1,9 +1,9 @@
 package programatorus.client.comm.transport.mock
 
-import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.transport.*
+import programatorus.client.utils.TaskRunner
 import java.util.concurrent.CompletableFuture
 
 open class MockTransport internal constructor(
@@ -117,8 +117,8 @@ open class MockTransport internal constructor(
 
         override fun construct(
             client: ITransportClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): ITransport = MockTransport(mEndpoint!!, client, mDisconnectOnReconnect)
     }
 }

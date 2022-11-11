@@ -2,19 +2,20 @@ package programatorus.client
 
 import android.os.Handler
 import programatorus.client.comm.IConnectionBuilder
+import programatorus.client.utils.TaskRunner
 
 abstract class AbstractConnectionBuilder<B : AbstractConnectionBuilder<B>> : IConnectionBuilder<B> {
 
-    var mHandler: Handler? = null
-    var mClientHandler: Handler? = null
+    var mTaskRunner: TaskRunner? = null
+    var mClientTaskRunner: TaskRunner? = null
 
-    override fun setHandler(handler: Handler): B {
-        mHandler = handler
+    override fun setTaskRunner(taskRunner: TaskRunner): B {
+        mTaskRunner = taskRunner
         return this as B
     }
 
-    override fun setClientHandler(handler: Handler): B {
-        mClientHandler = handler
+    override fun setClientTaskRunner(taskRunner: TaskRunner): B {
+        mClientTaskRunner = taskRunner
         return this as B
     }
 

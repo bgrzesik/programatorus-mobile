@@ -1,24 +1,23 @@
 package programatorus.client.utils
 
-import android.os.Handler
 import android.util.Log
 import java.util.concurrent.atomic.AtomicBoolean
 
-interface HandlerActor {
+interface ActiveObject {
     companion object {
         const val TAG = "HandlerActor"
     }
 
-    val handler: Handler
+    val taskRunner: TaskRunner
 
-    fun assertRunOnLooper(targetHandler: Handler = handler) {
-        if (!handler.looper.isCurrentThread) {
+    fun assertRunOnLooper(target: TaskRunner = taskRunner) {
+        if (!taskRunner.isCurrentThread) {
             Log.e(TAG, "", RuntimeException("Method ran on invalid thread"))
         }
-        assert(handler.looper.isCurrentThread) { "Method ran on invalid thread" }
+        assert(taskRunner.isCurrentThread) { "Method ran on invalid thread" }
     }
 
-    fun <T> assertLooper(targetHandler: Handler = handler, func: () -> T): T {
+    fun <T> assertLooper(target: TaskRunner = taskRunner, func: () -> T): T {
         assertRunOnLooper()
         return func()
     }
@@ -27,7 +26,7 @@ interface HandlerActor {
         guard: AtomicBoolean,
         timeout: Long? = null,
         enforcePost: Boolean = false,
-        targetHandler: Handler = handler,
+        target: TaskRunner = taskRunner,
         func: () -> Unit
     ) {
         if (!guard.compareAndSet(false, true)) {
@@ -44,17 +43,17 @@ interface HandlerActor {
     fun runOnLooper(
         timeout: Long? = null,
         enforcePost: Boolean = false,
-        targetHandler: Handler = handler,
+        target: TaskRunner = taskRunner,
         func: () -> Unit
     ) {
-        if (handler.looper.isCurrentThread && timeout == null && !enforcePost) {
+        if (taskRunner.isCurrentThread && timeout == null && !enforcePost) {
             assertRunOnLooper()
             func()
         } else {
             if (timeout != null) {
-                assert(handler.postDelayed(func, timeout))
+                taskRunner.postDelayed(func, timeout)
             } else {
-                assert(handler.post(func))
+                taskRunner.post(func)
             }
         }
     }

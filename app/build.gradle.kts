@@ -84,6 +84,7 @@ dependencies {
     testImplementation(project(mapOf("path" to ":app")))
     testImplementation("io.mockk:mockk-android:${mockkVersion}")
     testImplementation("io.mockk:mockk-agent:${mockkVersion}")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     androidTestImplementation("io.mockk:mockk-android:${mockkVersion}")
     androidTestImplementation("io.mockk:mockk-agent:${mockkVersion}")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")

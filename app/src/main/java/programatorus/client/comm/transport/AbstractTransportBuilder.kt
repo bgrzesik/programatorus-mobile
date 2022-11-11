@@ -1,28 +1,26 @@
 package programatorus.client.comm.transport
 
-import android.os.Handler
-import android.os.Looper
-import androidx.core.os.HandlerCompat
 import programatorus.client.AbstractConnectionBuilder
+import programatorus.client.utils.TaskRunner
 
 abstract class AbstractTransportBuilder<T: AbstractTransportBuilder<T>> : AbstractConnectionBuilder<T>(), ITransportBuilder<T> {
 
     abstract fun construct(
         client: ITransportClient,
-        handler: Handler,
-        clientHandler: Handler
+        taskRunner: TaskRunner,
+        clientTaskRunner: TaskRunner
     ): ITransport
 
     override fun build(
         client: ITransportClient,
-        handler: Handler?,
-        clientHandler: Handler?
+        taskRunner: TaskRunner?,
+        clientTaskRunner: TaskRunner?
     ): ITransport {
-        val theHandler = mHandler ?: handler?: HandlerCompat.createAsync(Looper.getMainLooper())
+        val runner = mTaskRunner ?: taskRunner ?: TaskRunner.constructDefault()
         return construct(
             client,
-            theHandler,
-            mClientHandler ?: clientHandler ?: theHandler
+            runner,
+            mClientTaskRunner ?: clientTaskRunner ?: runner
         )
     }
 }

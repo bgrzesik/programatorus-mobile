@@ -1,6 +1,5 @@
 package programatorus.client.comm.presentation.mock
 
-import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.presentation.AbstractMessengerBuilder
@@ -8,6 +7,7 @@ import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
 import programatorus.client.comm.presentation.IOutgoingMessage
 import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
@@ -128,8 +128,8 @@ open class MockMessenger internal constructor(
 
         override fun construct(
             client: IMessageClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): IMessenger = MockMessenger(mEndpoint!!, client, mDisconnectOnReconnect)
     }
 

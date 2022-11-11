@@ -1,9 +1,9 @@
 package programatorus.client.comm.presentation.mock
 
-import android.os.Handler
 import programatorus.client.comm.presentation.AbstractMessengerBuilder
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessenger
+import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 
 class LoopbackMessenger private constructor(
@@ -27,8 +27,8 @@ class LoopbackMessenger private constructor(
 
         override fun construct(
             client: IMessageClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): IMessenger = LoopbackMessenger(client, mDisconnectOnReconnect)
     }
 

@@ -1,28 +1,27 @@
 package programatorus.client.comm.presentation
 
-import android.os.Handler
-import android.os.Looper
-import androidx.core.os.HandlerCompat
 import programatorus.client.AbstractConnectionBuilder
+import programatorus.client.utils.TaskRunner
 
-abstract class AbstractMessengerBuilder<M : AbstractMessengerBuilder<M>> : AbstractConnectionBuilder<M>(), IMessengerBuilder<M> {
+abstract class AbstractMessengerBuilder<M : AbstractMessengerBuilder<M>> :
+    AbstractConnectionBuilder<M>(), IMessengerBuilder<M> {
 
     abstract fun construct(
         client: IMessageClient,
-        handler: Handler,
-        clientHandler: Handler
+        taskRunner: TaskRunner,
+        clientTaskRunner: TaskRunner
     ): IMessenger
 
     override fun build(
         client: IMessageClient,
-        handler: Handler?,
-        clientHandler: Handler?
+        taskRunner: TaskRunner?,
+        clientTaskRunner: TaskRunner?
     ): IMessenger {
-        val theHandler = mHandler ?: handler?: HandlerCompat.createAsync(Looper.getMainLooper())
+        val runner = mTaskRunner ?: taskRunner ?: TaskRunner.constructDefault()
         return construct(
             client,
-            theHandler,
-            mClientHandler ?: clientHandler ?: theHandler
+            runner,
+            mClientTaskRunner ?: clientTaskRunner ?: runner
         )
     }
 }

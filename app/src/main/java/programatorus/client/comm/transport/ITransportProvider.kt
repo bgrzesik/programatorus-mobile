@@ -1,13 +1,13 @@
 package programatorus.client.comm.transport
 
-import android.os.Handler
+import programatorus.client.utils.TaskRunner
 
 interface ITransportProvider {
 
     fun build(
         client: ITransportClient,
-        handler: Handler? = null,
-        clientHandler: Handler? = null
+        taskRunner: TaskRunner? = null,
+        clientTaskRunner: TaskRunner? = null
     ): ITransport
 
 }
