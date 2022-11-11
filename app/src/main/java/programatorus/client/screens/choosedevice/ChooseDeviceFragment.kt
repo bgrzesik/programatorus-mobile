@@ -24,9 +24,7 @@ import programatorus.client.R
 import programatorus.client.databinding.FragmentChooseDeviceBinding
 
 @SuppressLint("MissingPermission")
-class ChooseDeviceFragment :
-    Fragment(),
-    ChooseDeviceContract.View {
+class ChooseDeviceFragment : Fragment() {
 
     private lateinit var binding: FragmentChooseDeviceBinding
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -176,10 +174,6 @@ class ChooseDeviceFragment :
         if (bluetoothAdapter.isDiscovering) {
             bluetoothAdapter.cancelDiscovery()
         }
-    }
-
-    override fun setPairedDevices(bondedDevices: MutableSet<BluetoothDevice>) {
-
     }
 
     fun navigateToHome() {
