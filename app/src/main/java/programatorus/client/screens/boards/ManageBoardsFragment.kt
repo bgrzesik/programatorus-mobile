@@ -68,8 +68,8 @@ class ManageBoardsFragment : Fragment() {
 
     fun updateConfigurations() {
         configurationsManager.setState(
-            binding.favBoards.getBoards().map { it.asBoard() },
-            binding.allBoards.getBoards().map { it.asBoard() }
+            binding.allBoards.getBoards().map { it.asBoard() },
+            binding.favBoards.getBoards().map { it.asBoard() }
         )
     }
 

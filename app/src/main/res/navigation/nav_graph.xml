@@ -27,6 +27,11 @@
             android:id="@+id/action_home_to_manageBoards"
             app:destination="@id/ManageBoardsFragment"
             app:popUpTo="@id/HomeFragment"/>
+
+        <action
+            android:id="@+id/action_home_to_uploadFile"
+            app:destination="@id/UploadFileFragment"
+            app:popUpTo="@id/HomeFragment"/>
     </fragment>
 
     <fragment
@@ -34,6 +39,13 @@
         android:name="programatorus.client.screens.boards.ManageBoardsFragment"
         android:label="@string/manage_boards_fragment_label"
         tools:layout="@layout/fragment_manage_boards">
+    </fragment>
+
+    <fragment
+        android:id="@+id/UploadFileFragment"
+        android:name="programatorus.client.screens.uploadfile.UploadFileFragment"
+        android:label="@string/upload_file_fragment_label"
+        tools:layout="@layout/fragment_upload_file">
 
     </fragment>
 
