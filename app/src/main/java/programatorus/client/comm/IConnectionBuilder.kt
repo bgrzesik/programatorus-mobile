@@ -1,9 +1,9 @@
 package programatorus.client.comm
 
-import android.os.Handler
+import programatorus.client.utils.TaskRunner
 
 interface IConnectionBuilder<B: IConnectionBuilder<B>> {
-    fun setHandler(handler: Handler): B
+    fun setTaskRunner(taskRunner: TaskRunner): B
 
-    fun setClientHandler(handler: Handler): B
+    fun setClientTaskRunner(taskRunner: TaskRunner): B
 }

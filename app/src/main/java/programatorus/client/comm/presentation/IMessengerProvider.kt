@@ -1,13 +1,13 @@
 package programatorus.client.comm.presentation
 
-import android.os.Handler
+import programatorus.client.utils.TaskRunner
 
 interface IMessengerProvider {
 
     fun build(
         client: IMessageClient,
-        handler: Handler? = null,
-        clientHandler: Handler? = null
+        taskRunner: TaskRunner? = null,
+        clientTaskRunner: TaskRunner? = null
     ): IMessenger
 
 }

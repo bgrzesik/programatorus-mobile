@@ -1,21 +1,21 @@
 package programatorus.client.comm.presentation
 
-import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.ConnectionClientDelegate
 import programatorus.client.comm.transport.*
+import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
 class ProtocolMessenger private constructor(
     transport: ITransportProvider,
-    handler: Handler? = null,
-    clientHandler: Handler? = null,
+    taskRunner: TaskRunner? = null,
+    clientTaskRunner: TaskRunner? = null,
     private val mClient: IMessageClient
 ) : IMessenger {
 
     private val mTransportClient = Client()
-    private val mTransport: ITransport = transport.build(mTransportClient, handler, clientHandler)
+    private val mTransport: ITransport = transport.build(mTransportClient, taskRunner, clientTaskRunner)
 
     companion object {
         const val TAG = "ProtocolMessenger"
@@ -70,9 +70,9 @@ class ProtocolMessenger private constructor(
 
         override fun construct(
             client: IMessageClient,
-            handler: Handler,
-            clientHandler: Handler
-        ): IMessenger = ProtocolMessenger(mTransport!!, handler, clientHandler, client)
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
+        ): IMessenger = ProtocolMessenger(mTransport!!, taskRunner, clientTaskRunner, client)
 
     }
 }

@@ -6,13 +6,13 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Handler
 import android.util.Log
 import androidx.core.content.ContextCompat
 import programatorus.client.comm.transport.AbstractTransportBuilder
 import programatorus.client.comm.transport.ITransport
 import programatorus.client.comm.transport.ITransportClient
 import programatorus.client.comm.transport.io.StreamingTransport
+import programatorus.client.utils.TaskRunner
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
@@ -94,8 +94,8 @@ class BluetoothTransport(
 
         override fun construct(
             client: ITransportClient,
-            handler: Handler,
-            clientHandler: Handler
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
         ): ITransport = BluetoothTransport(mContext!!, mDevice!!, client)
     }
 }

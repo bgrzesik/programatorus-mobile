@@ -1,29 +1,28 @@
 package programatorus.client.comm.presentation
 
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.utils.HandlerActor
+import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
 
 class Messenger private constructor(
     messenger: IMessengerProvider,
     client: IMessageClient,
-    private val mHandler: Handler,
-    private val mClientHandler: Handler
-) : IMessenger, HandlerActor {
+    private val mTaskRunner: TaskRunner,
+    private val mClientTaskRunner: TaskRunner
+) : IMessenger, ActiveObject {
 
     companion object {
         const val TAG = "Messenger"
     }
 
     private val mClient = Client(client)
-    private val mImpl: IMessenger = messenger.build(mClient, mHandler, mClientHandler)
+    private val mImpl: IMessenger = messenger.build(mClient, mTaskRunner, mClientTaskRunner)
 
-    override val handler: Handler
-        get() = mHandler
+    override val taskRunner: TaskRunner
+        get() = mTaskRunner
 
 
     override fun send(message: Protocol.GenericMessage): IOutgoingMessage {
@@ -78,14 +77,14 @@ class Messenger private constructor(
         }
 
         private fun onDelivered(outgoing: IOutgoingMessage?) =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 assert(mOutgoing == outgoing)
                 Log.d(TAG, "onDelivered(): Packet delivered.")
                 response.complete(mOutgoing)
             }
 
         private fun onDeliveryFailed(throwable: Throwable) =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 Log.e(TAG, "onDeliveryFailed(): Packet delivery failure", throwable)
                 response.completeExceptionally(throwable)
             }
@@ -99,17 +98,17 @@ class Messenger private constructor(
     ) : IMessageClient {
 
         override fun onMessageReceived(message: Protocol.GenericMessage) =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onMessageReceived(message)
             }
 
         override fun onStateChanged(state: ConnectionState) =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onStateChanged(state)
             }
 
         override fun onError() =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mClient.onError()
             }
     }
@@ -124,9 +123,9 @@ class Messenger private constructor(
 
         override fun construct(
             client: IMessageClient,
-            handler: Handler,
-            clientHandler: Handler
-        ): IMessenger = Messenger(mMessenger!!, client, handler, clientHandler)
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
+        ): IMessenger = Messenger(mMessenger!!, client, taskRunner, clientTaskRunner)
     }
 
 }

@@ -1,15 +1,14 @@
 package programatorus.client.comm.session
 
 import android.os.Handler
-import android.os.Looper
 import android.util.Log
-import com.google.protobuf.Descriptors
 import com.google.protobuf.Empty
 import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessengerProvider
 import programatorus.client.comm.presentation.IOutgoingMessage
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.utils.HandlerActor
+import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import programus.proto.Protocol.GenericMessage
 import java.util.concurrent.CompletableFuture
@@ -20,14 +19,14 @@ import java.util.concurrent.atomic.AtomicLong
 class Session private constructor(
     messenger: IMessengerProvider,
     client: ISessionClient,
-    private val mHandler: Handler,
-    private val mClientHandler: Handler
-) : ISession, HandlerActor {
+    private val mTaskRunner: TaskRunner,
+    private val mClientTaskRunner: TaskRunner
+) : ISession, ActiveObject {
 
     private companion object {
         const val TAG = "Session"
 
-        const val HEARTBEAT_MS: Long = 500
+        const val HEARTBEAT_MS: Long = 2000
         const val TIMEOUT_MS: Long = 8 * HEARTBEAT_MS
     }
 
@@ -44,13 +43,13 @@ class Session private constructor(
 
     private val mClient = Client(client)
     private val mQueue = LinkedBlockingQueue<PendingMessage>()
-    private val mMessenger = messenger.build(mClient, mClientHandler, mClientHandler)
+    private val mMessenger = messenger.build(mClient, mTaskRunner, mClientTaskRunner)
 
-    override val handler: Handler
-        get() = mHandler
+    override val taskRunner: TaskRunner
+        get() = mTaskRunner
 
     override fun request(message: GenericMessage): CompletableFuture<GenericMessage> {
-        Log.d(TAG, "request():")
+        Log.d(TAG, "request(): ${message.payloadCase}")
 
         val pending = PendingMessage(
             GenericMessage.newBuilder(message)
@@ -115,7 +114,7 @@ class Session private constructor(
         var response = response
 
         if (exception != null) {
-            Log.e(TAG, "onRequest(): ")
+            Log.e(TAG, "onRequest(): ", exception)
             response = GenericMessage.newBuilder()
                 .setResponse(requestId)
                 .apply {
@@ -269,7 +268,7 @@ class Session private constructor(
             }
 
             Log.d(TAG, "onRequest(): Deferring request to client")
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mUserClient.onRequest(request)
                     .whenComplete { response, exception ->
                         onRequestDone(request.request, response, exception)
@@ -301,13 +300,13 @@ class Session private constructor(
             if (state == ConnectionState.CONNECTED) {
                 updateLastTransfer()
             }
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mUserClient.onStateChanged(state)
             }
         }
 
         override fun onError() =
-            runOnLooper(targetHandler = mClientHandler) {
+            runOnLooper(target = mClientTaskRunner) {
                 mUserClient.onError()
             }
 
@@ -323,9 +322,9 @@ class Session private constructor(
 
         override fun construct(
             client: ISessionClient,
-            handler: Handler,
-            clientHandler: Handler
-        ): ISession = Session(mMessenger!!, client, handler, clientHandler)
+            taskRunner: TaskRunner,
+            clientTaskRunner: TaskRunner
+        ): ISession = Session(mMessenger!!, client, taskRunner, clientTaskRunner)
     }
 
 }
