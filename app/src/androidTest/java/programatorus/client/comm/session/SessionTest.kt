@@ -14,7 +14,7 @@ open class SessionTest {
     @Before
     open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
-    @Test(timeout = 5000)
+    @Test(timeout = 60000)
     fun testKeepAliveDisconnect() {
         val latch = CountDownLatch(1)
 
