@@ -7,10 +7,12 @@ import io.mockk.mockkStatic
 import io.mockk.unmockkAll
 import org.hamcrest.CoreMatchers
 import org.junit.Assume
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessengerProvider
-import programatorus.client.comm.presentation.Messenger
-import programatorus.client.comm.presentation.ProtocolMessenger
+import programatorus.client.comm.app.IResponder
+import programatorus.client.comm.app.RequestRouter
+import programatorus.client.comm.presentation.*
+import programatorus.client.comm.presentation.mock.IMockMessengerEndpoint
+import programatorus.client.comm.presentation.mock.MockMessenger
+import programatorus.client.comm.session.ISession
 import programatorus.client.comm.session.ISessionClient
 import programatorus.client.comm.session.ISessionProvider
 import programatorus.client.comm.session.Session
@@ -52,6 +54,22 @@ object TestUtils {
             value = "Test 1234"
         })
         .build()
+
+    fun createMockedSession(
+        client: ISessionClient,
+        endpoint: IMockMessengerEndpoint
+    ): Pair<ISession, MockMessengerOrchestrator> {
+        val orchestrator = MockMessengerOrchestrator()
+        val session = Session.Builder()
+            .setMessenger(
+                MockMessenger.Builder()
+                    .setOrchestrator(orchestrator)
+                    .setEndpoint(endpoint)
+            )
+            .build(client)
+
+        return Pair(session, orchestrator)
+    }
 
     private fun <T> mockLooper(f: () -> T): T {
         if (isAndroid)
@@ -147,6 +165,18 @@ object TestUtils {
         val right = Session.Builder()
             .setMessenger(rightMessenger)
 
+        return Pair(left, right)
+    }
+
+    fun createSessionResponderPair(
+        leftResponders: List<IResponder>,
+        rightResponders: List<IResponder>,
+        wrapTransport: Boolean = false,
+        wrapMessenger: Boolean = false
+    ): Pair<ISession, ISession> {
+        val (leftBuilder, rightBuilder) = createSessionPair(wrapTransport, wrapMessenger)
+        val left = leftBuilder.build(RequestRouter(leftResponders))
+        val right = rightBuilder.build(RequestRouter(rightResponders))
         return Pair(left, right)
     }
 
