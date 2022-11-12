@@ -43,7 +43,7 @@ open class RequesterResponderTest(
     @Before
     open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
-    @Test
+    @Test(timeout=2000)
     fun testDeviceStatusUpdate() {
         val latch = CountDownLatch(2)
         val deviceStatusUpdate = object : Requester<Unit> {
@@ -96,7 +96,7 @@ open class RequesterResponderTest(
     }
 
 
-    @Test
+    @Test(timeout=2000)
     fun testGetBoards() {
         val onGetBoardsResponder = object : IResponder {
             override val requestPayloadCase: PayloadCase

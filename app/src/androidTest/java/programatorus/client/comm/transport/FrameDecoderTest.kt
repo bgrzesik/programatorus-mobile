@@ -21,22 +21,22 @@ class FrameDecoderTest {
         Assert.assertArrayEquals(plain, decoded)
     }
 
-    @Test
+    @Test(timeout=200)
     fun testRubbishData() {
         Assert.assertNull(decodeSingleFrame(byteArrayOf(0xff.toByte(), 0xf1.toByte(), 0x2f, 0x3f)))
     }
 
-    @Test
+    @Test(timeout=200)
     fun testEmptySteam() {
         Assert.assertNull(decodeSingleFrame(byteArrayOf()))
     }
 
-    @Test
+    @Test(timeout=200)
     fun testNullSteam() {
         Assert.assertNull(decodeSingleFrame(byteArrayOf(0x00, 0x00)))
     }
 
-    @Test
+    @Test(timeout=200)
     fun testSteamWithoutZeros() {
         testSingleFrame(
             byteArrayOf(0x1),
@@ -52,7 +52,7 @@ class FrameDecoderTest {
         )
     }
 
-    @Test
+    @Test(timeout=200)
     fun testSteamWithZeros() {
         testSingleFrame(
             byteArrayOf(0x1, 0x0),

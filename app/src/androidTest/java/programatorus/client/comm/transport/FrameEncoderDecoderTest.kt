@@ -26,7 +26,7 @@ class FrameEncoderDecoderTest {
         Assert.assertArrayEquals(plain, decoded)
     }
 
-    @Test
+    @Test(timeout=200)
     fun testEncodeDecodeWithoutZeros() {
         test(byteArrayOf(0x1, 0x2, 0x3, 0x4))
         test(byteArrayOf(0x1, 0x2, 0x3, 0x4, 0x5, 0x6))
@@ -40,7 +40,7 @@ class FrameEncoderDecoderTest {
         test(plain)
     }
 
-    @Test
+    @Test(timeout=200)
     fun testEncodeDecodeWithZeros() {
         test(byteArrayOf(0x1, 0x0))
         test(byteArrayOf(0x1, 0x0, 0x1))
@@ -51,7 +51,7 @@ class FrameEncoderDecoderTest {
         test(ByteArray(256))
     }
 
-    @Test
+    @Test(timeout=200)
     fun testRandomizedMessages() {
         val random = Random(2137)
 

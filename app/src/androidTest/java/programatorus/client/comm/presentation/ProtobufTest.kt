@@ -9,7 +9,7 @@ import java.io.ByteArrayOutputStream
 
 class ProtobufTest {
 
-    @Test
+    @Test(timeout=500)
     fun testBufferParseWrite() {
         val outputStream = ByteArrayOutputStream(1024)
         val message = TestUtils.newTestMessage()
