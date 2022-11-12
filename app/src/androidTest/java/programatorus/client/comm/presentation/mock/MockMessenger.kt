@@ -2,10 +2,7 @@ package programatorus.client.comm.presentation.mock
 
 import android.util.Log
 import programatorus.client.comm.AbstractConnection
-import programatorus.client.comm.presentation.AbstractMessengerBuilder
-import programatorus.client.comm.presentation.IMessageClient
-import programatorus.client.comm.presentation.IMessenger
-import programatorus.client.comm.presentation.IOutgoingMessage
+import programatorus.client.comm.presentation.*
 import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
@@ -76,7 +73,7 @@ open class MockMessenger internal constructor(
         state = ConnectionState.DISCONNECTED
     }
 
-    fun mockPacket(packet: Protocol.GenericMessage) {
+    fun mockMessage(packet: Protocol.GenericMessage) {
         Log.d(TAG, "mockPacket()")
 
         assert(state == ConnectionState.CONNECTED)
@@ -106,7 +103,7 @@ open class MockMessenger internal constructor(
 
             if (endpointResponse != null) {
                 Log.d(TAG, "Mocked endpoint response")
-                mockPacket(endpointResponse)
+                mockMessage(endpointResponse)
             }
         }
     }
@@ -115,6 +112,7 @@ open class MockMessenger internal constructor(
     class Builder : AbstractMessengerBuilder<Builder>() {
         private var mEndpoint: IMockMessengerEndpoint? = null
         private var mDisconnectOnReconnect: Boolean = false
+        private var mOrchestrator: MockMessengerOrchestrator? = null
 
         fun setEndpoint(endpoint: IMockMessengerEndpoint): Builder {
             mEndpoint = endpoint
@@ -126,11 +124,20 @@ open class MockMessenger internal constructor(
             return this
         }
 
+        fun setOrchestrator(orchestrator: MockMessengerOrchestrator): Builder {
+            mOrchestrator = orchestrator
+            return this
+        }
+
         override fun construct(
             client: IMessageClient,
             taskRunner: TaskRunner,
             clientTaskRunner: TaskRunner
-        ): IMessenger = MockMessenger(mEndpoint!!, client, mDisconnectOnReconnect)
+        ): IMessenger {
+            val mockMessenger = MockMessenger(mEndpoint!!, client, mDisconnectOnReconnect)
+            mOrchestrator?.register(mockMessenger)
+            return mockMessenger
+        }
     }
 
 }
