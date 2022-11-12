@@ -1,26 +1,50 @@
 package programatorus.client.comm.transport.io
 
 import android.util.Log
-import programatorus.client.comm.AbstractConnection
 import programatorus.client.comm.transport.*
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.*
-import java.util.*
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.withLock
 
 
 abstract class StreamingTransport<T : StreamingTransport<T>>(
     private val mClient: ITransportClient,
-) : AbstractConnection(mClient), ITransport {
+) : ITransport {
 
     companion object {
         private const val TAG = "StreamingTransport"
-        private const val MAX_SIZE = 1024
-        private const val PREAMBLE = 0b1010_1010
     }
+
+    override var state: ConnectionState
+        get() {
+            mStateLock.readLock().withLock {
+                return mState
+            }
+        }
+        set(value) {
+            val current = state
+            if (value == current) {
+                return
+            }
+
+            Log.d(TAG, "Changing transport state $current -> $value")
+            mStateLock.writeLock().withLock {
+                mState = value
+            }
+
+            mClient.onStateChanged(mState)
+        }
+
+    private var mState = ConnectionState.DISCONNECTED
+    private val mStateLock: ReadWriteLock = ReentrantReadWriteLock()
+    private val mLock = ReentrantLock()
 
     private var mOutputQueue: BlockingQueue<OutgoingPacket> = LinkedBlockingQueue()
     private var mRunning: AtomicBoolean = AtomicBoolean(false)
@@ -71,17 +95,23 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
         state = ConnectionState.CONNECTING
 
-        if (!doConnect() || !isConnected) {
+        val doConnectSucceed = mLock.withLock {
+            doConnect()
+        }
+
+        if (!doConnectSucceed || !isConnected) {
             disconnect()
-            state = ConnectionState.DISCONNECTED
             return
         }
 
-        mInputThread = IOThread("input", this::inputThreadTask)
-        mInputThread?.start()
+        mRunning.set(true)
+        mLock.withLock {
+            mInputThread = IOThread("input", this::inputThreadTask)
+            mInputThread?.start()
 
-        mOutputThread = IOThread("output", this::outputThreadTask)
-        mOutputThread?.start()
+            mOutputThread = IOThread("output", this::outputThreadTask)
+            mOutputThread?.start()
+        }
 
         state = ConnectionState.CONNECTED
     }
@@ -93,8 +123,18 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         Log.d(TAG, "inputThreadTask(): Trying to parse from input stream")
 
         val frameDecoder = FrameDecoder(inputStream!!)
-        val buffer = frameDecoder.readFrame() ?: return
-        mClient.onPacketReceived(buffer)
+        val buffer = frameDecoder.readFrame()
+        if (buffer != null) {
+            Log.d(TAG, "inputThreadTask(): Decoded frame size=${buffer.size}")
+            mClient.onPacketReceived(buffer)
+        } else {
+            if (frameDecoder.isEof) {
+                Log.d(TAG, "inputThreadTask(): Found EOF disconnecting")
+                // This call is safe
+                disconnect()
+            }
+            Log.d(TAG, "inputThreadTask(): Failed to decode")
+        }
     }
 
     /**
@@ -127,16 +167,18 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
         mRunning.set(false)
 
-        try {
-            mInputThread?.interrupt()
-            mOutputThread?.interrupt()
-        } catch (_: Throwable) {
+        mLock.withLock {
+            try {
+                mInputThread?.interrupt()
+                mOutputThread?.interrupt()
+            } catch (_: Throwable) {
+            }
+
+            mInputThread = null
+            mOutputThread = null
+
+            doDisconnect()
         }
-
-        mInputThread = null
-        mOutputThread = null
-
-        doDisconnect()
 
         state = ConnectionState.DISCONNECTED
     }
@@ -148,28 +190,32 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
         override fun run() {
             try {
-                while (isConnected) {
+                while (isConnected && mRunning.get()) {
                     try {
                         mIoOperation()
                     } catch (th: InterruptedIOException) {
-                        if (!mRunning.get())
-                            return
+                        if (!mRunning.get()) {
+                            break
+                        }
                         Log.e(TAG, "run(): ", th)
                     } catch (th: InterruptedException) {
-                        if (!mRunning.get())
-                            return
+                        if (!mRunning.get()) {
+                            break
+                        }
                         Log.e(TAG, "run(): ", th)
                     }
                 }
             } catch (th: Throwable) {
-                if (!mRunning.get())
-                    return
-                try {
-                    Log.e(TAG, "run(): IO thread dead", th)
-                } catch (_: RuntimeException) {
-                    th.printStackTrace()
+                if (mRunning.get()) {
+                    try {
+                        Log.e(TAG, "run(): IO thread dead", th)
+                    } catch (_: RuntimeException) {
+                        th.printStackTrace()
+                    }
                 }
             }
+
+            Log.d(TAG, "run(): Thread quited ${this.name}")
         }
     }
 
