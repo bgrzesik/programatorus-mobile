@@ -22,7 +22,7 @@ class FrameDecoderTest {
     }
 
     @Test
-    fun testWriteSliceSize() {
+    fun testRubbishData() {
         Assert.assertNull(decodeSingleFrame(byteArrayOf(0xff.toByte(), 0xf1.toByte(), 0x2f, 0x3f)))
     }
 
