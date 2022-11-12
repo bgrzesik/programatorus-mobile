@@ -1,6 +1,5 @@
 package programatorus.client.comm.session
 
-import android.os.Handler
 import android.util.Log
 import com.google.protobuf.Empty
 import programatorus.client.comm.presentation.IMessageClient

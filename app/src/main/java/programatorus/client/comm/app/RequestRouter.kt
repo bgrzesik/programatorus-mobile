@@ -4,7 +4,7 @@ import android.util.Log
 import programatorus.client.comm.IConnectionClient
 import programatorus.client.comm.session.ISessionClient
 import programatorus.client.comm.transport.ConnectionState
-import programus.proto.Protocol.*
+import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import java.util.concurrent.CompletableFuture
 

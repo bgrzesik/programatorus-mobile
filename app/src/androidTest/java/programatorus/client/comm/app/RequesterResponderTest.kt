@@ -8,8 +8,6 @@ import org.junit.runners.Parameterized
 import programatorus.client.comm.TestUtils
 import programatorus.client.comm.app.proto.GetBoards
 import programatorus.client.comm.app.proto.OnDeviceStatusUpdate
-import programatorus.client.comm.session.ISession
-import programus.proto.Protocol
 import programus.proto.Protocol.*
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import java.util.concurrent.CompletableFuture

@@ -4,7 +4,7 @@ import com.google.protobuf.Empty
 import programatorus.client.comm.app.PojoResponder
 import programus.proto.Protocol.DeviceUpdateStatus.Status.*
 import programus.proto.Protocol.GenericMessage
-import java.util.Optional
+import java.util.*
 
 interface OnDeviceStatusUpdate : PojoResponder<OnDeviceStatusUpdate.DeviceStatus, Unit> {
 

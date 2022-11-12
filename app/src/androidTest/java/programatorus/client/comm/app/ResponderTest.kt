@@ -10,7 +10,6 @@ import programatorus.client.comm.app.proto.OnDeviceStatusUpdate
 import programatorus.client.comm.app.proto.OnDeviceStatusUpdate.DeviceStatus
 import programatorus.client.comm.presentation.mock.IMockMessengerEndpoint
 import programatorus.client.comm.transport.ConnectionState
-import programus.proto.Protocol
 import programus.proto.Protocol.DeviceUpdateStatus
 import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
