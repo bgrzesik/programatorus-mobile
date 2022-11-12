@@ -22,7 +22,7 @@ open class ResponderTest {
     @Before
     open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
-    @Test
+    @Test(timeout=1000)
     fun testDeviceUpdateStatus() {
         val sendLatch = CountDownLatch(1)
         val latch = CountDownLatch(2)

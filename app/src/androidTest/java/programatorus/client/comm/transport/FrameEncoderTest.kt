@@ -7,7 +7,7 @@ import java.util.*
 
 class FrameEncoderTest {
 
-    @Test
+    @Test(timeout=200)
     fun testWriteSliceSize() {
         fun testNumber(number: Int, expected: ByteArray) {
             val array = ByteArrayOutputStream(2);
@@ -37,7 +37,7 @@ class FrameEncoderTest {
         Assert.assertArrayEquals(expected, array.toByteArray())
     }
 
-    @Test
+    @Test(timeout=200)
     fun testWriteWithoutZero() {
         testEncoding(
             byteArrayOf(0x1, 0x2, 0x3, 0x4),
@@ -58,7 +58,7 @@ class FrameEncoderTest {
         )
     }
 
-    @Test
+    @Test(timeout=200)
     fun testWriteWithZero() {
         testEncoding(byteArrayOf(0x0), byteArrayOf(0x80.toByte(), 0x80.toByte(), 0x0))
         testEncoding(byteArrayOf(0x1, 0x0), byteArrayOf(0x81.toByte(), 0x80.toByte(), 0x1, 0x0))

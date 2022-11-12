@@ -16,7 +16,7 @@ open class RequesterTest {
     @Before
     open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
-    @Test
+    @Test(timeout=1000)
     fun testGetBoardsRequest() {
         val router = RequestRouter(emptyList())
         val endpoint = object : IMockMessengerEndpoint {

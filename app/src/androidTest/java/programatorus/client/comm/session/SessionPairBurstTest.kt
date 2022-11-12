@@ -46,7 +46,7 @@ open class SessionPairBurstTest(
     @Before
     open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
-    @Test
+    @Test(timeout=2000)
     fun testRequestResponse() {
         val (leftBuilder, rightBuilder) = TestUtils.createSessionPair(
             mWrapTransport,
@@ -101,7 +101,7 @@ open class SessionPairBurstTest(
         right.disconnect()
     }
 
-    @Test
+    @Test(timeout=2000)
     fun testOrder() {
         val (leftBuilder, rightBuilder) = TestUtils.createSessionPair(
             mWrapTransport,
