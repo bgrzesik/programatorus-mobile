@@ -163,7 +163,15 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
     override fun disconnect() {
         Log.d(TAG, "disconnect()")
-        state = ConnectionState.DISCONNECTING
+
+        mStateLock.writeLock().withLock {
+            if (mState == ConnectionState.DISCONNECTED) {
+                return@disconnect
+            }
+
+            // This is reentrant lock won't dead lock here
+            state = ConnectionState.DISCONNECTING
+        }
 
         mRunning.set(false)
 
