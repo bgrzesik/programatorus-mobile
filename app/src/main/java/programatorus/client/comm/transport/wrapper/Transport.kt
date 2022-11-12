@@ -1,6 +1,5 @@
 package programatorus.client.comm.transport.wrapper
 
-import android.os.Handler
 import android.util.Log
 import programatorus.client.comm.transport.*
 import programatorus.client.utils.ActiveObject

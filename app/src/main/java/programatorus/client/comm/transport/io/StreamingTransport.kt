@@ -3,7 +3,9 @@ package programatorus.client.comm.transport.io
 import android.util.Log
 import programatorus.client.comm.transport.*
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
-import java.io.*
+import java.io.InputStream
+import java.io.InterruptedIOException
+import java.io.OutputStream
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit

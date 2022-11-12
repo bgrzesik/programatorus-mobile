@@ -1,6 +1,5 @@
 package programatorus.client.utils
 
-import android.os.Handler
 import android.os.Looper
 import androidx.core.os.HandlerCompat
 

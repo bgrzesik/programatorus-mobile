@@ -2,7 +2,6 @@ package programatorus.client.comm
 
 import android.util.Log
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.comm.transport.ITransportClient
 
 abstract class AbstractConnection(
     private val client: IConnectionClient,

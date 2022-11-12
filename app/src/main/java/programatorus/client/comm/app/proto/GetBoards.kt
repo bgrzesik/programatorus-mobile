@@ -1,8 +1,9 @@
 package programatorus.client.comm.app.proto
 
 import programatorus.client.comm.app.Requester
-import programus.proto.Protocol.*
+import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
+import programus.proto.Protocol.GetBoardsRequest
 
 class GetBoards : Requester<GetBoards.Boards> {
 
