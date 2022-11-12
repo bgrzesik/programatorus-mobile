@@ -76,28 +76,29 @@ class ManageBoardsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.favBoards.visibility = View.GONE
-        binding.allBoards.visibility = View.VISIBLE
+        with(binding) {
+            favBoards.enableTouch()
 
-        binding.favBoards.enableTouch()
-
-        binding.allBoards.setBoards(
-            configurationsManager.getAll().map { AllBoardsListItem.from(it) }
-        )
-
-        binding.favBoards.setBoards(
-            configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
-        )
-
-        binding.tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
-        binding.tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
-
-        binding.btn.setOnClickListener {
-            Log.d(
-                "fav list:",
-                "fav ${binding.favBoards.getBoards()} \n all ${binding.allBoards.getBoards()}"
+            allBoards.setBoards(
+                configurationsManager.getAll().map { AllBoardsListItem.from(it) }
             )
+
+            favBoards.setBoards(
+                configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
+            )
+
+            tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
+            tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
+
+            // TODO: Remove later 
+            btn.setOnClickListener {
+                Log.d(
+                    "fav list:",
+                    "fav ${favBoards.getBoards()} \n all ${allBoards.getBoards()}"
+                )
+            }
         }
+        
 
     }
 

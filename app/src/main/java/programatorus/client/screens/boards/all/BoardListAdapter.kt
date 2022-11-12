@@ -56,15 +56,17 @@ class BoardListAdapter():
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: AllBoardsListItem, onItemClickListener: ClickListener) {
-            binding.filename.text = item.name
-            binding.checkbox.isChecked = item.isSelected.get()
+            with(binding) {
+                filename.text = item.name
+                checkbox.isChecked = item.isSelected.get()
 
-            binding.checkbox.setOnClickListener {
-                item.toggle()
-            }
+                checkbox.setOnClickListener {
+                    item.toggle()
+                }
 
-            binding.root.setOnClickListener {
-                onItemClickListener(item)
+                root.setOnClickListener {
+                    onItemClickListener(item)
+                }
             }
         }
     }

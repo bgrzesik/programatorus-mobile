@@ -63,10 +63,12 @@ class BoardListAdapter():
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: FavBoardsListItem, onItemClickListener: ClickListener) {
-            binding.filename.text = item.name
+            with(binding) {
+                filename.text = item.name
 
-            binding.root.setOnClickListener {
-                onItemClickListener(item)
+                root.setOnClickListener {
+                    onItemClickListener(item)
+                }
             }
         }
     }
