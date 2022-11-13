@@ -2,6 +2,8 @@ package programatorus
 
 import android.util.Log
 import com.google.protobuf.Empty
+import programatorus.client.comm.app.RequestRouter
+import programatorus.client.comm.app.proto.GetBoards
 import programatorus.client.comm.presentation.Messenger
 import programatorus.client.comm.presentation.ProtocolMessenger
 import programatorus.client.comm.session.ISessionClient
@@ -23,6 +25,8 @@ fun main() {
     val semaphore = Semaphore(1)
     semaphore.acquire()
 
+    val router = RequestRouter(listOf())
+
     val session = Session.Builder()
         .setMessenger(
             Messenger.Builder()
@@ -38,22 +42,11 @@ fun main() {
                         )
                 )
         )
-        .build(object : ISessionClient {
-            override fun onRequest(request: GenericMessage): CompletableFuture<GenericMessage> {
-                Log.i(TAG, "Got request $request")
-
-                return CompletableFuture.completedFuture(
-                    GenericMessage.newBuilder()
-                        .setOk(Empty.getDefaultInstance())
-                        .build()
-                )
-            }
-
-            override fun onStateChanged(state: ConnectionState) {
-                Log.i(TAG, "State changed -> $state")
-            }
-        })
+        .build(router)
     session.reconnect()
 
-    semaphore.acquire()
+    val boards = GetBoards().request(session).get()
+    Log.i(TAG, "Got boards ${boards.boards.contentToString()}")
+
+    session.disconnect()
 }
