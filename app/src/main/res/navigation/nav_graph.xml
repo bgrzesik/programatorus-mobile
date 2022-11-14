@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/ChooseDeviceFragment">
+
+    <fragment
+        android:id="@+id/ChooseDeviceFragment"
+        android:name="programatorus.client.screens.choosedevice.ChooseDeviceFragment"
+        android:label="@string/choose_device_fragment_label"
+        tools:layout="@layout/fragment_choose_device">
+
+        <action
+            android:id="@+id/action_chooseDevice_to_home"
+            app:destination="@id/HomeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/HomeFragment"
+        android:name="programatorus.client.screens.home.HomeFragment"
+        android:label="@string/home_fragment_label"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_home_to_manageBoards"
+            app:destination="@id/ManageBoardsFragment"
+            app:popUpTo="@id/HomeFragment"/>
+
+        <action
+            android:id="@+id/action_home_to_uploadFile"
+            app:destination="@id/UploadFileFragment"
+            app:popUpTo="@id/HomeFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageBoardsFragment"
+        android:name="programatorus.client.screens.boards.ManageBoardsFragment"
+        android:label="@string/manage_boards_fragment_label"
+        tools:layout="@layout/fragment_manage_boards">
+    </fragment>
+
+    <fragment
+        android:id="@+id/UploadFileFragment"
+        android:name="programatorus.client.screens.uploadfile.UploadFileFragment"
+        android:label="@string/upload_file_fragment_label"
+        tools:layout="@layout/fragment_upload_file">
+
+    </fragment>
+
+</navigation>
