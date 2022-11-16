@@ -20,8 +20,8 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import programatorus.client.R
 import programatorus.client.databinding.FragmentChooseDeviceBinding
+import programatorus.client.device.DeviceAddress
 
 @SuppressLint("MissingPermission")
 class ChooseDeviceFragment : Fragment() {
@@ -45,7 +45,7 @@ class ChooseDeviceFragment : Fragment() {
         binding = FragmentChooseDeviceBinding.inflate(inflater, container, false)
 
         binding.pairedDevices.setClickListener {
-            navigateToHome()
+            navigateToHome(DeviceAddress.BluetoothDevice(it.address))
         }
 
         requireContext().registerReceiver(discoveryHandler, IntentFilter(BluetoothDevice.ACTION_FOUND))
@@ -176,8 +176,9 @@ class ChooseDeviceFragment : Fragment() {
         }
     }
 
-    fun navigateToHome() {
-        findNavController().navigate(R.id.action_chooseDevice_to_home)
+    fun navigateToHome(address: DeviceAddress.BluetoothDevice) {
+        val action = ChooseDeviceFragmentDirections.actionChooseDeviceToHome(address)
+        findNavController().navigate(action)
     }
 
     companion object {

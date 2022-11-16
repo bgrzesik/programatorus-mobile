@@ -46,7 +46,7 @@ fun main() {
     session.reconnect()
 
     val boards = GetBoards().request(session).get()
-    Log.i(TAG, "Got boards ${boards.boards.contentToString()}")
+    Log.i(TAG, "Got boards $boards")
 
     session.disconnect()
 }
