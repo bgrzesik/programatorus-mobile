@@ -8,12 +8,13 @@ import android.view.View
 import android.view.ViewGroup
 import programatorus.client.SharedData
 import programatorus.client.databinding.FragmentManageBoardsBinding
+import programatorus.client.device.BoundDevice
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
 
 
 class ManageBoardsFragment : Fragment() {
-
+    private lateinit var mDevice: BoundDevice
     private var _binding: FragmentManageBoardsBinding? = null
 
     private val binding get() = _binding!!
@@ -76,6 +77,16 @@ class ManageBoardsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireContext().also { context ->
+            mDevice = BoundDevice(context)
+            mDevice.bind()
+            mDevice.onBind.thenAccept { device ->
+                device.getBoards().thenAccept { boards ->
+                    configurationsManager.setState(boards, boards)
+                }
+            }
+        }
+
         with(binding) {
             favBoards.enableTouch()
 
@@ -98,7 +109,7 @@ class ManageBoardsFragment : Fragment() {
                 )
             }
         }
-        
+
 
     }
 

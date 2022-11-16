@@ -8,6 +8,8 @@ plugins {
     id("com.android.application")
     kotlin("android")
     id("com.google.protobuf")
+    id("kotlin-parcelize")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -90,7 +92,6 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation(kotlin("stdlib-jdk7", kotlinVersion))
     implementation("androidx.navigation:navigation-fragment-ktx:2.5.2")
     implementation("androidx.navigation:navigation-ui-ktx:2.5.2")
     implementation("com.google.protobuf:protobuf-kotlin:3.19.4")

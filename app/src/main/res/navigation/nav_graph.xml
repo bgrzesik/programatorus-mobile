@@ -32,6 +32,9 @@
             android:id="@+id/action_home_to_uploadFile"
             app:destination="@id/UploadFileFragment"
             app:popUpTo="@id/HomeFragment"/>
+        <argument
+            android:name="device"
+            app:argType="programatorus.client.device.DeviceAddress" />
     </fragment>
 
     <fragment

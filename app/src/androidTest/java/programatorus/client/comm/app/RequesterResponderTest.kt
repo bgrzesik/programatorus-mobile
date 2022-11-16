@@ -105,8 +105,12 @@ open class RequesterResponderTest(
                     GenericMessage.newBuilder()
                         .setGetBoardsResponse(
                             GetBoardsResponse.newBuilder()
-                                .addName("test 0")
-                                .addName("test 1")
+                                .addBoard(GetBoardsResponse.Board.newBuilder()
+                                    .setName("test 0")
+                                    .setFavourite(true))
+                                .addBoard(GetBoardsResponse.Board.newBuilder()
+                                    .setName("test 1")
+                                    .setFavourite(false))
                         )
                         .build()
                 )
@@ -122,7 +126,11 @@ open class RequesterResponderTest(
         right.reconnect()
 
         val boards = GetBoards().request(left).get()
-        Assert.assertArrayEquals(boards.boards, arrayOf("test 0", "test 1"))
+        Assert.assertEquals(boards.size, 2)
+        Assert.assertEquals(boards[0].name, "test 0")
+        Assert.assertTrue(boards[0].isFavorite)
+        Assert.assertEquals(boards[1].name, "test 1")
+        Assert.assertFalse(boards[1].isFavorite)
 
         left.disconnect()
         right.disconnect()
