@@ -224,8 +224,10 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
                     }
                 }
             }
-
-            Log.d(TAG, "run(): Thread quited ${this.name}")
+            try {
+                Log.d(TAG, "run(): Thread quited ${this.name}")
+            } catch (_: RuntimeException) {
+            }
         }
     }
 
