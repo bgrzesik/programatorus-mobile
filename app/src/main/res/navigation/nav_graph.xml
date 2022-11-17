@@ -40,6 +40,11 @@
         <argument
             android:name="device"
             app:argType="programatorus.client.device.DeviceAddress" />
+
+        <action
+            android:id="@+id/action_home_to_flashRequest"
+            app:destination="@id/FlashRequestFragment"
+            app:popUpTo="@id/HomeFragment"/>
     </fragment>
 
     <fragment
@@ -60,6 +65,14 @@
         android:id="@+id/UploadFileFragment"
         android:name="programatorus.client.screens.uploadfile.UploadFileFragment"
         android:label="@string/upload_file_fragment_label"
+        tools:layout="@layout/fragment_upload_file">
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/FlashRequestFragment"
+        android:name="programatorus.client.screens.flashrequest.FlashRequestFragment"
+        android:label="@string/flash_request_fragment_label"
         tools:layout="@layout/fragment_upload_file">
 
     </fragment>

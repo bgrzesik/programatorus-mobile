@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import programatorus.client.R
+import programatorus.client.SharedContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
 
@@ -30,6 +31,10 @@ class HomeFragment : Fragment() {
     ): View? {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+        SharedContext.boardsService.pull()
+        SharedContext.firmwareService.pull()
+
         return binding.root
 
     }
@@ -52,6 +57,10 @@ class HomeFragment : Fragment() {
 
         binding.btnUploadFile.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_uploadFile)
+        }
+
+        binding.btnFlashRequest.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_flashRequest)
         }
     }
 

@@ -21,4 +21,9 @@
         android:id="@+id/btn_upload_file"
         android:text="@string/upload_file" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_flash_request"
+        android:text="@string/flash_request" />
+
 </LinearLayout>

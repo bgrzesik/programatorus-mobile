@@ -7,6 +7,7 @@
     <string name="manage_firmwares_fragment_label">Manage Firmware</string>
     <string name="upload_file_fragment_label">Upload File</string>
     <string name="home_fragment_label">Home</string>
+    <string name="flash_request_fragment_label">Flash Request</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
@@ -23,9 +24,13 @@
     <string name="show_boards">Boards</string>
     <string name="show_firmware">Firmware</string>
     <string name="upload_file">Upload file</string>
+    <string name="flash_request">Flash request</string>
 
 <!--    Choose Device-->
     <string name="choose_file_to_upload">Choose file to upload</string>
+
+
+    <string name="submit_flash">Submit</string>
 
 
 
