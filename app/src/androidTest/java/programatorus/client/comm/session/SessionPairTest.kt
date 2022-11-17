@@ -3,7 +3,6 @@ package programatorus.client.comm.session
 import android.util.Log
 import io.mockk.*
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -42,9 +41,6 @@ open class SessionPairTest(
         }
 
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     private fun testPair(
         leftClient: ISessionClient,

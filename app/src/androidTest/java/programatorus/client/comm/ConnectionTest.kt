@@ -1,7 +1,6 @@
 package programatorus.client.comm
 
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -81,9 +80,6 @@ open class ConnectionTest(
             ),
         )
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 5000)
     fun testStateMachine() {

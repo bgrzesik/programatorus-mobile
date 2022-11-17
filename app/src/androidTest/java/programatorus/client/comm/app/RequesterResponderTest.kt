@@ -1,7 +1,6 @@
 package programatorus.client.comm.app
 
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -37,9 +36,6 @@ open class RequesterResponderTest(
             )
         }
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout=2000)
     fun testDeviceStatusUpdate() {

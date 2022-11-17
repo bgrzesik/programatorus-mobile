@@ -2,7 +2,6 @@ package programatorus.client.comm.app
 
 import com.google.protobuf.Empty
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import programatorus.client.comm.IConnectionClient
 import programatorus.client.comm.TestUtils
@@ -17,9 +16,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 
 open class ResponderTest {
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout=1000)
     fun testDeviceUpdateStatus() {

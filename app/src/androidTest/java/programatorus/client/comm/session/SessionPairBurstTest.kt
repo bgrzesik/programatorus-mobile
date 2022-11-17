@@ -2,7 +2,6 @@ package programatorus.client.comm.session
 
 import io.mockk.*
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -42,9 +41,6 @@ open class SessionPairBurstTest(
         }
 
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout=2000)
     fun testRequestResponse() {

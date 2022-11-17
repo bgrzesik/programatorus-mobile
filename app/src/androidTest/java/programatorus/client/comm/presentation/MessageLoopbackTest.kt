@@ -2,7 +2,6 @@ package programatorus.client.comm.presentation
 
 import android.util.Log
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -70,9 +69,6 @@ open class MessageLoopbackTest(
             *test(Messenger.Builder().setMessenger(LoopbackMessenger.Builder())),
         )
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 8000)
     fun testLoopbackSendReceive() {
