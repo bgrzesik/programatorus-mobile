@@ -5,8 +5,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkAll
-import org.hamcrest.CoreMatchers
-import org.junit.Assume
 import programatorus.client.comm.app.IResponder
 import programatorus.client.comm.app.RequestRouter
 import programatorus.client.comm.presentation.*
@@ -31,22 +29,6 @@ object TestUtils {
 
     val isAndroid: Boolean
         get() = System.getProperty("java.specification.vendor") == "The Android Project"
-
-    fun assumeAndroid() {
-        Assume.assumeThat(
-            "Those tests should not be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            CoreMatchers.`is`("The Android Project")
-        )
-    }
-
-    fun assumeNotAndroid() {
-        Assume.assumeThat(
-            "Those tests should not be ran on Android",
-            System.getProperty("java.specification.vendor"),
-            CoreMatchers.not("The Android Project")
-        )
-    }
 
     fun newTestMessage() = GenericMessage.newBuilder()
         .setSessionId(10)

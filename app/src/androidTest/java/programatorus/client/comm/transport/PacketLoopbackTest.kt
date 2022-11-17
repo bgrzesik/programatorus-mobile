@@ -2,7 +2,6 @@ package programatorus.client.comm.transport
 
 import android.util.Log
 import org.junit.Assert
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -39,9 +38,6 @@ open class PacketLoopbackTest(
             *test(LoopbackTransport.Builder())
         )
     }
-
-    @Before
-    open fun assumeRunOnAndroid() = TestUtils.assumeAndroid()
 
     @Test(timeout = 8000)
     fun testLoopbackSendReceive() {

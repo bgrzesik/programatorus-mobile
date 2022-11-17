@@ -19,9 +19,6 @@ import java.util.concurrent.Semaphore
 const val TAG = "LocalTcpClient"
 
 fun main() {
-    val mocker = AndroidMocker()
-    mocker.mock()
-
     val semaphore = Semaphore(1)
     semaphore.acquire()
 
