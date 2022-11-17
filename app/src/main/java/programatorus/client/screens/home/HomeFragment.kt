@@ -47,7 +47,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnFirmware.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_manageBoards)
+            findNavController().navigate(R.id.action_home_to_manageFirmwares)
         }
 
         binding.btnUploadFile.setOnClickListener {

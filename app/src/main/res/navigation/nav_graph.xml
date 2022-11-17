@@ -29,6 +29,11 @@
             app:popUpTo="@id/HomeFragment"/>
 
         <action
+            android:id="@+id/action_home_to_manageFirmwares"
+            app:destination="@id/ManageFirmwaresFragment"
+            app:popUpTo="@id/HomeFragment"/>
+
+        <action
             android:id="@+id/action_home_to_uploadFile"
             app:destination="@id/UploadFileFragment"
             app:popUpTo="@id/HomeFragment"/>
@@ -42,6 +47,13 @@
         android:name="programatorus.client.screens.boards.ManageBoardsFragment"
         android:label="@string/manage_boards_fragment_label"
         tools:layout="@layout/fragment_manage_boards">
+    </fragment>
+
+    <fragment
+        android:id="@+id/ManageFirmwaresFragment"
+        android:name="programatorus.client.screens.firmware.ManageFirmwaresFragment"
+        android:label="@string/manage_firmwares_fragment_label"
+        tools:layout="@layout/fragment_manage_firmwares">
     </fragment>
 
     <fragment

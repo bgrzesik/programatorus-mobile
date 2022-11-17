@@ -1,13 +1,13 @@
 package programatorus.client.shared
 
-class ConfigurationsManager<T>(
+class FavoritesRepository<T>(
     private var allItems: List<T> = listOf(),
     private var favItems: List<T> = listOf()
 ) {
 
 
     fun updateState(all: List<T>, favorites: List<T>) {
-        allItems=all
+        allItems = all
 
         val old = favItems.toSet()
         val new = favorites.toSet()
@@ -16,7 +16,7 @@ class ConfigurationsManager<T>(
     }
 
     fun setState(all: List<T>, favorites: List<T>) {
-        allItems=all
+        allItems = all
         favItems = favorites
     }
 
