@@ -51,7 +51,7 @@ class FrameEncoderDecoderTest {
         test(ByteArray(256))
     }
 
-    @Test(timeout=200)
+    @Test(timeout=400)
     fun testRandomizedMessages() {
         val random = Random(2137)
 
