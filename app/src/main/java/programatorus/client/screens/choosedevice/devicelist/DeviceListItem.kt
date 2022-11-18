@@ -1,4 +1,4 @@
-package programatorus.client.screens.choosedevice
+package programatorus.client.screens.choosedevice.devicelist
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice

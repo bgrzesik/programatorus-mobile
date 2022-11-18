@@ -79,16 +79,6 @@ class ManageBoardsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireContext().also { context ->
-            mDevice = BoundDevice(context)
-            mDevice.bind()
-            mDevice.onBind.thenAccept { device ->
-                device.getBoards().thenAccept { boards ->
-                    configurationsManager.setState(boards, boards)
-                }
-            }
-        }
-
         with(binding) {
             favBoards.enableTouch()
 

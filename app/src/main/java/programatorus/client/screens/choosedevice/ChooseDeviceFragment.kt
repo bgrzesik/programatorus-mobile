@@ -22,6 +22,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import programatorus.client.databinding.FragmentChooseDeviceBinding
 import programatorus.client.device.DeviceAddress
+import programatorus.client.screens.choosedevice.devicelist.DeviceListItem
 
 @SuppressLint("MissingPermission")
 class ChooseDeviceFragment : Fragment() {
@@ -52,12 +53,13 @@ class ChooseDeviceFragment : Fragment() {
 
 
         binding.addItem.setOnClickListener {
-            discoveryPermissions()
-            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-            }
-            startActivityForResult(discoverableIntent, 2137)
-            startDiscovery()
+//            discoveryPermissions()
+//            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+//                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+//            }
+//            startActivityForResult(discoverableIntent, 2137)
+//            startDiscovery()
+            binding.discoveredDevices.addDevice(DeviceListItem("X", "DDD"))
         }
         return binding.root
     }

@@ -62,6 +62,10 @@ class HomeFragment : Fragment() {
         binding.btnFlashRequest.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_flashRequest)
         }
+
+        binding.btnDebugger.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_debugger)
+        }
     }
 
     override fun onDestroyView() {

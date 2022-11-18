@@ -9,12 +9,12 @@
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_boards"
-        android:text="@string/show_boards" />
+        android:text="@string/manage_boards" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_firmware"
-        android:text="@string/show_firmware" />
+        android:text="@string/manage_firmware" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
@@ -25,5 +25,10 @@
         style="@style/ButtonHome"
         android:id="@+id/btn_flash_request"
         android:text="@string/flash_request" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_debugger"
+        android:text="@string/debugger" />
 
 </LinearLayout>
