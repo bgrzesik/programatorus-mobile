@@ -80,7 +80,8 @@ open class RequesterResponderTest(
 
         val (left, right) = TestUtils.createSessionResponderPair(
             emptyList(),
-            listOf(onDeviceStatusUpdate)
+            listOf(onDeviceStatusUpdate),
+            mWrapTransport, mWrapMessenger
         )
 
         left.reconnect()
@@ -119,7 +120,8 @@ open class RequesterResponderTest(
 
         val (left, right) = TestUtils.createSessionResponderPair(
             emptyList(),
-            listOf(onGetBoardsResponder)
+            listOf(onGetBoardsResponder),
+            mWrapTransport, mWrapMessenger
         )
 
         left.reconnect()
