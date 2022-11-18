@@ -17,14 +17,14 @@ class FavFirmwaresListView @JvmOverloads constructor(
 
     private val binding: ComponentFavFirmwaresListBinding
 
-    private val firmwaresAdapter: FirmwareListAdapter
+    private val firmwaresAdapter: FirmwaresListAdapter
 
     init {
         binding = ComponentFavFirmwaresListBinding.inflate(
             LayoutInflater.from(context),
             this
         )
-        firmwaresAdapter = FirmwareListAdapter()
+        firmwaresAdapter = FirmwaresListAdapter()
 
         binding.componentFirmwaresList.apply {
             layoutManager = LinearLayoutManager(context)
@@ -52,7 +52,7 @@ class FavFirmwaresListView @JvmOverloads constructor(
             override fun onMove(recyclerView: RecyclerView,
                                 viewHolder: RecyclerView.ViewHolder,
                                 target: RecyclerView.ViewHolder): Boolean {
-                val adapter = recyclerView.adapter as FirmwareListAdapter
+                val adapter = recyclerView.adapter as FirmwaresListAdapter
                 val from = viewHolder.adapterPosition
                 val to = target.adapterPosition
                 adapter.moveItem(from, to)

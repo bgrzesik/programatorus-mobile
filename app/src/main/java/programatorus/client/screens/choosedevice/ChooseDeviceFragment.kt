@@ -53,13 +53,12 @@ class ChooseDeviceFragment : Fragment() {
 
 
         binding.addItem.setOnClickListener {
-//            discoveryPermissions()
-//            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-//                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-//            }
-//            startActivityForResult(discoverableIntent, 2137)
-//            startDiscovery()
-            binding.discoveredDevices.addDevice(DeviceListItem("X", "DDD"))
+            discoveryPermissions()
+            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
+                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
+            }
+            startActivityForResult(discoverableIntent, 2137)
+            startDiscovery()
         }
         return binding.root
     }

@@ -33,31 +33,10 @@ class DebuggerFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        with(binding) {
-//            messageList.setMessages(
-//                listOf(
-//                    MessageListItem.my("XD"),
-//                    MessageListItem.remote("ddddd"),
-//                    MessageListItem.my("mmmddd    ekanfja   jkhfkjahjkfahjdfk  xxxxxxxxxxxx")
-//                )
-//            )
-
-            btnSend.setOnClickListener {
-                sendCommand()
-            }
-
-//            commandToSend.setOnEditorActionListener(writeListener)
+        binding.btnSend.setOnClickListener {
+            sendCommand()
         }
     }
-
-    private val writeListener =
-        OnEditorActionListener { view, actionId, event ->
-            if (actionId == EditorInfo.IME_NULL && event.action === KeyEvent.ACTION_UP) {
-                sendCommand()
-            }
-            true
-        }
-
     fun sendCommand() {
         // TODO: MSG
         val command = binding.commandToSend.text.toString()

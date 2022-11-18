@@ -15,14 +15,14 @@ class AllFirmwaresListView @JvmOverloads constructor(
 
     private val binding: ComponentAllFirmwaresListBinding
 
-    private val FirmwaresAdapter: FirmwareListAdapter
+    private val FirmwaresAdapter: FirmwaresListAdapter
 
     init {
         binding = ComponentAllFirmwaresListBinding.inflate(
             LayoutInflater.from(context),
             this
         )
-        FirmwaresAdapter = FirmwareListAdapter()
+        FirmwaresAdapter = FirmwaresListAdapter()
 
         binding.componentFirmwaresList.apply {
             layoutManager = LinearLayoutManager(context)

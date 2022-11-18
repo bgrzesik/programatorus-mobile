@@ -32,7 +32,18 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
+
+        // TODO: REWRITE
         SharedContext.boardsService.pull()
+//        requireContext().also { context ->
+//            mDevice = BoundDevice(context)
+//            mDevice.bind()
+//            mDevice.onBind.thenAccept { device ->
+//                device.getBoards().thenAccept { boards ->
+//                    SharedContext.boardsService.repository.setState(boards, boards)
+//                }
+//            }
+//        }
         SharedContext.firmwareService.pull()
 
         return binding.root

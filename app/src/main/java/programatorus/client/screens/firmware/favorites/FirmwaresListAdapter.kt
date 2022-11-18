@@ -1,29 +1,29 @@
-package programatorus.client.screens.firmware.all
+package programatorus.client.screens.firmware.favorites
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
-import programatorus.client.databinding.AllFirmwaresListItemBinding
+import programatorus.client.databinding.FavFirmwaresListItemBinding
 
-typealias ClickListener = (target: AllFirmwaresListItem) -> Unit
+typealias ClickListener = (target: FavFirmwaresListItem) -> Unit
 
-class FirmwareListAdapter():
-    RecyclerView.Adapter<FirmwareListAdapter.FirmwareItemViewHolder>() {
+class FirmwaresListAdapter():
+    RecyclerView.Adapter<FirmwaresListAdapter.FirmwareItemViewHolder>() {
 
     val differ = AsyncListDiffer(
         this,
-        object : DiffUtil.ItemCallback<AllFirmwaresListItem>() {
-            override fun areItemsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
+        object : DiffUtil.ItemCallback<FavFirmwaresListItem>() {
+            override fun areItemsTheSame(item: FavFirmwaresListItem, other: FavFirmwaresListItem): Boolean =
                 item == other
 
-            override fun areContentsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
+            override fun areContentsTheSame(item: FavFirmwaresListItem, other: FavFirmwaresListItem): Boolean =
                 item == other
         })
 
     private var onItemClickListener: ClickListener = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FirmwareItemViewHolder {
-        val binding = AllFirmwaresListItemBinding.inflate(
+        val binding = FavFirmwaresListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false)
@@ -42,26 +42,29 @@ class FirmwareListAdapter():
 
     override fun getItemCount() = differ.currentList.size
 
-    fun setItems(items: List<AllFirmwaresListItem>) {
+    fun setItems(items: List<FavFirmwaresListItem>) {
         differ.submitList(items)
         notifyDataSetChanged()
     }
 
-    fun getItems(): List<AllFirmwaresListItem> {
+    fun getItems(): MutableList<FavFirmwaresListItem> {
         return differ.currentList
     }
 
-    inner class FirmwareItemViewHolder(private val binding: AllFirmwaresListItemBinding)
+    fun moveItem(from: Int, to: Int) {
+        val list = differ.currentList.toMutableList()
+        val item = list[from]
+        list.removeAt(from)
+        list.add(to, item)
+        differ.submitList(list)
+    }
+
+    inner class FirmwareItemViewHolder(private val binding: FavFirmwaresListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: AllFirmwaresListItem, onItemClickListener: ClickListener) {
+        fun bind(item: FavFirmwaresListItem, onItemClickListener: ClickListener) {
             with(binding) {
                 filename.text = item.name
-                checkbox.isChecked = item.isSelected.get()
-
-                checkbox.setOnClickListener {
-                    item.toggle()
-                }
 
                 root.setOnClickListener {
                     onItemClickListener(item)

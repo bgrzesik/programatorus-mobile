@@ -6,7 +6,6 @@
     android:id="@+id/device_list_item"
     android:layout_height="wrap_content"
     android:layout_width="match_parent" >
-<!--    android:background="@drawable/default_item_border">-->
 
 
     <androidx.appcompat.widget.AppCompatTextView
