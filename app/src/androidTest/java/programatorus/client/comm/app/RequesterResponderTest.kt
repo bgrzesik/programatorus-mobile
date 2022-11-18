@@ -9,6 +9,10 @@ import programatorus.client.comm.app.proto.GetBoards
 import programatorus.client.comm.app.proto.OnDeviceStatusUpdate
 import programus.proto.Protocol.*
 import programus.proto.Protocol.GenericMessage.PayloadCase
+import programatorus.client.comm.app.proto.FileUpload
+import programus.proto.Protocol
+import programus.proto.Protocol.FileUpload.EventCase
+import java.io.ByteArrayInputStream
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CountDownLatch
 
@@ -127,6 +131,80 @@ open class RequesterResponderTest(
         Assert.assertTrue(boards[0].isFavorite)
         Assert.assertEquals(boards[1].name, "test 1")
         Assert.assertFalse(boards[1].isFavorite)
+
+        left.disconnect()
+        right.disconnect()
+    }
+
+
+    @Test
+    fun testFileUpload() {
+        val fileName = "test_file.bin"
+        val fileBytes = ByteArray(8192) { 0xaa.toByte() }
+
+        val onFileUploadResponder = object : IResponder {
+            var mExpectedIndex: Int = 0
+            var mBuffer = mutableListOf<Byte>()
+
+            override val requestPayloadCase: PayloadCase
+                get() = PayloadCase.FILEUPLOAD
+
+            fun handleStart(start: Protocol.FileUpload.Start) {
+                Assert.assertEquals(0, mBuffer.size)
+                Assert.assertEquals(fileName, start.name)
+                Assert.assertEquals(fileBytes.size, start.size.toInt())
+            }
+
+            fun handlePart(part: Protocol.FileUpload.Part) {
+                Assert.assertEquals(mExpectedIndex, part.partNo)
+
+                mExpectedIndex++
+                mBuffer.addAll(part.chunk)
+
+                Assert.assertTrue(mBuffer.size <= fileBytes.size)
+            }
+
+            fun handleFinish(_finish: Protocol.FileUpload.Finish) {
+                Assert.assertArrayEquals(fileBytes, mBuffer.toByteArray())
+            }
+
+            override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> {
+                val fileUpload = message.fileUpload
+
+                if (fileUpload.eventCase != EventCase.START) {
+                    Assert.assertEquals(102, fileUpload.uid)
+                }
+
+                when (fileUpload.eventCase) {
+                    EventCase.START -> handleStart(fileUpload.start)
+                    EventCase.PART -> handlePart(fileUpload.part)
+                    EventCase.FINISH -> handleFinish(fileUpload.finish)
+                    else -> {
+                        Assert.fail()
+                        throw RuntimeException()
+                    }
+                }
+
+                return CompletableFuture.completedFuture(
+                    GenericMessage.newBuilder()
+                        .setFileUpload(Protocol.FileUpload.newBuilder()
+                            .setUid(102)
+                            .setResult(Protocol.FileUpload.Result.OK))
+                        .build()
+                )
+            }
+        }
+
+        val (left, right) = TestUtils.createSessionResponderPair(
+            emptyList(),
+            listOf(onFileUploadResponder),
+            mWrapTransport, mWrapMessenger
+        )
+
+        left.reconnect()
+        right.reconnect()
+
+        FileUpload.upload(left, fileName, fileBytes.size, ByteArrayInputStream(fileBytes)).get()
 
         left.disconnect()
         right.disconnect()
