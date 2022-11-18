@@ -1,12 +1,12 @@
 package programatorus.client.comm.app.proto
 
-import programatorus.client.comm.app.Requester
+import programatorus.client.comm.app.IRequester
 import programatorus.client.model.Board
 import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import programus.proto.Protocol.GetBoardsRequest
 
-class GetBoards : Requester<List<Board>> {
+class GetBoards : IRequester<List<Board>> {
 
     override fun prepareRequest(): GenericMessage.Builder =
         GenericMessage.newBuilder()

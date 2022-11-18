@@ -40,7 +40,7 @@ open class RequesterResponderTest(
     @Test(timeout=2000)
     fun testDeviceStatusUpdate() {
         val latch = CountDownLatch(2)
-        val deviceStatusUpdate = object : Requester<Unit> {
+        val deviceStatusUpdate = object : IRequester<Unit> {
             override fun prepareRequest() =
                 GenericMessage.newBuilder()
                     .setDeviceUpdateStatus(

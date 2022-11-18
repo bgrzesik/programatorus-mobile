@@ -5,7 +5,7 @@ import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import java.util.concurrent.CompletableFuture
 
-interface Requester<Out> {
+interface IRequester<Out> {
     fun prepareRequest(): GenericMessage.Builder
 
     val responsePayloadCase: PayloadCase
