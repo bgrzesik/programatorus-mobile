@@ -2,12 +2,9 @@ package programatorus.client.screens.debugegr
 
 import android.os.Bundle
 import android.util.Log
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView.OnEditorActionListener
 import androidx.fragment.app.Fragment
 import programatorus.client.databinding.FragmentDebuggerBinding
 import programatorus.client.screens.debugger.messagelist.MessageListItem
@@ -41,7 +38,7 @@ class DebuggerFragment : Fragment() {
         // TODO: MSG
         val command = binding.commandToSend.text.toString()
         Log.d("DEBUGGER", "sendCommand: command")
-        binding.messageList.addMessage(MessageListItem.my(command))
+        binding.messageList.addMessage(MessageListItem.local(command))
         binding.messageList.scrollToBottom()
     }
 

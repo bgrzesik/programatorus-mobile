@@ -1,14 +1,11 @@
 package programatorus.client.screens.debugger.messagelist
 
-import android.graphics.Color
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.RecyclerView
 import programatorus.client.R
 import programatorus.client.databinding.MessageListItemBinding
-import programatorus.client.screens.debugger.messagelist.MessageListAdapter.Colors.MY_COLOR
-import programatorus.client.screens.debugger.messagelist.MessageListAdapter.Colors.REMOTE_COLOR
 
 typealias ClickListener = (target: MessageListItem) -> Unit
 
@@ -17,11 +14,14 @@ class MessageListAdapter():
 
     var messages: MutableList<MessageListItem> = mutableListOf()
 
+    private lateinit var context: Context
+
     private var onItemClickListener: ClickListener = {}
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageItemViewHolder {
+        context = parent.context
         val binding = MessageListItemBinding.inflate(
-            LayoutInflater.from(parent.context),
+            LayoutInflater.from(context),
             parent,
             false)
         return MessageItemViewHolder(binding)
@@ -54,7 +54,7 @@ class MessageListAdapter():
             binding.message.text = item.message
 
             binding.message.setTextColor(
-                if (item.isMy) MY_COLOR else REMOTE_COLOR
+                if (item.isLocal) localColor() else remoteColor()
             )
 
             binding.root.setOnClickListener {
@@ -63,9 +63,7 @@ class MessageListAdapter():
         }
 
     }
-    private object Colors {
-        val MY_COLOR = Color.argb(255, 250,250,150)
-        val REMOTE_COLOR = Color.argb(255, 225,225,225)
-    }
+    private fun localColor() = context.getColor(R.color.debuggerLocal)
+    private fun remoteColor() = context.getColor(R.color.debuggerRemote)
 }
 
