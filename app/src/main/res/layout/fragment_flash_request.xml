@@ -1,14 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/select_board_message"
+        android:gravity="center"
+        android:textSize="24sp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_choose_board"
+        style="@style/ButtonFlash"
+        android:text="@string/selected_board"/>
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="@string/select_firmware_message"
+        android:gravity="center"
+        android:textSize="24sp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_choose_firmware"
+        style="@style/ButtonFlash"
+        android:text="@string/selected_firmware" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_submit"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="48dp"
-        android:layout_width="match_parent"
+        style="@style/ButtonFlash"
+        android:layout_marginTop="48dp"
         android:text="@string/submit_flash" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>
