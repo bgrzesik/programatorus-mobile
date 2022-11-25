@@ -18,6 +18,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat.checkSelfPermission
+import androidx.core.content.IntentCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import programatorus.client.databinding.FragmentChooseDeviceBinding
@@ -27,8 +28,30 @@ import programatorus.client.screens.choosedevice.devicelist.DeviceListItem
 @SuppressLint("MissingPermission")
 class ChooseDeviceFragment : Fragment() {
 
+@SuppressLint("MissingPermission")
+class ChooseDeviceFragment : Fragment() {
+
     private lateinit var binding: FragmentChooseDeviceBinding
     private lateinit var bluetoothAdapter: BluetoothAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val intent = activity?.intent ?: return
+
+        val deviceType = intent.getStringExtra("deviceType") ?: return
+        val deviceAddr = intent.getStringExtra("deviceAddr") ?: return
+
+        val device: DeviceAddress = when (deviceType) {
+            "bluetooth" -> DeviceAddress.BluetoothDevice(deviceAddr)
+            "tcp" -> DeviceAddress.TcpDevice(deviceAddr, 2137)
+            else -> return
+        }
+
+        val action = ChooseDeviceFragmentDirections.actionChooseDeviceToHome(device)
+
+        findNavController().navigate(action)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
