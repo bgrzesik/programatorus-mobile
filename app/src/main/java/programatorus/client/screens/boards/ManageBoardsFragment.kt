@@ -11,7 +11,6 @@ import programatorus.client.databinding.FragmentManageBoardsBinding
 import programatorus.client.device.BoundDevice
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
-import programatorus.client.shared.BoardsService
 
 
 class ManageBoardsFragment : Fragment() {
@@ -79,16 +78,6 @@ class ManageBoardsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        requireContext().also { context ->
-            mDevice = BoundDevice(context)
-            mDevice.bind()
-            mDevice.onBind.thenAccept { device ->
-                device.getBoards().thenAccept { boards ->
-                    repository.setState(boards, boards)
-                }
-            }
-        }
 
         with(binding) {
             favBoards.enableTouch()
