@@ -88,12 +88,4 @@
 
     </fragment>
 
-    <fragment
-        android:id="@+id/FlashRequestFragment"
-        android:name="programatorus.client.screens.flashrequest.FlashRequestFragment"
-        android:label="@string/flash_request_fragment_label"
-        tools:layout="@layout/fragment_upload_file">
-
-    </fragment>
-
 </navigation>
