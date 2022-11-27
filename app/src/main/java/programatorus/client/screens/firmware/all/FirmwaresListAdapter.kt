@@ -1,40 +1,40 @@
-package programatorus.client.screens.boards.all
+package programatorus.client.screens.firmware.all
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
-import programatorus.client.databinding.AllBoardsListItemBinding
+import programatorus.client.databinding.AllFirmwaresListItemBinding
 
-typealias ClickListener = (target: AllBoardsListItem) -> Unit
+typealias ClickListener = (target: AllFirmwaresListItem) -> Unit
 
-class BoardListAdapter():
-    RecyclerView.Adapter<BoardListAdapter.BoardItemViewHolder>() {
+class FirmwaresListAdapter():
+    RecyclerView.Adapter<FirmwaresListAdapter.FirmwareItemViewHolder>() {
 
     val differ = AsyncListDiffer(
         this,
-        object : DiffUtil.ItemCallback<AllBoardsListItem>() {
-            override fun areItemsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
+        object : DiffUtil.ItemCallback<AllFirmwaresListItem>() {
+            override fun areItemsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
                 item == other
 
-            override fun areContentsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
+            override fun areContentsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
                 item == other
         })
 
     private var onItemClickListener: ClickListener = {}
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BoardItemViewHolder {
-        val binding = AllBoardsListItemBinding.inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FirmwareItemViewHolder {
+        val binding = AllFirmwaresListItemBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false)
-        return BoardItemViewHolder(binding)
+        return FirmwareItemViewHolder(binding)
     }
 
     fun setClickListener(clickListener: ClickListener) {
         onItemClickListener = clickListener
     }
 
-    override fun onBindViewHolder(holder: BoardItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FirmwareItemViewHolder, position: Int) {
         val item= differ.currentList[position]
         holder.bind(item, onItemClickListener)
     }
@@ -42,19 +42,19 @@ class BoardListAdapter():
 
     override fun getItemCount() = differ.currentList.size
 
-    fun setItems(items: List<AllBoardsListItem>) {
+    fun setItems(items: List<AllFirmwaresListItem>) {
         differ.submitList(items)
         notifyDataSetChanged()
     }
 
-    fun getItems(): List<AllBoardsListItem> {
+    fun getItems(): List<AllFirmwaresListItem> {
         return differ.currentList
     }
 
-    inner class BoardItemViewHolder(private val binding: AllBoardsListItemBinding)
+    inner class FirmwareItemViewHolder(private val binding: AllFirmwaresListItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: AllBoardsListItem, onItemClickListener: ClickListener) {
+        fun bind(item: AllFirmwaresListItem, onItemClickListener: ClickListener) {
             with(binding) {
                 filename.text = item.name
                 checkbox.isChecked = item.isSelected.get()

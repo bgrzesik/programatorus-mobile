@@ -24,7 +24,7 @@
                 android:textSize="32sp"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <programatorus.client.screens.choosedevice.DeviceListView
+            <programatorus.client.screens.choosedevice.devicelist.DeviceListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/paired_devices"/>
@@ -37,7 +37,7 @@
                 android:textSize="32sp"
                 app:layout_constraintTop_toTopOf="parent"/>
 
-            <programatorus.client.screens.choosedevice.DeviceListView
+            <programatorus.client.screens.choosedevice.devicelist.DeviceListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/discovered_devices"/>

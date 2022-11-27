@@ -74,7 +74,12 @@ class UploadFileFragment : Fragment() {
     private fun openFile(documentUri: Uri) {
         val fileDescriptor = contentResolver.openFileDescriptor(documentUri, "r") ?: return
         val fileInputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        uploadFile(fileInputStream)
         Log.d("OPEN_FILE", "openFile: ${fileInputStream.available()}")
+    }
+
+    private fun uploadFile(stream: FileInputStream) {
+        // TODO: MSG upload file
     }
 
     companion object {

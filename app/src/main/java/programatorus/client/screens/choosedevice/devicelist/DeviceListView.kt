@@ -1,4 +1,4 @@
-package programatorus.client.screens.choosedevice
+package programatorus.client.screens.choosedevice.devicelist
 
 import android.content.Context
 import android.util.AttributeSet

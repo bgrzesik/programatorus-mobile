@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import programatorus.client.R
+import programatorus.client.SharedContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
 
@@ -30,6 +31,21 @@ class HomeFragment : Fragment() {
     ): View? {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
+
+
+        // TODO: REWRITE
+        SharedContext.boardsService.pull()
+//        requireContext().also { context ->
+//            mDevice = BoundDevice(context)
+//            mDevice.bind()
+//            mDevice.onBind.thenAccept { device ->
+//                device.getBoards().thenAccept { boards ->
+//                    SharedContext.boardsService.repository.setState(boards, boards)
+//                }
+//            }
+//        }
+        SharedContext.firmwareService.pull()
+
         return binding.root
 
     }
@@ -47,11 +63,19 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnFirmware.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_manageBoards)
+            findNavController().navigate(R.id.action_home_to_manageFirmwares)
         }
 
         binding.btnUploadFile.setOnClickListener {
             findNavController().navigate(R.id.action_home_to_uploadFile)
+        }
+
+        binding.btnFlashRequest.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_flashRequest)
+        }
+
+        binding.btnDebugger.setOnClickListener {
+            findNavController().navigate(R.id.action_home_to_debugger)
         }
     }
 

@@ -29,12 +29,27 @@
             app:popUpTo="@id/HomeFragment"/>
 
         <action
+            android:id="@+id/action_home_to_manageFirmwares"
+            app:destination="@id/ManageFirmwaresFragment"
+            app:popUpTo="@id/HomeFragment"/>
+
+        <action
             android:id="@+id/action_home_to_uploadFile"
             app:destination="@id/UploadFileFragment"
             app:popUpTo="@id/HomeFragment"/>
         <argument
             android:name="device"
             app:argType="programatorus.client.device.DeviceAddress" />
+
+        <action
+            android:id="@+id/action_home_to_flashRequest"
+            app:destination="@id/FlashRequestFragment"
+            app:popUpTo="@id/HomeFragment"/>
+
+        <action
+            android:id="@+id/action_home_to_debugger"
+            app:destination="@id/DebuggerFragment"
+            app:popUpTo="@id/HomeFragment"/>
     </fragment>
 
     <fragment
@@ -45,10 +60,31 @@
     </fragment>
 
     <fragment
+        android:id="@+id/ManageFirmwaresFragment"
+        android:name="programatorus.client.screens.firmware.ManageFirmwaresFragment"
+        android:label="@string/manage_firmwares_fragment_label"
+        tools:layout="@layout/fragment_manage_firmwares">
+    </fragment>
+
+    <fragment
         android:id="@+id/UploadFileFragment"
         android:name="programatorus.client.screens.uploadfile.UploadFileFragment"
         android:label="@string/upload_file_fragment_label"
         tools:layout="@layout/fragment_upload_file">
+    </fragment>
+
+    <fragment
+        android:id="@+id/FlashRequestFragment"
+        android:name="programatorus.client.screens.flashrequest.FlashRequestFragment"
+        android:label="@string/flash_request_fragment_label"
+        tools:layout="@layout/fragment_upload_file">
+    </fragment>
+
+    <fragment
+        android:id="@+id/DebuggerFragment"
+        android:name="programatorus.client.screens.debugegr.DebuggerFragment"
+        android:label="@string/debugger_fragment_label"
+        tools:layout="@layout/fragment_debugger">
 
     </fragment>
 

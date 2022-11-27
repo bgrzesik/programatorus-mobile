@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.SharedData
+import programatorus.client.SharedContext
 import programatorus.client.databinding.FragmentManageBoardsBinding
 import programatorus.client.device.BoundDevice
 import programatorus.client.screens.boards.all.AllBoardsListItem
@@ -19,7 +19,8 @@ class ManageBoardsFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val configurationsManager = SharedData.boardManager
+    private val boardsService = SharedContext.boardsService
+    private val repository = boardsService.repository
 
 
     override fun onCreateView(
@@ -34,21 +35,21 @@ class ManageBoardsFragment : Fragment() {
 
     fun useAll() {
         binding.favBoards.visibility = View.GONE
-        configurationsManager.setOrderedFavorites(
+        repository.setOrderedFavorites(
             favorites()
         )
         binding.allBoards.visibility = View.VISIBLE
     }
 
     fun useFavorites() {
-        configurationsManager.updateState(
+        repository.updateState(
             all(),
             extractFavorites()
         )
         with(binding) {
             allBoards.visibility = View.GONE
             favBoards.setBoards(
-                configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
+                repository.getFavorites().map { FavBoardsListItem.from(it) }
             )
             binding.favBoards.visibility = View.VISIBLE
         }
@@ -68,34 +69,25 @@ class ManageBoardsFragment : Fragment() {
             .map { it.asBoard() }
 
     fun updateConfigurations() {
-        configurationsManager.setState(
+        repository.setState(
             binding.allBoards.getBoards().map { it.asBoard() },
             binding.favBoards.getBoards().map { it.asBoard() }
         )
+        boardsService.push()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireContext().also { context ->
-            mDevice = BoundDevice(context)
-            mDevice.bind()
-            mDevice.onBind.thenAccept { device ->
-                device.getBoards().thenAccept { boards ->
-                    configurationsManager.setState(boards, boards)
-                }
-            }
-        }
-
         with(binding) {
             favBoards.enableTouch()
 
             allBoards.setBoards(
-                configurationsManager.getAll().map { AllBoardsListItem.from(it) }
+                repository.getAll().map { AllBoardsListItem.from(it) }
             )
 
             favBoards.setBoards(
-                configurationsManager.getFavorites().map { FavBoardsListItem.from(it) }
+                repository.getFavorites().map { FavBoardsListItem.from(it) }
             )
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
