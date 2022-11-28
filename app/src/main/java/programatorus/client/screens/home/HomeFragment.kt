@@ -59,6 +59,11 @@ class HomeFragment : Fragment() {
         }
 
         binding.btnBoards.setOnClickListener {
+            mDevice.onBind.thenAccept { device ->
+                device.getBoards().thenAccept { boards ->
+                    SharedContext.boardsService.repository.setState(boards, boards)
+                }
+            }
             findNavController().navigate(R.id.action_home_to_manageBoards)
         }
 

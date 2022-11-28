@@ -7,7 +7,7 @@ class BoardsService() {
 
     fun pull() {
         // TODO: MSG Get boards
-        val all = (1..5).map { Board(it.toString(), true) } + (6..12).map { Board(it.toString(), false) }
+        val all = (1..5).map { Board(it.toString(), true) } + (6..50).map { Board(it.toString(), false) }
         val favorites = (1..5).map { Board(it.toString(), true) }
 
         repository.setState(all, favorites)
@@ -19,4 +19,6 @@ class BoardsService() {
 
         // TODO: MSG Post boards
     }
+
+    fun getAll(): List<Board> = repository.getAll()
 }

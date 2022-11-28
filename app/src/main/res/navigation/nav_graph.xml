@@ -82,7 +82,7 @@
 
     <fragment
         android:id="@+id/DebuggerFragment"
-        android:name="programatorus.client.screens.debugegr.DebuggerFragment"
+        android:name="programatorus.client.screens.debugger.DebuggerFragment"
         android:label="@string/debugger_fragment_label"
         tools:layout="@layout/fragment_debugger">
 

@@ -1,4 +1,4 @@
-package programatorus.client.screens.debugegr
+package programatorus.client.screens.debugger
 
 import android.os.Bundle
 import android.util.Log

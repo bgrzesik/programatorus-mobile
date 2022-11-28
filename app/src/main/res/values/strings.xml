@@ -34,6 +34,15 @@
 
 
     <string name="submit_flash">Submit</string>
+    <string name="select_board_message">Select file corresponding to the model of the board you want to flash</string>
+    <string name="selected_board">Selected Board\n %1$s</string>
+    <string name="select_firmware_message">Select firmware file you want to flash onto the board</string>
+    <string name="selected_firmware">Selected Firmware\n %1$s</string>
+
+    <string name="selected_board_alert">Choose board file</string>
+    <string name="selected_firmware_alert">Choose firmware file</string>
+
+    <string name="placeholder_selection">[-----]</string>
 
 
     <string name="send_gdb_command">Send</string>
