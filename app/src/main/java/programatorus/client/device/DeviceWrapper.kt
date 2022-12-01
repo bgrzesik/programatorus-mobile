@@ -2,6 +2,8 @@ package programatorus.client.device
 
 import android.net.Uri
 import programatorus.client.model.Board
+import programatorus.client.model.BoardsData
+import programatorus.client.model.FirmwareData
 import java.util.concurrent.CompletableFuture
 
 interface DeviceWrapper: IDevice {
@@ -12,6 +14,12 @@ interface DeviceWrapper: IDevice {
         get() = wrappedDevice.isConnected
 
     override fun getBoards() = wrappedDevice.getBoards()
+
+    override fun getFirmware() = wrappedDevice.getFirmware()
+
+    override fun putBoards(data: BoardsData) = wrappedDevice.putBoards(data)
+
+    override fun putFirmware(data: FirmwareData) = wrappedDevice.putFirmware(data)
 
     override fun upload(documentUri: Uri) = wrappedDevice.upload(documentUri)
 

@@ -1,5 +1,6 @@
 package programatorus.client.shared
 
+import programatorus.client.model.Board
 import programatorus.client.model.Firmware
 
 class FirmwareService() {
@@ -19,4 +20,6 @@ class FirmwareService() {
 
         // TODO: MSG Post Firmware files
     }
+
+    fun getAll(): List<Firmware> = repository.getAll()
 }

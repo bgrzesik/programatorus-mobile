@@ -1,16 +1,16 @@
 package programatorus.client.shared
 
+import programatorus.client.SharedContext
 import programatorus.client.model.Board
+import programatorus.client.model.BoardsData
 
 class BoardsService() {
     val repository = FavoritesRepository<Board>()
 
     fun pull() {
-        // TODO: MSG Get boards
-        val all = (1..5).map { Board(it.toString(), true) } + (6..50).map { Board(it.toString(), false) }
-        val favorites = (1..5).map { Board(it.toString(), true) }
-
-        repository.setState(all, favorites)
+        SharedContext.deviceClient.getBoards().thenAccept { boards ->
+            repository.setState(boards.all, boards.favorites)
+        }
     }
 
     fun push() {

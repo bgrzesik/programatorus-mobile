@@ -240,7 +240,7 @@ class Session private constructor(
     ) : IMessageClient {
 
         private fun onResponse(response: GenericMessage) = assertLooper {
-            Log.d(TAG, "onResponse(): id=${response.response}")
+            Log.d(TAG, "onResponse(): id=${response.response}, Type=${response.payloadCase}")
             assert(response.hasResponse())
             val pendingMessage = mWaitingForResponse.remove(response.response)
             if (pendingMessage == null) {

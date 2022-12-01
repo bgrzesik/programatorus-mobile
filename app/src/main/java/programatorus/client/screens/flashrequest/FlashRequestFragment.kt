@@ -22,8 +22,8 @@ class FlashRequestFragment : Fragment() {
     private lateinit var selectedFirmware: String
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentFlashRequestBinding.inflate(inflater, container, false)
@@ -36,15 +36,18 @@ class FlashRequestFragment : Fragment() {
         return binding.root
     }
 
-    private fun chooseFileAlert(title: String, currentFile: String, onComplete: (text: String) -> Unit) {
+    private fun chooseFileAlert(
+        title: String,
+        currentFile: String,
+        files: List<FileListItem>,
+        onComplete: (text: String) -> Unit
+    ) {
         Alert.chooseFile(
-                requireContext(),
-                layoutInflater,
-                SharedContext.boardsService.getAll().map {
-                    FileListItem(it.name, it.isFavorite)
-                },
-                title,
-                currentFile,
+            requireContext(),
+            layoutInflater,
+            files,
+            title,
+            currentFile,
         ) { onComplete(it) }
     }
 
@@ -66,7 +69,11 @@ class FlashRequestFragment : Fragment() {
 
     private fun chooseBoardAlert() {
         val title = getString(R.string.selected_board_alert)
-        chooseFileAlert(title, selectedBoard) {
+        chooseFileAlert(title,
+            selectedBoard,
+            SharedContext.boardsService.getAll().map {
+                FileListItem(it.name, it.isFavorite)
+            }) {
             selectedBoard = it
             updateBoardText()
         }
@@ -74,7 +81,11 @@ class FlashRequestFragment : Fragment() {
 
     private fun chooseFirmwareAlert() {
         val title = getString(R.string.selected_firmware_alert)
-        chooseFileAlert(title, selectedFirmware) {
+        chooseFileAlert(title,
+            selectedFirmware,
+            SharedContext.firmwareService.getAll().map {
+                FileListItem(it.name, it.isFavorite)
+            }) {
             selectedFirmware = it
             updateFirmwareText()
         }

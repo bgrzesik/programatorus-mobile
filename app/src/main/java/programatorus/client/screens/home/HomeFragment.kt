@@ -1,17 +1,25 @@
 package programatorus.client.screens.home
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import programatorus.client.R
 import programatorus.client.SharedContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
+import programatorus.client.device.DeviceAddress
 
 
 class HomeFragment : Fragment() {
@@ -19,7 +27,7 @@ class HomeFragment : Fragment() {
         const val TAG = "HomeFragment"
     }
 
-    private lateinit var mDevice: BoundDevice
+    private lateinit var presenter: HomePresenter
     private val args: HomeFragmentArgs by navArgs()
     private var _binding: FragmentHomeBinding? = null
 
@@ -32,19 +40,7 @@ class HomeFragment : Fragment() {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-
-        // TODO: REWRITE
-        SharedContext.boardsService.pull()
-//        requireContext().also { context ->
-//            mDevice = BoundDevice(context)
-//            mDevice.bind()
-//            mDevice.onBind.thenAccept { device ->
-//                device.getBoards().thenAccept { boards ->
-//                    SharedContext.boardsService.repository.setState(boards, boards)
-//                }
-//            }
-//        }
-        SharedContext.firmwareService.pull()
+        presenter = HomePresenter(this, requireContext(), args.device)
 
         return binding.root
 
@@ -53,17 +49,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireContext().also { context ->
-            mDevice = BoundDevice(context, args.device)
-            mDevice.bind()
-        }
-
         binding.btnBoards.setOnClickListener {
-            mDevice.onBind.thenAccept { device ->
-                device.getBoards().thenAccept { boards ->
-                    SharedContext.boardsService.repository.setState(boards, boards)
-                }
-            }
             findNavController().navigate(R.id.action_home_to_manageBoards)
         }
 
@@ -84,8 +70,56 @@ class HomeFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+//        showLoading()
+        val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+        presenter.start(dialog)
+//        showContents()
+    }
+
+//    fun showLoading() {
+//        binding.loadingLayout.loadingLayout.visibility=View.VISIBLE
+//    }
+//
+//    fun stopLoading() {
+//            binding.loadingLayout.loadingLayout.visibility=View.GONE
+//    }
+//
+//    fun showContents() {
+//        binding.btns.visibility=View.VISIBLE
+//    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+}
+
+class HomePresenter(val view: HomeFragment, val context: Context, val device: DeviceAddress) {
+
+    private lateinit var mDevice: BoundDevice
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+
+    fun start(dialog: AlertDialog){
+            mDevice = BoundDevice(context, device)
+            mDevice.bind()
+            mDevice.onBind.thenAccept { device ->
+                    SharedContext.start(device).thenAccept { _ ->
+                        dialog.dismiss()
+//                        view.stopLoading()
+//                        view.showContents()
+                    }
+//                    view.stopLoading()
+                }
+//        view.stopLoading()
+
+//                SharedContext.getFirmwareBlocking()
+//                SharedContext.getBoardsBlocking()
+//                view.stopLoading()
+
+//            .invokeOnCompletion { _ -> view.stopLoading() }
+    }
+
 }
