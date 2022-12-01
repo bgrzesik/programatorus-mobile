@@ -25,8 +25,6 @@ import programatorus.client.databinding.FragmentChooseDeviceBinding
 import programatorus.client.device.DeviceAddress
 import programatorus.client.screens.choosedevice.devicelist.DeviceListItem
 
-@SuppressLint("MissingPermission")
-class ChooseDeviceFragment : Fragment() {
 
 @SuppressLint("MissingPermission")
 class ChooseDeviceFragment : Fragment() {
