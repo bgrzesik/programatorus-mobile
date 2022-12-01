@@ -1,4 +1,4 @@
-package programatorus.client.screens.home
+package programatorus.client.shared
 
 import android.content.Context
 import android.view.LayoutInflater

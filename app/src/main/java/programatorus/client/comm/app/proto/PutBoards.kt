@@ -9,8 +9,18 @@ class PutBoards(val data: BoardsData) : IRequester<Boolean> {
     override fun prepareRequest(): Protocol.GenericMessage.Builder =
         Protocol.GenericMessage.newBuilder()
             .setPutBoardsRequest(Protocol.PutBoardsRequest.newBuilder()
-                .addAllAll(data.all as MutableIterable<Protocol.Board>)
-                .addAllFavorites(data.favorites as MutableIterable<Protocol.Board>)
+                .addAllAll(data.all.map {
+                    Protocol.Board.newBuilder()
+                        .setFavourite(it.isFavorite)
+                        .setName(it.name)
+                        .build()
+                })
+                .addAllFavorites(data.favorites.map {
+                    Protocol.Board.newBuilder()
+                        .setFavourite(it.isFavorite)
+                        .setName(it.name)
+                        .build()
+                })
                 .build())
 
     override val responsePayloadCase = Protocol.GenericMessage.PayloadCase.PUTBOARDSRESPONSE

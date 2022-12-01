@@ -1,28 +1,35 @@
 package programatorus.client.shared
 
+import programatorus.client.SharedRemoteContext
+import programatorus.client.device.IDevice
 import programatorus.client.model.Board
 import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
+import java.util.concurrent.CompletableFuture
 
 class FirmwareService() {
     val repository = FavoritesRepository<Firmware>()
+    lateinit var client: IDevice
 
-    fun pull() {
-        // TODO: MSG Get Firmware files
-        val all = (1..5).map { Firmware(it.toString(), true) } + (6..12).map { Firmware(it.toString(), false) }
-        val favorites = (1..5).map { Firmware(it.toString(), true) }
-
-        repository.setState(all, favorites)
+    fun pull(): CompletableFuture<Unit> {
+        val future = CompletableFuture<Unit>()
+        client.getFirmware().thenAccept { firmware ->
+            repository.setState(firmware.all, firmware.favorites)
+            future.complete(Unit)
+        }
+        return future
     }
 
-    fun push() {
-        repository.getAll()
-        repository.getFavorites()
+    fun push(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
 
-        // TODO: MSG Post Firmware files
+        client.putFirmware(getFirmwareData())
+            .thenAccept { future.complete(it) }
+        return future
     }
 
     fun getAll(): List<Firmware> = repository.getAll()
 
-    fun getFirmwareData(): FirmwareData = FirmwareData(repository.getAll(), repository.getFavorites())
+    private fun getFirmwareData(): FirmwareData =
+        FirmwareData(repository.getAll(), repository.getFavorites())
 }

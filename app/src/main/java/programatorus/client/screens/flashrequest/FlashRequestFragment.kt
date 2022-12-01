@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import programatorus.client.R
-import programatorus.client.SharedContext
+import programatorus.client.SharedRemoteContext
 import programatorus.client.databinding.FragmentFlashRequestBinding
 import programatorus.client.screens.flashrequest.fileslist.Alert
 import programatorus.client.screens.flashrequest.fileslist.FileListItem
@@ -71,7 +71,7 @@ class FlashRequestFragment : Fragment() {
         val title = getString(R.string.selected_board_alert)
         chooseFileAlert(title,
             selectedBoard,
-            SharedContext.boardsService.getAll().map {
+            SharedRemoteContext.boardsService.getAll().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
             selectedBoard = it
@@ -83,7 +83,7 @@ class FlashRequestFragment : Fragment() {
         val title = getString(R.string.selected_firmware_alert)
         chooseFileAlert(title,
             selectedFirmware,
-            SharedContext.firmwareService.getAll().map {
+            SharedRemoteContext.firmwareService.getAll().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
             selectedFirmware = it

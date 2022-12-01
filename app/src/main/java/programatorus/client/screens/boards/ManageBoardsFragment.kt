@@ -6,11 +6,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.SharedContext
+import programatorus.client.SharedRemoteContext
 import programatorus.client.databinding.FragmentManageBoardsBinding
 import programatorus.client.device.BoundDevice
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
+import programatorus.client.shared.LoadingDialog
 
 
 class ManageBoardsFragment : Fragment() {
@@ -19,7 +20,7 @@ class ManageBoardsFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val boardsService = SharedContext.boardsService
+    private val boardsService = SharedRemoteContext.boardsService
     private val repository = boardsService.repository
 
 
@@ -73,7 +74,10 @@ class ManageBoardsFragment : Fragment() {
             binding.allBoards.getBoards().map { it.asBoard() },
             binding.favBoards.getBoards().map { it.asBoard() }
         )
-        boardsService.push()
+        val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+        boardsService.push().thenRun {
+            dialog.dismiss()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

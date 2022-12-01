@@ -6,10 +6,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.SharedContext
+import programatorus.client.SharedRemoteContext
 import programatorus.client.databinding.FragmentManageFirmwaresBinding
 import programatorus.client.screens.firmware.all.AllFirmwaresListItem
 import programatorus.client.screens.firmware.favorites.FavFirmwaresListItem
+import programatorus.client.shared.LoadingDialog
 
 
 class ManageFirmwaresFragment : Fragment() {
@@ -18,7 +19,7 @@ class ManageFirmwaresFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val firmwareService = SharedContext.firmwareService
+    private val firmwareService = SharedRemoteContext.firmwareService
     private val repository = firmwareService.repository
 
     override fun onCreateView(
@@ -71,7 +72,10 @@ class ManageFirmwaresFragment : Fragment() {
             binding.allFirmwares.getFirmwares().map { it.asFirmware() },
             binding.favFirmwares.getFirmwares().map { it.asFirmware() }
         )
-        firmwareService.push()
+        val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+        firmwareService.push().thenRun {
+            dialog.dismiss()
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,12 +94,6 @@ class ManageFirmwaresFragment : Fragment() {
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
             tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
-
-            SharedContext.deviceClient.putFirmware(
-                firmwareService.getFirmwareData()
-            ).thenAccept {
-                Log.d("XXXXX", "$it")
-            }
 
             // TODO: Remove later 
             btn.setOnClickListener {

@@ -1,24 +1,34 @@
 package programatorus.client.shared
 
-import programatorus.client.SharedContext
+import programatorus.client.SharedRemoteContext
+import programatorus.client.device.IDevice
 import programatorus.client.model.Board
 import programatorus.client.model.BoardsData
+import programatorus.client.model.FirmwareData
+import java.util.concurrent.CompletableFuture
 
 class BoardsService() {
     val repository = FavoritesRepository<Board>()
+    lateinit var client: IDevice
 
-    fun pull() {
-        SharedContext.deviceClient.getBoards().thenAccept { boards ->
+    fun pull(): CompletableFuture<Unit> {
+        val future = CompletableFuture<Unit>()
+        client.getBoards().thenAccept { boards ->
             repository.setState(boards.all, boards.favorites)
+            future.complete(Unit)
         }
+        return future
     }
 
-    fun push() {
-        repository.getAll()
-        repository.getFavorites()
+    fun push(): CompletableFuture<Boolean> {
+        val future = CompletableFuture<Boolean>()
 
-        // TODO: MSG Post boards
+        client.putBoards(getBoardsData())
+            .thenAccept { future.complete(it) }
+        return future
     }
 
     fun getAll(): List<Board> = repository.getAll()
+
+    fun getBoardsData(): BoardsData = BoardsData(repository.getAll(), repository.getFavorites())
 }

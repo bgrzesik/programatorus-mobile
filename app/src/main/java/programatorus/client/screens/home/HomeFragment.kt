@@ -2,24 +2,21 @@ package programatorus.client.screens.home
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import programatorus.client.R
-import programatorus.client.SharedContext
+import programatorus.client.SharedRemoteContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
 import programatorus.client.device.DeviceAddress
+import programatorus.client.shared.LoadingDialog
 
 
 class HomeFragment : Fragment() {
@@ -106,7 +103,7 @@ class HomePresenter(val view: HomeFragment, val context: Context, val device: De
             mDevice = BoundDevice(context, device)
             mDevice.bind()
             mDevice.onBind.thenAccept { device ->
-                    SharedContext.start(device).thenAccept { _ ->
+                    SharedRemoteContext.start(device).thenAccept { _ ->
                         dialog.dismiss()
 //                        view.stopLoading()
 //                        view.showContents()
