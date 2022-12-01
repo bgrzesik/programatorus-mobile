@@ -2,6 +2,7 @@ package programatorus.client.shared
 
 import programatorus.client.model.Board
 import programatorus.client.model.Firmware
+import programatorus.client.model.FirmwareData
 
 class FirmwareService() {
     val repository = FavoritesRepository<Firmware>()
@@ -22,4 +23,6 @@ class FirmwareService() {
     }
 
     fun getAll(): List<Firmware> = repository.getAll()
+
+    fun getFirmwareData(): FirmwareData = FirmwareData(repository.getAll(), repository.getFavorites())
 }

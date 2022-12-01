@@ -9,8 +9,18 @@ class PutFirmware(val data:FirmwareData) : IRequester<Boolean> {
     override fun prepareRequest(): Protocol.GenericMessage.Builder =
         Protocol.GenericMessage.newBuilder()
             .setPutFirmwareRequest(Protocol.PutFirmwareRequest.newBuilder()
-                .addAllAll(data.all as MutableIterable<Protocol.Firmware>)
-                .addAllFavorites(data.favorites as MutableIterable<Protocol.Firmware>)
+                .addAllAll(data.all.map {
+                    Protocol.Firmware.newBuilder()
+                        .setFavourite(it.isFavorite)
+                        .setName(it.name)
+                        .build()
+                })
+                .addAllFavorites(data.favorites.map {
+                    Protocol.Firmware.newBuilder()
+                        .setFavourite(it.isFavorite)
+                        .setName(it.name)
+                        .build()
+                })
                 .build())
 
     override val responsePayloadCase = Protocol.GenericMessage.PayloadCase.PUTFIRMWARERESPONSE

@@ -91,6 +91,12 @@ class ManageFirmwaresFragment : Fragment() {
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
             tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
 
+            SharedContext.deviceClient.putFirmware(
+                firmwareService.getFirmwareData()
+            ).thenAccept {
+                Log.d("XXXXX", "$it")
+            }
+
             // TODO: Remove later 
             btn.setOnClickListener {
                 Log.d(
