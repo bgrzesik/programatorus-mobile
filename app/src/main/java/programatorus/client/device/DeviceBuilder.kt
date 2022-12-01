@@ -50,7 +50,7 @@ class DeviceBuilder {
         mWrapMessenger = false
     }
 
-    fun build(handler: Handler) : IDevice {
+    fun build(handler: Handler, context: Context) : IDevice {
         var transportProvider = mTransportProvider!!
 
         if (mWrapTransport) {
@@ -69,7 +69,7 @@ class DeviceBuilder {
         val session = Session.Builder()
                 .setMessenger(messenger)
 
-        return RemoteDevice(session, handler)
+        return RemoteDevice(session, handler, context)
     }
 
 }

@@ -40,8 +40,12 @@ object FileUpload {
             return future
         }
 
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+
         cursor.moveToFirst()
+
+        val fileName = cursor.getString(nameIndex)
         val fileSize = cursor.getLong(sizeIndex).toInt()
 
         val inputStream = contentResolver.openInputStream(uri)
@@ -56,7 +60,6 @@ object FileUpload {
             return future
         }
 
-        val fileName = path.subSequence(path.lastIndexOf('/') + 1, -1).toString()
         return upload(session, fileName, fileSize, inputStream)
     }
 
@@ -139,7 +142,7 @@ object FileUpload {
 
 
             override fun next(session: ISession): CompletableFuture<State> {
-                val bytes = ByteArray(512)
+                val bytes = ByteArray(2048)
                 val read = inputStream.read(bytes)
                 Log.d(TAG, "next(): state=Transferring transferId=$transferId read=$read")
 
