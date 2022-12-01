@@ -74,6 +74,10 @@ class ManageBoardsFragment : Fragment() {
             binding.allBoards.getBoards().map { it.asBoard() },
             binding.favBoards.getBoards().map { it.asBoard() }
         )
+        repository.updateState(
+            all(),
+            extractFavorites()
+        )
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
         boardsService.push().thenRun {
             dialog.dismiss()

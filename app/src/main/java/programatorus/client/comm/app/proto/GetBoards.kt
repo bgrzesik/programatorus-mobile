@@ -18,6 +18,8 @@ class GetBoards : IRequester<BoardsData> {
     override fun handleResponse(message: GenericMessage): BoardsData {
         val favorites = message.getBoardsResponse.favoritesList.map {
             Board(it.name, it.favourite)
+        }.filter {
+            it.isFavorite
         }
         val all = message.getBoardsResponse.allList.map {
             Board(it.name, it.favourite)

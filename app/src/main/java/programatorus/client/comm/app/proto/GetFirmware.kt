@@ -18,6 +18,8 @@ class GetFirmware : IRequester<FirmwareData> {
     override fun handleResponse(message: GenericMessage): FirmwareData {
         val favorites = message.getFirmwareResponse.favoritesList.map {
             Firmware(it.name, it.favourite)
+        }.filter {
+            it.isFavorite
         }
         val all = message.getFirmwareResponse.allList.map {
             Firmware(it.name, it.favourite)

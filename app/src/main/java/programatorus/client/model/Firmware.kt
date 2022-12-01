@@ -1,5 +1,7 @@
 package programatorus.client.model
 
-data class Firmware(val name: String, val isFavorite: Boolean)
+import programatorus.client.shared.Likeable
+
+data class Firmware(val name: String, override val isFavorite: Boolean): Likeable
 
 data class FirmwareData(val all: List<Firmware>, val favorites: List<Firmware>)

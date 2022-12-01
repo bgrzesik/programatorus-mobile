@@ -72,6 +72,10 @@ class ManageFirmwaresFragment : Fragment() {
             binding.allFirmwares.getFirmwares().map { it.asFirmware() },
             binding.favFirmwares.getFirmwares().map { it.asFirmware() }
         )
+        repository.updateState(
+            all(),
+            extractFavorites()
+        )
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
         firmwareService.push().thenRun {
             dialog.dismiss()
