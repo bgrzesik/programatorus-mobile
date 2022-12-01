@@ -50,11 +50,11 @@ class DeviceService : Service() {
             val device = when (deviceType) {
                 is DeviceAddress.BluetoothDevice -> DeviceBuilder()
                         .bluetooth(this@DeviceService, getBluetoothDevice(deviceType.mac))
-                        .build(mServiceHandler)
+                        .build(mServiceHandler, this)
 
                 is DeviceAddress.TcpDevice -> DeviceBuilder()
                         .tcp(deviceType.address, deviceType.port)
-                        .build(mServiceHandler)
+                        .build(mServiceHandler, this)
 
                 null -> throw NullPointerException("Missing device")
             }
