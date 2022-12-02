@@ -5,9 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import programatorus.client.R
 import programatorus.client.SharedRemoteContext
+import programatorus.client.SharedRemoteContext.flashService
 import programatorus.client.databinding.FragmentFlashRequestBinding
+import programatorus.client.model.Board
+import programatorus.client.model.Firmware
+import programatorus.client.screens.choosedevice.ChooseDeviceFragmentDirections
 import programatorus.client.screens.flashrequest.fileslist.Alert
 import programatorus.client.screens.flashrequest.fileslist.FileListItem
 
@@ -100,7 +105,16 @@ class FlashRequestFragment : Fragment() {
     }
 
     fun sendRequest() {
-        // TODO: MSG
+        flashService.sendRequest(Board(selectedBoard, true), Firmware(selectedFirmware, true))
+            .thenAccept {
+                navigateToResults(it)
+            }
+
+    }
+
+    fun navigateToResults(message: String) {
+        val action = FlashRequestFragmentDirections.actionFlashRequestToFlashResult(message)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

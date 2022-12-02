@@ -9,10 +9,13 @@ import programatorus.client.comm.app.proto.GetBoards
 import programatorus.client.comm.app.proto.GetFirmware
 import programatorus.client.comm.app.proto.PutBoards
 import programatorus.client.comm.app.proto.PutFirmware
+import programatorus.client.comm.app.proto.*
 import programatorus.client.comm.session.ISession
 import programatorus.client.comm.session.ISessionProvider
 import programatorus.client.comm.transport.ConnectionState
+import programatorus.client.model.Board
 import programatorus.client.model.BoardsData
+import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
 import programatorus.client.utils.HandlerTaskRunner
 import java.util.concurrent.CompletableFuture
@@ -48,5 +51,7 @@ class RemoteDevice(
 
     override fun upload(documentUri: Uri): CompletableFuture<Unit> =
         FileUpload.upload(mSession, documentUri, mContext.contentResolver)
+
+    override fun flashRequest(board: Board, firmware: Firmware) = FlashRequest(board, firmware).request(mSession)
 
 }

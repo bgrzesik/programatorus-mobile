@@ -8,6 +8,7 @@
     <string name="upload_file_fragment_label">Upload File</string>
     <string name="home_fragment_label">Home</string>
     <string name="flash_request_fragment_label">Flash Request</string>
+    <string name="flash_result_fragment_label">Flash Result</string>
     <string name="debugger_fragment_label">Flash Request</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>

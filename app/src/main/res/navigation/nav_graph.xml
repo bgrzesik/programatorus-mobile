@@ -78,6 +78,22 @@
         android:name="programatorus.client.screens.flashrequest.FlashRequestFragment"
         android:label="@string/flash_request_fragment_label"
         tools:layout="@layout/fragment_upload_file">
+
+        <action
+            android:id="@+id/action_flashRequest_to_flashResult"
+            app:popUpTo="@id/HomeFragment"
+            app:destination="@id/FlashResultFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/FlashResultFragment"
+        android:name="programatorus.client.screens.flashrequest.FlashResultFragment"
+        android:label="@string/flash_result_fragment_label"
+        tools:layout="@layout/fragment_upload_file">
+
+        <argument
+            android:name="message"
+            app:argType="string" />
     </fragment>
 
     <fragment

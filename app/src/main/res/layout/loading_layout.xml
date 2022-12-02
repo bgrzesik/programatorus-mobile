@@ -27,7 +27,7 @@
             android:id="@+id/loading_text"
             android:text="loading"
             android:textSize="22sp"
-            android:layout_gravity="center"
+            android:gravity="center"
             app:layout_constraintTop_toTopOf="parent"/>
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
