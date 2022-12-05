@@ -12,7 +12,6 @@ import programus.proto.Protocol
 import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import programus.proto.Protocol.GetBoardsResponse
-import java.util.concurrent.CompletableFuture
 
 open class RequesterTest {
 
@@ -23,11 +22,11 @@ open class RequesterTest {
             override fun onMessage(packet: GenericMessage): GenericMessage? {
                 val data = BoardsData(
                         listOf(
-                                Board("Test 0", true),
-                                Board("Test 1", false)
+                                Board("test 0", true),
+                                Board("test 1", false)
                         ),
                         listOf(
-                                Board("Test 0", true)
+                                Board("test 0", true)
                         )
                 )
 

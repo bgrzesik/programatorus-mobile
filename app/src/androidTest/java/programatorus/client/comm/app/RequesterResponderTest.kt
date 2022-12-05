@@ -106,11 +106,11 @@ open class RequesterResponderTest(
             override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> {
                 val data = BoardsData(
                     listOf(
-                        Board("Test 0", true),
-                        Board("Test 1", false)
+                        Board("test 0", true),
+                        Board("test 1", false)
                     ),
                     listOf(
-                        Board("Test 0", true)
+                        Board("test 0", true)
                     )
                 )
 
