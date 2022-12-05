@@ -1,26 +1,23 @@
 package programatorus.client.screens.boards
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.SharedRemoteContext
+import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentManageBoardsBinding
-import programatorus.client.device.BoundDevice
 import programatorus.client.screens.boards.all.AllBoardsListItem
 import programatorus.client.screens.boards.favorites.FavBoardsListItem
 import programatorus.client.shared.LoadingDialog
 
 
 class ManageBoardsFragment : Fragment() {
-    private lateinit var mDevice: BoundDevice
     private var _binding: FragmentManageBoardsBinding? = null
 
     private val binding get() = _binding!!
 
-    private val boardsService = SharedRemoteContext.boardsService
+    private val boardsService = RemoteContext.boardsService
     private val repository = boardsService.repository
 
 
@@ -36,17 +33,13 @@ class ManageBoardsFragment : Fragment() {
 
     fun useAll() {
         binding.favBoards.visibility = View.GONE
-        repository.setOrderedFavorites(
-            favorites()
-        )
+        setOrderedFavorites()
         binding.allBoards.visibility = View.VISIBLE
     }
 
     fun useFavorites() {
-        repository.updateState(
-            all(),
-            extractFavorites()
-        )
+        setOrderedFavorites()
+        addNewFavorites()
         with(binding) {
             allBoards.visibility = View.GONE
             favBoards.setBoards(
@@ -54,6 +47,12 @@ class ManageBoardsFragment : Fragment() {
             )
             binding.favBoards.visibility = View.VISIBLE
         }
+    }
+
+    private fun setOrderedFavorites() {
+        repository.setOrderedFavorites(
+                favorites()
+        )
     }
 
     private fun extractFavorites() =
@@ -69,19 +68,28 @@ class ManageBoardsFragment : Fragment() {
         binding.favBoards.getBoards()
             .map { it.asBoard() }
 
-    fun updateConfigurations() {
-        repository.setState(
-            binding.allBoards.getBoards().map { it.asBoard() },
-            binding.favBoards.getBoards().map { it.asBoard() }
-        )
-        repository.updateState(
-            all(),
-            extractFavorites()
-        )
+    fun updateRemoteConfig() {
+        persistState()
+        addNewFavorites()
+
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
         boardsService.push().thenRun {
             dialog.dismiss()
         }
+    }
+
+    private fun persistState() {
+        repository.setState(
+                binding.allBoards.getBoards().map { it.asBoard() },
+                binding.favBoards.getBoards().map { it.asBoard() }
+        )
+    }
+
+    private fun addNewFavorites() {
+        repository.updateState(
+                all(),
+                extractFavorites()
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -100,21 +108,13 @@ class ManageBoardsFragment : Fragment() {
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
             tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
-
-            // TODO: Remove later 
-            btn.setOnClickListener {
-                Log.d(
-                    "fav list:",
-                    "fav ${favBoards.getBoards()} \n all ${allBoards.getBoards()}"
-                )
-            }
         }
 
 
     }
 
     override fun onDestroyView() {
-        updateConfigurations()
+        updateRemoteConfig()
         super.onDestroyView()
         _binding = null
     }

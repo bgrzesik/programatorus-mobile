@@ -18,9 +18,9 @@ interface IDevice {
     fun putBoards(data: BoardsData): CompletableFuture<Boolean>
 
     fun putFirmware(data: FirmwareData): CompletableFuture<Boolean>
+
     // TODO(bgrzesik): add progress
     fun upload(documentUri: Uri) : CompletableFuture<Unit>
-
 
     fun flashRequest(board: Board, firmware: Firmware): CompletableFuture<String>
 }

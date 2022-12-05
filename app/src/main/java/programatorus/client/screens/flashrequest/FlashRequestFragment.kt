@@ -7,12 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import programatorus.client.R
-import programatorus.client.SharedRemoteContext
-import programatorus.client.SharedRemoteContext.flashService
+import programatorus.client.RemoteContext
+import programatorus.client.RemoteContext.flashService
 import programatorus.client.databinding.FragmentFlashRequestBinding
 import programatorus.client.model.Board
 import programatorus.client.model.Firmware
-import programatorus.client.screens.choosedevice.ChooseDeviceFragmentDirections
 import programatorus.client.screens.flashrequest.fileslist.Alert
 import programatorus.client.screens.flashrequest.fileslist.FileListItem
 
@@ -76,7 +75,7 @@ class FlashRequestFragment : Fragment() {
         val title = getString(R.string.selected_board_alert)
         chooseFileAlert(title,
             selectedBoard,
-            SharedRemoteContext.boardsService.getAll().map {
+            RemoteContext.boardsService.getAll().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
             selectedBoard = it
@@ -88,7 +87,7 @@ class FlashRequestFragment : Fragment() {
         val title = getString(R.string.selected_firmware_alert)
         chooseFileAlert(title,
             selectedFirmware,
-            SharedRemoteContext.firmwareService.getAll().map {
+            RemoteContext.firmwareService.getAll().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
             selectedFirmware = it
@@ -109,7 +108,6 @@ class FlashRequestFragment : Fragment() {
             .thenAccept {
                 navigateToResults(it)
             }
-
     }
 
     fun navigateToResults(message: String) {

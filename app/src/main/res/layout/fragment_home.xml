@@ -6,46 +6,29 @@
     android:orientation="vertical"
     tools:context=".screens.home.HomeFragment">
 
-<!--    <include-->
-<!--        android:id="@+id/loading_layout"-->
-<!--        layout="@layout/loading_layout"-->
-<!--        android:elevation="1dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent" />-->
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_boards"
+        android:text="@string/manage_boards" />
 
-    <LinearLayout
-        android:id="@+id/btns"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" >
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_firmware"
+        android:text="@string/manage_firmware" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_boards"
-            style="@style/ButtonHome"
-            android:text="@string/manage_boards" />
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_upload_file"
+        android:text="@string/upload_file" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_firmware"
-            style="@style/ButtonHome"
-            android:text="@string/manage_firmware" />
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_flash_request"
+        android:text="@string/flash_request" />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_upload_file"
-            style="@style/ButtonHome"
-            android:text="@string/upload_file" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_flash_request"
-            style="@style/ButtonHome"
-            android:text="@string/flash_request" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btn_debugger"
-            style="@style/ButtonHome"
-            android:text="@string/debugger" />
-
-    </LinearLayout>
-
+    <androidx.appcompat.widget.AppCompatButton
+        style="@style/ButtonHome"
+        android:id="@+id/btn_debugger"
+        android:text="@string/debugger" />
 
 </LinearLayout>
-

@@ -9,10 +9,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import programatorus.client.R
-import programatorus.client.SharedRemoteContext
+import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
 import programatorus.client.device.DeviceAddress
@@ -20,19 +18,20 @@ import programatorus.client.shared.LoadingDialog
 
 
 class HomeFragment : Fragment() {
-    companion object{
+    companion object {
         const val TAG = "HomeFragment"
     }
 
     private lateinit var presenter: HomePresenter
+    private lateinit var dialog: AlertDialog
     private val args: HomeFragmentArgs by navArgs()
     private var _binding: FragmentHomeBinding? = null
 
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -46,47 +45,47 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnBoards.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_manageBoards)
-        }
+        setupButtons()
+    }
 
-        binding.btnFirmware.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_manageFirmwares)
-        }
+    private fun setupButtons() {
+        with(binding) {
+            btnBoards.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_manageBoards)
+            }
 
-        binding.btnUploadFile.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_uploadFile)
-        }
+            btnFirmware.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_manageFirmwares)
+            }
 
-        binding.btnFlashRequest.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_flashRequest)
-        }
+            btnUploadFile.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_uploadFile)
+            }
 
-        binding.btnDebugger.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_debugger)
+            btnFlashRequest.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_flashRequest)
+            }
+
+            btnDebugger.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_debugger)
+            }
         }
     }
 
     override fun onResume() {
         super.onResume()
 
-//        showLoading()
-        val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
-        presenter.start(dialog)
-//        showContents()
+        showLoading()
+        presenter.start()
     }
 
-//    fun showLoading() {
-//        binding.loadingLayout.loadingLayout.visibility=View.VISIBLE
-//    }
-//
-//    fun stopLoading() {
-//            binding.loadingLayout.loadingLayout.visibility=View.GONE
-//    }
-//
-//    fun showContents() {
-//        binding.btns.visibility=View.VISIBLE
-//    }
+    fun showLoading() {
+        dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+    }
+
+    fun stopLoading() {
+        dialog.dismiss()
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
@@ -96,27 +95,18 @@ class HomeFragment : Fragment() {
 
 class HomePresenter(val view: HomeFragment, val context: Context, val device: DeviceAddress) {
 
-    private lateinit var mDevice: BoundDevice
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
-
-    fun start(dialog: AlertDialog){
-            mDevice = BoundDevice(context, device)
+    fun start() {
+        if (!RemoteContext.isInitialized) {
+            val mDevice = BoundDevice(context, device)
             mDevice.bind()
             mDevice.onBind.thenAccept { device ->
-                    SharedRemoteContext.start(device).thenAccept { _ ->
-                        dialog.dismiss()
-//                        view.stopLoading()
-//                        view.showContents()
-                    }
-//                    view.stopLoading()
+                RemoteContext.start(device).thenAccept { _ ->
+                    view.stopLoading()
                 }
-//        view.stopLoading()
-
-//                SharedContext.getFirmwareBlocking()
-//                SharedContext.getBoardsBlocking()
-//                view.stopLoading()
-
-//            .invokeOnCompletion { _ -> view.stopLoading() }
+            }
+        } else {
+            view.stopLoading()
+        }
     }
 
 }

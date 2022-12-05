@@ -10,6 +10,8 @@ import programatorus.client.comm.app.proto.OnDeviceStatusUpdate
 import programus.proto.Protocol.*
 import programus.proto.Protocol.GenericMessage.PayloadCase
 import programatorus.client.comm.app.proto.FileUpload
+import programatorus.client.model.Board
+import programatorus.client.model.BoardsData
 import programus.proto.Protocol
 import programus.proto.Protocol.FileUpload.EventCase
 import java.io.ByteArrayInputStream
@@ -101,20 +103,36 @@ open class RequesterResponderTest(
             override val requestPayloadCase: PayloadCase
                 get() = PayloadCase.GETBOARDSREQUEST
 
-            override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> =
-                CompletableFuture.completedFuture(
+            override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> {
+                val data = BoardsData(
+                    listOf(
+                        Board("Test 0", true),
+                        Board("Test 1", false)
+                    ),
+                    listOf(
+                        Board("Test 0", true)
+                    )
+                )
+
+                return CompletableFuture.completedFuture(
                     GenericMessage.newBuilder()
                         .setGetBoardsResponse(
                             GetBoardsResponse.newBuilder()
-                                .addBoard(GetBoardsResponse.Board.newBuilder()
-                                    .setName("test 0")
-                                    .setFavourite(true))
-                                .addBoard(GetBoardsResponse.Board.newBuilder()
-                                    .setName("test 1")
-                                    .setFavourite(false))
-                        )
-                        .build()
+                                .addAllAll(data.all.map {
+                                    Protocol.Board.newBuilder()
+                                        .setFavourite(it.isFavorite)
+                                        .setName(it.name)
+                                        .build()
+                                })
+                                .addAllFavorites(data.favorites.map {
+                                    Protocol.Board.newBuilder()
+                                        .setFavourite(it.isFavorite)
+                                        .setName(it.name)
+                                        .build()
+                                })
+                        ).build()
                 )
+            }
 
         }
 
@@ -128,11 +146,12 @@ open class RequesterResponderTest(
         right.reconnect()
 
         val boards = GetBoards().request(left).get()
-        Assert.assertEquals(boards.size, 2)
-        Assert.assertEquals(boards[0].name, "test 0")
-        Assert.assertTrue(boards[0].isFavorite)
-        Assert.assertEquals(boards[1].name, "test 1")
-        Assert.assertFalse(boards[1].isFavorite)
+        Assert.assertEquals(boards.all.size, 2)
+        Assert.assertEquals(boards.favorites.size, 1)
+        Assert.assertEquals(boards.all[0].name, "test 0")
+        Assert.assertTrue(boards.all[0].isFavorite)
+        Assert.assertEquals(boards.all[1].name, "test 1")
+        Assert.assertFalse(boards.all[1].isFavorite)
 
         left.disconnect()
         right.disconnect()

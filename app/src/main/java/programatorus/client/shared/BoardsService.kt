@@ -1,10 +1,8 @@
 package programatorus.client.shared
 
-import programatorus.client.SharedRemoteContext
 import programatorus.client.device.IDevice
 import programatorus.client.model.Board
 import programatorus.client.model.BoardsData
-import programatorus.client.model.FirmwareData
 import java.util.concurrent.CompletableFuture
 
 class BoardsService() {

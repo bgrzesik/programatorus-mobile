@@ -1,12 +1,11 @@
 package programatorus.client.screens.firmware
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.SharedRemoteContext
+import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentManageFirmwaresBinding
 import programatorus.client.screens.firmware.all.AllFirmwaresListItem
 import programatorus.client.screens.firmware.favorites.FavFirmwaresListItem
@@ -19,7 +18,7 @@ class ManageFirmwaresFragment : Fragment() {
 
     private val binding get() = _binding!!
 
-    private val firmwareService = SharedRemoteContext.firmwareService
+    private val firmwareService = RemoteContext.firmwareService
     private val repository = firmwareService.repository
 
     override fun onCreateView(
@@ -34,17 +33,19 @@ class ManageFirmwaresFragment : Fragment() {
 
     fun useAll() {
         binding.favFirmwares.visibility = View.GONE
-        repository.setOrderedFavorites(
-            favorites()
-        )
+        setOrderedFavorites()
         binding.allFirmwares.visibility = View.VISIBLE
     }
 
-    fun useFavorites() {
-        repository.updateState(
-            all(),
-            extractFavorites()
+    private fun setOrderedFavorites() {
+        repository.setOrderedFavorites(
+                favorites()
         )
+    }
+
+    fun useFavorites() {
+        setOrderedFavorites()
+        addNewFavorites()
         with(binding) {
             allFirmwares.visibility = View.GONE
             favFirmwares.setFirmwares(
@@ -67,19 +68,28 @@ class ManageFirmwaresFragment : Fragment() {
         binding.favFirmwares.getFirmwares()
             .map { it.asFirmware() }
 
-    fun updateConfigurations() {
-        repository.setState(
-            binding.allFirmwares.getFirmwares().map { it.asFirmware() },
-            binding.favFirmwares.getFirmwares().map { it.asFirmware() }
-        )
-        repository.updateState(
-            all(),
-            extractFavorites()
-        )
+    fun updateRemoteConfig() {
+        persistState()
+        addNewFavorites()
+
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
         firmwareService.push().thenRun {
             dialog.dismiss()
         }
+    }
+
+    private fun persistState() {
+        repository.setState(
+                binding.allFirmwares.getFirmwares().map { it.asFirmware() },
+                binding.favFirmwares.getFirmwares().map { it.asFirmware() }
+        )
+    }
+
+    private fun addNewFavorites() {
+        repository.updateState(
+                all(),
+                extractFavorites()
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -98,21 +108,13 @@ class ManageFirmwaresFragment : Fragment() {
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
             tabs.getTabAt(FAVORITES)?.view?.setOnClickListener { useFavorites() }
-
-            // TODO: Remove later 
-            btn.setOnClickListener {
-                Log.d(
-                    "fav list:",
-                    "fav ${favFirmwares.getFirmwares()} \n all ${allFirmwares.getFirmwares()}"
-                )
-            }
         }
         
 
     }
 
     override fun onDestroyView() {
-        updateConfigurations()
+        updateRemoteConfig()
         super.onDestroyView()
         _binding = null
     }

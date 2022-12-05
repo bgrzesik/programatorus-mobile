@@ -2,12 +2,13 @@ package programatorus.client.comm.app.proto
 
 import programatorus.client.comm.app.IRequester
 import programatorus.client.model.FirmwareData
+import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol
 
 class PutFirmware(val data:FirmwareData) : IRequester<Boolean> {
 
-    override fun prepareRequest(): Protocol.GenericMessage.Builder =
-        Protocol.GenericMessage.newBuilder()
+    override fun prepareRequest(): GenericMessage.Builder =
+        GenericMessage.newBuilder()
             .setPutFirmwareRequest(Protocol.PutFirmwareRequest.newBuilder()
                 .addAllAll(data.all.map {
                     Protocol.Firmware.newBuilder()
@@ -23,9 +24,9 @@ class PutFirmware(val data:FirmwareData) : IRequester<Boolean> {
                 })
                 .build())
 
-    override val responsePayloadCase = Protocol.GenericMessage.PayloadCase.PUTFIRMWARERESPONSE
+    override val responsePayloadCase = GenericMessage.PayloadCase.PUTFIRMWARERESPONSE
 
-    override fun handleResponse(message: Protocol.GenericMessage): Boolean {
+    override fun handleResponse(message: GenericMessage): Boolean {
         return message.putFirmwareResponse.success
     }
 

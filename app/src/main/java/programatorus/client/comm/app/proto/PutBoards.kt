@@ -3,11 +3,12 @@ package programatorus.client.comm.app.proto
 import programatorus.client.comm.app.IRequester
 import programatorus.client.model.BoardsData
 import programus.proto.Protocol
+import programus.proto.Protocol.GenericMessage
 
 class PutBoards(val data: BoardsData) : IRequester<Boolean> {
 
-    override fun prepareRequest(): Protocol.GenericMessage.Builder =
-        Protocol.GenericMessage.newBuilder()
+    override fun prepareRequest(): GenericMessage.Builder =
+        GenericMessage.newBuilder()
             .setPutBoardsRequest(Protocol.PutBoardsRequest.newBuilder()
                 .addAllAll(data.all.map {
                     Protocol.Board.newBuilder()
@@ -23,9 +24,9 @@ class PutBoards(val data: BoardsData) : IRequester<Boolean> {
                 })
                 .build())
 
-    override val responsePayloadCase = Protocol.GenericMessage.PayloadCase.PUTBOARDSRESPONSE
+    override val responsePayloadCase = GenericMessage.PayloadCase.PUTBOARDSRESPONSE
 
-    override fun handleResponse(message: Protocol.GenericMessage): Boolean {
+    override fun handleResponse(message: GenericMessage): Boolean {
         return message.putBoardsResponse.success
     }
 

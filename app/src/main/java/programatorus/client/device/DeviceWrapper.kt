@@ -5,7 +5,6 @@ import programatorus.client.model.Board
 import programatorus.client.model.BoardsData
 import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
-import java.util.concurrent.CompletableFuture
 
 interface DeviceWrapper: IDevice {
 
