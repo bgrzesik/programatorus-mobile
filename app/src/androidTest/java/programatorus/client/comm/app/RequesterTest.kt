@@ -33,6 +33,7 @@ open class RequesterTest {
                 val builder = when (packet.payloadCase) {
                     PayloadCase.GETBOARDSREQUEST ->
                         GenericMessage.newBuilder()
+                                .setResponse(packet.request)
                                 .setGetBoardsResponse(
                                         GetBoardsResponse.newBuilder()
                                                 .addAllAll(data.all.map {
