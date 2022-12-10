@@ -1,50 +1,42 @@
 package programatorus.client.screens.home
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import programatorus.client.R
-import programatorus.client.SharedContext
+import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentHomeBinding
 import programatorus.client.device.BoundDevice
+import programatorus.client.device.DeviceAddress
+import programatorus.client.shared.LoadingDialog
 
 
 class HomeFragment : Fragment() {
-    companion object{
+    companion object {
         const val TAG = "HomeFragment"
     }
 
-    private lateinit var mDevice: BoundDevice
+    private lateinit var presenter: HomePresenter
+    private lateinit var dialog: AlertDialog
     private val args: HomeFragmentArgs by navArgs()
     private var _binding: FragmentHomeBinding? = null
 
     private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
 
-
-        // TODO: REWRITE
-        SharedContext.boardsService.pull()
-//        requireContext().also { context ->
-//            mDevice = BoundDevice(context)
-//            mDevice.bind()
-//            mDevice.onBind.thenAccept { device ->
-//                device.getBoards().thenAccept { boards ->
-//                    SharedContext.boardsService.repository.setState(boards, boards)
-//                }
-//            }
-//        }
-        SharedContext.firmwareService.pull()
+        presenter = HomePresenter(this, requireContext(), args.device)
 
         return binding.root
 
@@ -53,39 +45,68 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requireContext().also { context ->
-            mDevice = BoundDevice(context, args.device)
-            mDevice.bind()
-        }
+        setupButtons()
+    }
 
-        binding.btnBoards.setOnClickListener {
-            mDevice.onBind.thenAccept { device ->
-                device.getBoards().thenAccept { boards ->
-                    SharedContext.boardsService.repository.setState(boards, boards)
-                }
+    private fun setupButtons() {
+        with(binding) {
+            btnBoards.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_manageBoards)
             }
-            findNavController().navigate(R.id.action_home_to_manageBoards)
-        }
 
-        binding.btnFirmware.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_manageFirmwares)
-        }
+            btnFirmware.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_manageFirmwares)
+            }
 
-        binding.btnUploadFile.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_uploadFile)
-        }
+            btnUploadFile.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_uploadFile)
+            }
 
-        binding.btnFlashRequest.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_flashRequest)
-        }
+            btnFlashRequest.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_flashRequest)
+            }
 
-        binding.btnDebugger.setOnClickListener {
-            findNavController().navigate(R.id.action_home_to_debugger)
+            btnDebugger.setOnClickListener {
+                findNavController().navigate(R.id.action_home_to_debugger)
+            }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        showLoading()
+        presenter.start()
+    }
+
+    fun showLoading() {
+        dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+    }
+
+    fun stopLoading() {
+        dialog.dismiss()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+}
+
+class HomePresenter(val view: HomeFragment, val context: Context, val device: DeviceAddress) {
+
+    fun start() {
+        if (!RemoteContext.isInitialized) {
+            val mDevice = BoundDevice(context, device)
+            mDevice.bind()
+            mDevice.onBind.thenAccept { device ->
+                RemoteContext.start(device).thenAccept { _ ->
+                    view.stopLoading()
+                }
+            }
+        } else {
+            view.stopLoading()
+        }
+    }
+
 }

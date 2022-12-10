@@ -5,9 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import programatorus.client.R
-import programatorus.client.SharedContext
+import programatorus.client.RemoteContext
+import programatorus.client.RemoteContext.flashService
 import programatorus.client.databinding.FragmentFlashRequestBinding
+import programatorus.client.model.Board
+import programatorus.client.model.Firmware
 import programatorus.client.screens.flashrequest.fileslist.Alert
 import programatorus.client.screens.flashrequest.fileslist.FileListItem
 
@@ -22,8 +26,8 @@ class FlashRequestFragment : Fragment() {
     private lateinit var selectedFirmware: String
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentFlashRequestBinding.inflate(inflater, container, false)
@@ -36,15 +40,18 @@ class FlashRequestFragment : Fragment() {
         return binding.root
     }
 
-    private fun chooseFileAlert(title: String, currentFile: String, onComplete: (text: String) -> Unit) {
+    private fun chooseFileAlert(
+        title: String,
+        currentFile: String,
+        files: List<FileListItem>,
+        onComplete: (text: String) -> Unit
+    ) {
         Alert.chooseFile(
-                requireContext(),
-                layoutInflater,
-                SharedContext.boardsService.getAll().map {
-                    FileListItem(it.name, it.isFavorite)
-                },
-                title,
-                currentFile,
+            requireContext(),
+            layoutInflater,
+            files,
+            title,
+            currentFile,
         ) { onComplete(it) }
     }
 
@@ -66,7 +73,11 @@ class FlashRequestFragment : Fragment() {
 
     private fun chooseBoardAlert() {
         val title = getString(R.string.selected_board_alert)
-        chooseFileAlert(title, selectedBoard) {
+        chooseFileAlert(title,
+            selectedBoard,
+            RemoteContext.boardsService.getAll().map {
+                FileListItem(it.name, it.isFavorite)
+            }) {
             selectedBoard = it
             updateBoardText()
         }
@@ -74,7 +85,11 @@ class FlashRequestFragment : Fragment() {
 
     private fun chooseFirmwareAlert() {
         val title = getString(R.string.selected_firmware_alert)
-        chooseFileAlert(title, selectedFirmware) {
+        chooseFileAlert(title,
+            selectedFirmware,
+            RemoteContext.firmwareService.getAll().map {
+                FileListItem(it.name, it.isFavorite)
+            }) {
             selectedFirmware = it
             updateFirmwareText()
         }
@@ -89,7 +104,15 @@ class FlashRequestFragment : Fragment() {
     }
 
     fun sendRequest() {
-        // TODO: MSG
+        flashService.sendRequest(Board(selectedBoard, true), Firmware(selectedFirmware, true))
+            .thenAccept {
+                navigateToResults(it)
+            }
+    }
+
+    fun navigateToResults(message: String) {
+        val action = FlashRequestFragmentDirections.actionFlashRequestToFlashResult(message)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {
