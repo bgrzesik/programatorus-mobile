@@ -105,15 +105,14 @@ open class RequesterResponderTest(
 
             override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> {
                 val data = BoardsData(
-                    listOf(
-                        Board("test 0", true),
-                        Board("test 1", false)
-                    ),
+                    (0..499).map {
+                        Board("test $it", it%2 == 0)
+                    }
+                    ,
                     listOf(
                         Board("test 0", true)
                     )
                 )
-
                 return CompletableFuture.completedFuture(
                     GenericMessage.newBuilder()
                         .setGetBoardsResponse(
@@ -146,7 +145,7 @@ open class RequesterResponderTest(
         right.reconnect()
 
         val boards = GetBoards().request(left).get()
-        Assert.assertEquals(boards.all.size, 2)
+        Assert.assertEquals(boards.all.size, 500)
         Assert.assertEquals(boards.favorites.size, 1)
         Assert.assertEquals(boards.all[0].name, "test 0")
         Assert.assertTrue(boards.all[0].isFavorite)

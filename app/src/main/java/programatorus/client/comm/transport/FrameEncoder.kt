@@ -7,7 +7,7 @@ class FrameEncoder(
     val mOutputStream: OutputStream
 ) : OutputStream() {
 
-    private val mSliceBuffer = ByteBuffer.allocate(4096)
+    private val mSliceBuffer = ByteBuffer.allocate(4096*16)
 
     override fun write(b: Int) {
         if (b != 0) {
@@ -19,7 +19,7 @@ class FrameEncoder(
 
     fun writeSliceSize(size: Int) {
         var number = size;
-        assert(number <= 0x3fff)
+        assert(number <= 0x3ffff)
         mOutputStream.write(0x80 or (number and 0x7f))
         number = number ushr 7
         mOutputStream.write(0x80 or (number and 0x7f))

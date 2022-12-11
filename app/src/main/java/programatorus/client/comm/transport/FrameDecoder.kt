@@ -8,7 +8,7 @@ class FrameDecoder(
 ) {
 
     private var mEof = false
-    private var mFrameBuffer = ByteBuffer.allocate(4096)
+    private var mFrameBuffer = ByteBuffer.allocate(4096*16)
 
     val isEof: Boolean get() = mEof
 
