@@ -2,7 +2,7 @@ package programatorus.client.screens.choosedevice
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -11,14 +11,14 @@ import android.content.Context
 import android.content.Context.*
 import android.content.Intent
 import android.content.IntentFilter
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.checkSelfPermission
-import androidx.core.content.IntentCompat
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import programatorus.client.databinding.FragmentChooseDeviceBinding
@@ -70,76 +70,45 @@ class ChooseDeviceFragment : Fragment() {
             navigateToHome(DeviceAddress.BluetoothDevice(it.address))
         }
 
+        binding.discoveredDevices.setClickListener {
+            navigateToHome(DeviceAddress.BluetoothDevice(it.address))
+        }
+
         requireContext().registerReceiver(discoveryHandler, IntentFilter(BluetoothDevice.ACTION_FOUND))
 
 
-        binding.addItem.setOnClickListener {
-            discoveryPermissions()
-            val discoverableIntent: Intent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
-                putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
-            }
-            startActivityForResult(discoverableIntent, 2137)
-            startDiscovery()
+        binding.discovery.setOnClickListener {
+            runDiscovery()
         }
         return binding.root
     }
 
-    private fun discoveryPermissions() {
-        when(checkSelfPermission(
-            requireContext(), Manifest.permission.BLUETOOTH_ADMIN
-        )){
-            PackageManager.PERMISSION_DENIED -> {
-                requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_ADMIN)
-            }
-            PackageManager.PERMISSION_GRANTED -> {}
-        }
+    private fun runDiscovery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            when(checkSelfPermission(
-                requireContext(), Manifest.permission.BLUETOOTH_SCAN
-            )){
-                PackageManager.PERMISSION_DENIED -> {
-                    requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_SCAN)
-                }
-                PackageManager.PERMISSION_GRANTED -> {}
-            }
-            when(checkSelfPermission(
-                requireContext(), Manifest.permission.BLUETOOTH_CONNECT
-            )){
-                PackageManager.PERMISSION_DENIED -> {
-                    requestPermissions(arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BT_CONNECT)
-                }
-                PackageManager.PERMISSION_GRANTED -> {}
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            when(checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
-            )){
-                PackageManager.PERMISSION_DENIED -> {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), REQUEST_COARSE_LOCATION)
-                }
-                PackageManager.PERMISSION_GRANTED -> {}
-            }
-            when(checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
-            )){
-                PackageManager.PERMISSION_DENIED -> {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_FINE_LOCATION)
-                }
-                PackageManager.PERMISSION_GRANTED -> {}
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            when(checkSelfPermission(
-                requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            )){
-                PackageManager.PERMISSION_DENIED -> {
-                    requestPermissions(arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_BACKGROUND_LOCATION)
-                }
-                PackageManager.PERMISSION_GRANTED -> {}
-            }
+            requestMultiplePermissions.launch(arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.BLUETOOTH_ADMIN,
+                Manifest.permission.BLUETOOTH_ADVERTISE,
+            ))
+        } else {
+            requestMultiplePermissions.launch(arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.BLUETOOTH_ADMIN,
+            ))
         }
     }
+
+    private val requestMultiplePermissions =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                Log.d("BT permissions", "${it.key} = ${it.value}")
+            }
+            startDiscovery()
+        }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -156,7 +125,7 @@ class ChooseDeviceFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             REQUEST_ENABLE_BT -> {
-                if (resultCode == Activity.RESULT_OK) {
+                if (resultCode == RESULT_OK) {
                     setPairedDevices()
                 } else {
                     val activity = activity
@@ -173,8 +142,7 @@ class ChooseDeviceFragment : Fragment() {
             val action = intent.action
 
             if (BluetoothDevice.ACTION_FOUND == action) {
-                val device =
-                    intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
+                val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE)
                 if (device != null) {
                     addDevice(device)
                 }
@@ -199,17 +167,12 @@ class ChooseDeviceFragment : Fragment() {
     }
 
     fun navigateToHome(address: DeviceAddress.BluetoothDevice) {
+        bluetoothAdapter.cancelDiscovery()
         val action = ChooseDeviceFragmentDirections.actionChooseDeviceToHome(address)
         findNavController().navigate(action)
     }
 
     companion object {
         const val REQUEST_ENABLE_BT = 101
-        const val REQUEST_BT_ADMIN = 102
-        const val REQUEST_COARSE_LOCATION = 103
-        const val REQUEST_FINE_LOCATION = 104
-        const val REQUEST_BT_CONNECT = 105
-        const val REQUEST_BT_SCAN = 106
-        const val REQUEST_BACKGROUND_LOCATION = 107
     }
 }

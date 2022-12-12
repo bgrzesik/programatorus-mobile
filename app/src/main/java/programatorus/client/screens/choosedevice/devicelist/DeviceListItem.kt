@@ -10,6 +10,6 @@ data class DeviceListItem(
     companion object {
         @SuppressLint("MissingPermission")
         fun from(bluetoothDevice: BluetoothDevice) =
-            DeviceListItem(bluetoothDevice.name, bluetoothDevice.address)
+            DeviceListItem(bluetoothDevice.name ?: "[NO NAME]", bluetoothDevice.address)
     }
 }

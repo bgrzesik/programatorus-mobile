@@ -38,8 +38,10 @@ class DeviceListAdapter():
     }
 
     fun addItem(device: DeviceListItem) {
-        devices.add(device)
-        notifyItemInserted(devices.size - 1)
+        if (!devices.contains(device)) {
+            devices.add(device)
+            notifyItemInserted(devices.size - 1)
+        }
     }
 
     inner class DeviceItemViewHolder(private val binding: DeviceListItemBinding)
