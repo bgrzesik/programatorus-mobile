@@ -30,8 +30,8 @@ class HomeFragment : Fragment() {
     private val binding get() = _binding!!
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
@@ -96,16 +96,12 @@ class HomeFragment : Fragment() {
 class HomePresenter(val view: HomeFragment, val context: Context, val device: DeviceAddress) {
 
     fun start() {
-        if (!RemoteContext.isInitialized) {
-            val mDevice = BoundDevice(context, device)
-            mDevice.bind()
-            mDevice.onBind.thenAccept { device ->
-                RemoteContext.start(device).thenAccept { _ ->
-                    view.stopLoading()
-                }
+        val mDevice = BoundDevice(context, device)
+        mDevice.bind()
+        mDevice.onBind.thenAccept { device ->
+            RemoteContext.start(device).thenAccept { _ ->
+                view.stopLoading()
             }
-        } else {
-            view.stopLoading()
         }
     }
 

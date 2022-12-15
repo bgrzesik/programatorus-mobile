@@ -12,11 +12,9 @@ object RemoteContext {
         val future = CompletableFuture<Boolean>()
         if (!isInitialized) {
             initServices(device)
-            fetchInitialConfig(future)
-        } else {
-            future.complete(true)
         }
         isInitialized = true
+        fetchInitialConfig(future)
         return future
     }
 

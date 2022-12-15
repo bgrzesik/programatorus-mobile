@@ -1,11 +1,9 @@
 package programatorus.client.screens.uploadfile
 
-import android.app.Activity
 import android.content.ContentResolver
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,8 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import programatorus.client.databinding.FragmentUploadFileBinding
 import programatorus.client.device.BoundDevice
-import programatorus.client.device.IDevice
-import java.io.FileInputStream
+import programatorus.client.shared.LoadingDialog
 
 
 class UploadFileFragment : Fragment() {
@@ -27,7 +24,7 @@ class UploadFileFragment : Fragment() {
     private lateinit var _device: BoundDevice
 
     private var _selectFile =
-        registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+        registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri != null) {
                 contentResolver.takePersistableUriPermission(
                     uri,
@@ -51,7 +48,7 @@ class UploadFileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnChooseFile.setOnClickListener {
-            _selectFile.launch("*/*")
+            _selectFile.launch(arrayOf("*/*"))
         }
 
         contentResolver = requireContext().contentResolver
@@ -66,20 +63,12 @@ class UploadFileFragment : Fragment() {
 
     private fun openFile(documentUri: Uri) {
         val fileDescriptor = contentResolver.openFileDescriptor(documentUri, "r") ?: return
-        val fileInputStream = FileInputStream(fileDescriptor.fileDescriptor)
-        uploadFile(fileInputStream)
-        Log.d("OPEN_FILE", "openFile: ${fileInputStream.available()}")
-
+        val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
         _device.onBind.thenAccept { device ->
-            device.upload(documentUri)
+            device.upload(documentUri).thenAccept {
+               dialog.dismiss()
+            }
         }
     }
 
-    private fun uploadFile(stream: FileInputStream) {
-        // TODO: MSG upload file
-    }
-
-    companion object {
-        const val PICK_FILE = 2
-    }
 }
