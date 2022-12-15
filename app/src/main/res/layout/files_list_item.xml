@@ -8,22 +8,28 @@
     android:layout_width="match_parent"
     android:background="@drawable/default_item_border">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground">
 
-    <androidx.appcompat.widget.AppCompatImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/img"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"/>
+        <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/img"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
 
-    <androidx.appcompat.widget.AppCompatTextView
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:id="@+id/filename"
-            android:layout_marginStart="12dp"
-            android:gravity="left | center_vertical"
-            android:textColor="#E6302929"
-            android:textSize="20sp"/>
+        <androidx.appcompat.widget.AppCompatTextView
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:id="@+id/filename"
+                android:layout_marginStart="12dp"
+                android:gravity="left | center_vertical"
+                android:textColor="#E6302929"
+                android:textSize="20sp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
