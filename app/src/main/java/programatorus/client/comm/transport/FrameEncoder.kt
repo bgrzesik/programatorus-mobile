@@ -19,7 +19,7 @@ class FrameEncoder(
 
     fun writeSliceSize(size: Int) {
         var number = size;
-        assert(number <= 0x3ffff)
+        assert(number <= 0x7fff)
         mOutputStream.write(0x80 or (number and 0x7f))
         number = number ushr 7
         mOutputStream.write(0x80 or (number and 0x7f))
