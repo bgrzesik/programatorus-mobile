@@ -28,8 +28,12 @@ class RemoteDevice(
         private val mContext: Context,
 ) : IDevice, IConnectionClient {
 
+    private val mDebuggerLinesQueue = DebuggerLineQueue()
+
     private val mRouter: RequestRouter = RequestRouter(
-            emptyList(),
+            listOf(
+                mDebuggerLinesQueue
+            ),
             this
     )
 
@@ -66,5 +70,13 @@ class RemoteDevice(
         FileUpload.upload(mSession, documentUri, mContext.contentResolver)
 
     override fun flashRequest(board: Board, firmware: Firmware) = FlashRequest(board, firmware).request(mSession)
+
+    override fun startDebugger(board: Board, firmware: Firmware) = StartDebugger(board, firmware).request(mSession)
+
+    override fun stopDebugger() = StopDebugger().request(mSession)
+
+    override fun sendDebuggerLine(line: String) = SendDebuggerLine(line).request(mSession)
+
+    override fun pollDebuggerLine() = mDebuggerLinesQueue.poll()
 
 }
