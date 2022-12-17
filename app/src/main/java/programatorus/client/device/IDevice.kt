@@ -2,14 +2,18 @@ package programatorus.client.device
 
 import programatorus.client.model.Board
 import android.net.Uri
+import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.model.BoardsData
 import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 interface IDevice {
 
     val isConnected: Boolean
+
+    val onDisconnect: CompletableFuture<ConnectionState>
 
     fun getBoards() : CompletableFuture<BoardsData>
 
