@@ -3,6 +3,7 @@ package programatorus.client.device
 import android.content.Context
 import android.net.Uri
 import android.os.Handler
+import programatorus.client.comm.IConnectionClient
 import programatorus.client.comm.app.RequestRouter
 import programatorus.client.comm.app.proto.FileUpload
 import programatorus.client.comm.app.proto.GetBoards
@@ -19,27 +20,39 @@ import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
 import programatorus.client.utils.HandlerTaskRunner
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 class RemoteDevice(
         sessionBuilder: ISessionProvider,
         handler: Handler,
         private val mContext: Context,
-) : IDevice {
+) : IDevice, IConnectionClient {
 
     private val mRouter: RequestRouter = RequestRouter(
-            emptyList()
+            emptyList(),
+            this
     )
 
     private val mTaskRunner = HandlerTaskRunner(handler)
     private val mSession: ISession = sessionBuilder.build(mRouter, mTaskRunner, mTaskRunner)
+    private val mOnDisconnect = CompletableFuture<ConnectionState>()
 
     init {
         // TODO(bgrzesik): Proper connection handling
         mSession.reconnect()
     }
 
+    override fun onStateChanged(state: ConnectionState) {
+        if (state == ConnectionState.DISCONNECTED || state == ConnectionState.ERROR) {
+            mOnDisconnect.complete(state)
+        }
+    }
+
     override val isConnected: Boolean
         get() = mSession.state == ConnectionState.CONNECTING || mSession.state == ConnectionState.CONNECTED
+
+    override val onDisconnect: CompletableFuture<ConnectionState>
+        get() = mOnDisconnect
 
     override fun getBoards() = GetBoards().request(mSession)
 

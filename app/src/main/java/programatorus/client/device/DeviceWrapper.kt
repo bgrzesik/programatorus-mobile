@@ -1,10 +1,13 @@
 package programatorus.client.device
 
 import android.net.Uri
+import programatorus.client.comm.transport.ConnectionState
 import programatorus.client.model.Board
 import programatorus.client.model.BoardsData
 import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Future
 
 interface DeviceWrapper: IDevice {
 
@@ -12,6 +15,9 @@ interface DeviceWrapper: IDevice {
 
     override val isConnected: Boolean
         get() = wrappedDevice.isConnected
+
+    override val onDisconnect: CompletableFuture<ConnectionState>
+        get() = wrappedDevice.onDisconnect
 
     override fun getBoards() = wrappedDevice.getBoards()
 
