@@ -19,20 +19,17 @@ message SetSessionId {
   uint64 sessionId = 1;
 }
 
-message GetBoardsRequest {
-}
-
 message Board {
   string name = 1;
   bool favourite = 2;
 }
 
+message GetBoardsRequest {
+}
+
 message GetBoardsResponse {
   repeated Board all = 1;
   repeated Board favorites = 2;
-}
-
-message GetFirmwareRequest {
 }
 
 message PutBoardsRequest {
@@ -44,9 +41,14 @@ message PutBoardsResponse {
   bool success = 1;
 }
 
+
+
 message Firmware {
   string name = 1;
   bool favourite = 2;
+}
+
+message GetFirmwareRequest {
 }
 
 message GetFirmwareResponse {
@@ -63,15 +65,17 @@ message PutFirmwareResponse {
   bool success = 1;
 }
 
+
 message FlashRequest {
-  Firmware firmware = 1;
-  Board board = 2;
+    Firmware firmware = 1;
+    Board board = 2;
 }
 
 message FlashResponse {
-  bool success = 1;
-  string message = 2;
+    bool success = 1;
+    string message = 2;
 }
+
 
 message DeviceUpdateStatus {
   enum Status {
@@ -82,12 +86,12 @@ message DeviceUpdateStatus {
   }
 
   Status status = 1;
-  optional float flashingProgress = 2;
-  optional string image = 3;
+  float flashingProgress = 2;
+  string image = 3;
 }
 
 message FileUpload {
-  optional uint64 uid = 1;
+  uint64 uid = 1;
 
   enum FileType {
     FIRMWARE = 0;
@@ -124,6 +128,23 @@ message FileUpload {
   }
 }
 
+message DebuggerStart {
+  string target = 1;
+  string firmware = 2;
+}
+
+message DebuggerStarted {
+  uint32 sessionId = 1;
+}
+
+message DebuggerStop {
+}
+
+message DebuggerLine {
+  uint64 ordinal = 2;
+  string line = 3;
+}
+
 message GenericMessage {
   uint64 sessionId = 1;
 
@@ -143,6 +164,7 @@ message GenericMessage {
     PutBoardsRequest putBoardsRequest = 212;
     PutBoardsResponse putBoardsResponse = 213;
 
+
     GetFirmwareRequest getFirmwareRequest = 220;
     GetFirmwareResponse getFirmwareResponse = 221;
     PutFirmwareRequest putFirmwareRequest = 222;
@@ -151,10 +173,20 @@ message GenericMessage {
     FlashRequest flashRequest = 230;
     FlashResponse flashResponse = 231;
 
-    DeviceUpdateStatus deviceUpdateStatus = 202;
+
     // Response: Ok(102)
 
+    DeviceUpdateStatus deviceUpdateStatus = 202;
     FileUpload fileUpload = 203;
+
+    DebuggerStart debuggerStart = 204;
+    DebuggerStarted debuggerStarted = 205;
+
+    DebuggerStop debuggerStop = 206;
+    // Response: Ok(102)
+
+    DebuggerLine debuggerLine = 207;
+    // Response: Ok(102)
 
     TestMessage test = 301;
     ErrorMessage error = 302;
