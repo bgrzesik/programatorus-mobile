@@ -1,14 +1,19 @@
 package programatorus.client.screens.home
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import programatorus.client.MyApplication
 import programatorus.client.R
 import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentHomeBinding
@@ -45,6 +50,10 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        showLoading()
+
+        requireContext().registerReceiver(disconnectHandler, IntentFilter("programatorus,client.DISCONNECT"))
+
         setupButtons()
     }
 
@@ -75,7 +84,6 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
 
-        showLoading()
         presenter.start()
     }
 
@@ -91,6 +99,18 @@ class HomeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    private val disconnectHandler: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            handleDisconnect()
+        }
+    }
+
+    fun handleDisconnect() {
+        stopLoading()
+        Toast.makeText(context, "Failed to connect.\n Have you chosen correct device?\n Is your device running?", Toast.LENGTH_LONG).show()
+        findNavController().navigate(R.id.action_chooseDevice)
+    }
 }
 
 class HomePresenter(val view: HomeFragment, val context: Context, val device: DeviceAddress) {
@@ -99,7 +119,7 @@ class HomePresenter(val view: HomeFragment, val context: Context, val device: De
         val mDevice = BoundDevice(context, device)
         mDevice.bind()
         mDevice.onBind.thenAccept { device ->
-            RemoteContext.start(device).thenAccept { _ ->
+            RemoteContext.start(device).thenAccept {
                 view.stopLoading()
             }
         }
