@@ -31,4 +31,12 @@ interface DeviceWrapper: IDevice {
 
     override fun flashRequest(board: Board, firmware: Firmware) = wrappedDevice.flashRequest(board, firmware)
 
+    override fun startDebugger(board: Board, firmware: Firmware) = wrappedDevice.startDebugger(board, firmware)
+
+    override fun stopDebugger() = wrappedDevice.stopDebugger()
+
+    override fun sendDebuggerLine(line: String) = wrappedDevice.sendDebuggerLine(line)
+
+    override fun pollDebuggerLine() = wrappedDevice.pollDebuggerLine()
+
 }

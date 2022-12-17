@@ -1,21 +1,23 @@
 package programatorus.client.comm.app.proto
 
 import programatorus.client.comm.app.IRequester
+import programatorus.client.model.Board
+import programatorus.client.model.Firmware
 import programus.proto.Protocol.DebuggerStart
 import programus.proto.Protocol.GenericMessage
 import programus.proto.Protocol.GenericMessage.PayloadCase
 
 class StartDebugger(
-    val firmware: String,
-    val target: String,
+    val board: Board,
+    val firmware: Firmware,
 ) : IRequester<Int> {
 
     override fun prepareRequest(): GenericMessage.Builder =
         GenericMessage.newBuilder()
             .setDebuggerStart(
                 DebuggerStart.newBuilder()
-                    .setFirmware(firmware)
-                    .setTarget(target)
+                    .setTarget(board.name)
+                    .setFirmware(firmware.name)
             )
 
     override val responsePayloadCase: PayloadCase

@@ -5,11 +5,11 @@ import java.util.concurrent.CompletableFuture
 
 interface PojoResponder<Request, Response> : IResponder {
 
-    abstract fun unpackRequest(request: GenericMessage): Request
+    fun unpackRequest(request: GenericMessage): Request
 
-    abstract fun onRequest(request: Request): CompletableFuture<Response>
+    fun onRequest(request: Request): CompletableFuture<Response>
 
-    abstract fun prepareResponse(response: Response): GenericMessage.Builder
+    fun prepareResponse(response: Response): GenericMessage.Builder
 
     override fun onRequest(message: GenericMessage): CompletableFuture<GenericMessage> {
         assert(requestPayloadCase == message.payloadCase)

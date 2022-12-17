@@ -2,7 +2,6 @@ package programatorus.client.comm.app.proto
 
 import com.google.protobuf.Empty
 import programatorus.client.comm.app.PojoResponder
-import programus.proto.Protocol.DeviceUpdateStatus
 import programus.proto.Protocol.DeviceUpdateStatus.Status.*
 import programus.proto.Protocol.GenericMessage
 import java.util.*

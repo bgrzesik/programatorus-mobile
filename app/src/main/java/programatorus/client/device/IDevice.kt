@@ -27,4 +27,13 @@ interface IDevice {
     fun upload(documentUri: Uri) : CompletableFuture<Unit>
 
     fun flashRequest(board: Board, firmware: Firmware): CompletableFuture<String>
+
+    fun startDebugger(board: Board, firmware: Firmware): CompletableFuture<Int>
+
+    fun stopDebugger(): CompletableFuture<Unit>
+
+    fun sendDebuggerLine(line: String): CompletableFuture<Unit>
+
+    fun pollDebuggerLine(): CompletableFuture<String>
+
 }
