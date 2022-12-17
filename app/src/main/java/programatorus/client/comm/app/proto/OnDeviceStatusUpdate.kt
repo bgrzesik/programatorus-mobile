@@ -2,6 +2,7 @@ package programatorus.client.comm.app.proto
 
 import com.google.protobuf.Empty
 import programatorus.client.comm.app.PojoResponder
+import programus.proto.Protocol.DeviceUpdateStatus
 import programus.proto.Protocol.DeviceUpdateStatus.Status.*
 import programus.proto.Protocol.GenericMessage
 import java.util.*
@@ -22,18 +23,8 @@ interface OnDeviceStatusUpdate : PojoResponder<OnDeviceStatusUpdate.DeviceStatus
             null -> DeviceStatus.Status.UNREACHABLE
         }
 
-        val flashingProgress = if (update.hasFlashingProgress()) {
-            Optional.of(update.flashingProgress)
-        } else {
-            Optional.empty()
-        }
-
-        val image = if (update.hasImage()) {
-            Optional.of(update.image)
-        } else {
-            Optional.empty()
-        }
-
+        val flashingProgress = Optional.of(update.flashingProgress)
+        val image = Optional.of(update.image)
         return DeviceStatus(status, flashingProgress, image)
     }
 
