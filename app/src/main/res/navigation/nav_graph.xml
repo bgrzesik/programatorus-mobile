@@ -5,6 +5,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/ChooseDeviceFragment">
 
+    <action
+        android:id="@+id/action_chooseDevice"
+        app:destination="@id/ChooseDeviceFragment"
+        app:popUpTo="@id/nav_graph"
+        app:popUpToInclusive="true" />
+
     <fragment
         android:id="@+id/ChooseDeviceFragment"
         android:name="programatorus.client.screens.choosedevice.ChooseDeviceFragment"

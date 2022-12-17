@@ -1,6 +1,8 @@
 package programatorus.client.comm.transport.io
 
+import android.content.Intent
 import android.util.Log
+import programatorus.client.MyApplication
 import programatorus.client.comm.transport.*
 import programatorus.client.comm.transport.wrapper.OutgoingPacket
 import java.io.InputStream
@@ -191,6 +193,10 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
         }
 
         state = ConnectionState.DISCONNECTED
+
+        val intent = Intent("programatorus,client.DISCONNECT")
+        MyApplication.getAppContext().sendBroadcast(intent)
+
     }
 
     private inner class IOThread<T : StreamingTransport<T>>(

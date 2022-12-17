@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import programatorus.client.MyApplication
 import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentManageFirmwaresBinding
 import programatorus.client.screens.firmware.all.AllFirmwaresListItem
