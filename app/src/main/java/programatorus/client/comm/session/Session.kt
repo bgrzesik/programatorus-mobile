@@ -52,12 +52,7 @@ class Session private constructor(
 
         val pending = PendingMessage(
             GenericMessage.newBuilder(message)
-                .apply {
-                    if (mSessionId != null) {
-                        sessionId = mSessionId!!
-                    }
-                    request = mNextRequestId.incrementAndGet()
-                }
+                .setRequest(mNextRequestId.incrementAndGet())
                 .build()
         )
 
@@ -94,6 +89,8 @@ class Session private constructor(
             GenericMessage.PayloadCase.SETSESSIONID -> {
                 mSessionId = message.setSessionId.sessionId
                 Log.i(TAG, "processControlRequests(): Setting sessionId=$mSessionId")
+
+                pumpMessages()
 
                 GenericMessage.newBuilder()
                     .setOk(Empty.getDefaultInstance())
@@ -148,8 +145,17 @@ class Session private constructor(
 
     private fun pumpMessages() = runGuardedOnLooper(mPumpPending) {
         Log.d(TAG, "pumpMessages():")
+
+        if (mSessionId == null) {
+            return@runGuardedOnLooper
+        }
+
         while (mQueue.isNotEmpty()) {
             val pending = mQueue.poll()!!
+
+            pending.message = GenericMessage.newBuilder(pending.message)
+                    .setSessionId(mSessionId!!)
+                    .build()
 
             if (pending.isRequest) {
                 mWaitingForResponse[pending.id] = pending
@@ -203,7 +209,7 @@ class Session private constructor(
     }
 
     private inner class PendingMessage(
-        val message: GenericMessage,
+        var message: GenericMessage,
     ) {
         val future = CompletableFuture<GenericMessage>()
         private var mOutgoing: IOutgoingMessage? = null
