@@ -21,6 +21,7 @@
             android:id="@+id/action_chooseDevice_to_home"
             app:destination="@id/HomeFragment"
             app:popUpTo="@id/nav_graph"
+            app:launchSingleTop="true"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
