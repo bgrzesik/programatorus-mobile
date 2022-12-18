@@ -84,7 +84,7 @@
         android:id="@+id/FlashRequestFragment"
         android:name="programatorus.client.screens.flashrequest.FlashRequestFragment"
         android:label="@string/flash_request_fragment_label"
-        tools:layout="@layout/fragment_upload_file">
+        tools:layout="@layout/fragment_flash_request">
 
         <action
             android:id="@+id/action_flashRequest_to_flashResult"
@@ -96,7 +96,7 @@
         android:id="@+id/FlashResultFragment"
         android:name="programatorus.client.screens.flashrequest.FlashResultFragment"
         android:label="@string/flash_result_fragment_label"
-        tools:layout="@layout/fragment_upload_file">
+        tools:layout="@layout/fragment_flash_result">
 
         <argument
             android:name="message"
