@@ -88,8 +88,8 @@
 
         <action
             android:id="@+id/action_flashRequest_to_flashResult"
-            app:popUpTo="@id/FlashRequestFragment"
-            app:destination="@id/FlashResultFragment"/>
+            app:destination="@id/FlashResultFragment"
+            app:popUpTo="@id/FlashRequestFragment" />
     </fragment>
 
     <fragment

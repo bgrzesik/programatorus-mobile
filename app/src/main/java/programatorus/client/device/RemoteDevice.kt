@@ -79,4 +79,6 @@ class RemoteDevice(
 
     override fun pollDebuggerLine() = mDebuggerLinesQueue.poll()
 
+    override fun deleteFirmware(name: String) = DeleteFirmware(name).request(mSession)
+
 }

@@ -36,4 +36,6 @@ interface IDevice {
 
     fun pollDebuggerLine(): CompletableFuture<String>
 
+    fun deleteFirmware(name: String): CompletableFuture<Unit>
+
 }
