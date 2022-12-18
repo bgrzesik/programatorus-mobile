@@ -9,8 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
+import programatorus.client.R
+import programatorus.client.RemoteContext
+import programatorus.client.RemoteContext.device
 import programatorus.client.databinding.FragmentUploadFileBinding
 import programatorus.client.device.BoundDevice
+import programatorus.client.screens.uploadfile.deletelist.DeleteListItem
 import programatorus.client.shared.LoadingDialog
 
 
@@ -47,9 +51,31 @@ class UploadFileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.btnChooseFile.setOnClickListener {
-            _selectFile.launch(arrayOf("*/*"))
+        with(binding) {
+            btnChooseFile.setOnClickListener {
+                _selectFile.launch(arrayOf("*/*"))
+            }
+
+            deletableList.setItems(
+                RemoteContext.firmwareService.getAll().map {
+                    DeleteListItem(it.name)
+                })
+
+            deletableList.setClickListener {
+                DeleteAlert.confirm(
+                    requireContext(),
+                    getString(R.string.delete_file_text, it.name)
+                ) {
+                    val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+                    device.deleteFirmware(it.name).thenAccept {
+                        dialog.dismiss()
+                    }
+                    deletableList.removeItem(it)
+                }
+            }
         }
+
+
 
         contentResolver = requireContext().contentResolver
         _device = BoundDevice(requireContext())
@@ -64,10 +90,8 @@ class UploadFileFragment : Fragment() {
     private fun openFile(documentUri: Uri) {
         val fileDescriptor = contentResolver.openFileDescriptor(documentUri, "r") ?: return
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
-        _device.onBind.thenAccept { device ->
-            device.upload(documentUri).thenAccept {
-               dialog.dismiss()
-            }
+        device.upload(documentUri).thenAccept {
+            dialog.dismiss()
         }
     }
 

@@ -11,6 +11,7 @@ object RemoteContext {
     fun start(device: IDevice): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         if (!isInitialized) {
+            this.device = device
             initServices(device)
         }
         isInitialized = true
@@ -33,6 +34,8 @@ object RemoteContext {
     }
 
     var isInitialized: Boolean = false
+
+    lateinit var device: IDevice
 
     val boardsService = BoardsService()
     val firmwareService = FirmwareService()

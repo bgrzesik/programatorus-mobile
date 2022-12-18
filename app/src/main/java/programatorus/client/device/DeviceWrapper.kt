@@ -39,4 +39,6 @@ interface DeviceWrapper: IDevice {
 
     override fun pollDebuggerLine() = wrappedDevice.pollDebuggerLine()
 
+    override fun deleteFirmware(name: String) = wrappedDevice.deleteFirmware(name)
+
 }

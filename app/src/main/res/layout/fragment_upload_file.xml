@@ -1,14 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:orientation="vertical"
+    tools:context=".screens.uploadfile.UploadFileFragment">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/select_firmware_to_upload"
+        android:gravity="center"
+        android:textSize="24sp"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_choose_file"
+        android:layout_marginTop="16dp"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_width="match_parent"
+        android:drawableStart="@drawable/ic_upload"
+        android:textSize="22sp"
+        android:padding="16dp"
+        android:textAlignment="textStart"
         android:text="@string/choose_file_to_upload" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.appcompat.widget.AppCompatTextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/select_firmware_to_delete"
+        android:gravity="center"
+        android:textSize="24sp"/>
+
+    <programatorus.client.screens.uploadfile.deletelist.DeleteListView
+        android:layout_marginTop="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/deletable_list" />
+
+</LinearLayout>

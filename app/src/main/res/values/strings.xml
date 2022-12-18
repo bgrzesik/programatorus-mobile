@@ -23,15 +23,15 @@
     <string name="discover_button">Start discovery</string>
 
 <!--    Home -->
-    <string name="manage_boards">Boards</string>
-    <string name="manage_firmware">Firmware</string>
-    <string name="upload_file">Upload file</string>
+    <string name="manage_boards">Manage Boards</string>
+    <string name="manage_firmware">Manage Firmware</string>
+    <string name="upload_file">Upload/Delete files</string>
     <string name="flash_request">Flash request</string>
     <string name="debugger">Debugger</string>
 
 
 <!--    Choose Device-->
-    <string name="choose_file_to_upload">Choose file to upload</string>
+    <string name="choose_file_to_upload">Upload File</string>
 
 
     <string name="submit_flash">Submit</string>
@@ -45,6 +45,11 @@
 
     <string name="placeholder_selection">[-----]</string>
 
+    <string name="select_firmware_to_upload">Use button below to upload firmware files to remote device</string>
+    <string name="select_firmware_to_delete">You can delete firmware files from remote device using list below</string>
+
+    <string name="delete_file_title">Delete File</string>
+    <string name="delete_file_text">Are you sure you want to permanently delete file \"%1$s\" from remote Raspberry Pi?</string>
 
     <string name="send_gdb_command">Send</string>
 
