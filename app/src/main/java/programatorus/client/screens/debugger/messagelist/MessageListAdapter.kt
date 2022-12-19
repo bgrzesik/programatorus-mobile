@@ -45,7 +45,6 @@ class MessageListAdapter():
 
     fun addItem(item: MessageListItem) {
         messages.add(item)
-        Log.d("DEBUGGER", "items: $messages")
         notifyItemInserted(messages.size - 1)
     }
 

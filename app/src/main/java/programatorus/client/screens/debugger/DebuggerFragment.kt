@@ -1,5 +1,9 @@
 package programatorus.client.screens.debugger
 
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,6 +16,7 @@ import programatorus.client.databinding.FragmentDebuggerBinding
 import programatorus.client.model.Board
 import programatorus.client.model.Firmware
 import programatorus.client.screens.debugger.messagelist.MessageListItem
+import programatorus.client.screens.flashrequest.FlashRequestFragment
 import programatorus.client.screens.home.HomeFragmentArgs
 import java.util.concurrent.CompletableFuture
 
@@ -26,6 +31,13 @@ class DebuggerFragment : Fragment() {
 
     private val binding get() = _binding!!
 
+    private val resultsHandler: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val message = intent.getStringExtra(LINE_KEY)
+            receive(message)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,6 +50,7 @@ class DebuggerFragment : Fragment() {
             Firmware(args.firmware, true)
         ).get()
 
+        requireContext().registerReceiver(resultsHandler, IntentFilter(DEBUGGER_LINE))
         startLoop()
 
         return binding.root
@@ -59,15 +72,19 @@ class DebuggerFragment : Fragment() {
 
     private fun loop() {
         device.pollDebuggerLine().thenAccept { line ->
+            val intent = Intent(DEBUGGER_LINE)
+            intent.putExtra(LINE_KEY, line)
+            requireContext().sendBroadcast(intent)
             Log.d(TAG, "line polled: $line")
-            receive(line)
             loop()
         }
     }
 
-    private fun receive(line: String) {
-        binding.messageList.addMessage(MessageListItem.remote(line))
-        binding.messageList.scrollToBottom()
+    private fun receive(line: String?) {
+        line?.let {
+            binding.messageList.addMessage(MessageListItem.remote(it.trim()))
+            binding.messageList.scrollToBottom()
+        }
     }
 
     fun sendCommand() {
@@ -87,5 +104,7 @@ class DebuggerFragment : Fragment() {
 
     companion object {
         val TAG = "DEBUGGER"
+        val DEBUGGER_LINE = "programatorus.client.DEBUGGER_LINE"
+        val LINE_KEY = "line"
     }
 }
