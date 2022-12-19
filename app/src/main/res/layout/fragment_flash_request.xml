@@ -2,30 +2,30 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="@string/select_board_message"
         android:gravity="center"
-        android:textSize="24sp"/>
+        android:text="@string/select_board_message"
+        android:textSize="24sp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_choose_board"
         style="@style/ButtonFlash"
-        android:text="@string/selected_board"/>
+        android:text="@string/selected_board" />
 
 
     <androidx.appcompat.widget.AppCompatTextView
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
-        android:text="@string/select_firmware_message"
         android:gravity="center"
-        android:textSize="24sp"/>
+        android:text="@string/select_firmware_message"
+        android:textSize="24sp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_choose_firmware"
@@ -33,11 +33,16 @@
         android:text="@string/selected_firmware" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_submit"
+        android:id="@+id/btn_flash_request"
         style="@style/ButtonFlash"
         android:layout_marginTop="48dp"
         android:text="@string/submit_flash" />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_start_debug"
+        style="@style/ButtonFlash"
+        android:layout_marginTop="12dp"
+        android:text="@string/start_debugger" />
 
 
 </LinearLayout>

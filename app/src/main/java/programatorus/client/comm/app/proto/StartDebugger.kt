@@ -21,7 +21,7 @@ class StartDebugger(
             )
 
     override val responsePayloadCase: PayloadCase
-        get() = PayloadCase.DEBUGGERSTART
+        get() = PayloadCase.DEBUGGERSTARTED
 
     override fun handleResponse(message: GenericMessage): Int =
         message.debuggerStarted.sessionId

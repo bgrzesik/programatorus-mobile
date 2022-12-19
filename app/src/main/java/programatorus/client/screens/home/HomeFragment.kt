@@ -74,10 +74,6 @@ class HomeFragment : Fragment() {
             btnFlashRequest.setOnClickListener {
                 findNavController().navigate(R.id.action_home_to_flashRequest)
             }
-
-            btnDebugger.setOnClickListener {
-                findNavController().navigate(R.id.action_home_to_debugger)
-            }
         }
     }
 
@@ -108,6 +104,7 @@ class HomeFragment : Fragment() {
 
     fun handleDisconnect() {
         stopLoading()
+        RemoteContext.isInitialized = false
         Toast.makeText(context, "Failed to connect.\n Have you chosen correct device?\n Is your device running?", Toast.LENGTH_LONG).show()
         findNavController().navigate(R.id.action_chooseDevice)
     }
