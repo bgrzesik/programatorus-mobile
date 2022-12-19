@@ -88,8 +88,8 @@ class DebuggerFragment : Fragment() {
     }
 
     fun sendCommand() {
-        val command = binding.commandToSend.text.toString()
-        binding.messageList.addMessage(MessageListItem.local(command))
+        val command = binding.commandToSend.text.toString() + "\n"
+        binding.messageList.addMessage(MessageListItem.local(command.trim()))
         binding.messageList.scrollToBottom()
         device.sendDebuggerLine(command)
     }
