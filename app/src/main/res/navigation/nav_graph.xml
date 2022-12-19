@@ -53,10 +53,6 @@
             app:destination="@id/FlashRequestFragment"
             app:popUpTo="@id/HomeFragment"/>
 
-        <action
-            android:id="@+id/action_home_to_debugger"
-            app:destination="@id/DebuggerFragment"
-            app:popUpTo="@id/HomeFragment"/>
     </fragment>
 
     <fragment
@@ -90,11 +86,17 @@
             android:id="@+id/action_flashRequest_to_flashResult"
             app:destination="@id/FlashResultFragment"
             app:popUpTo="@id/FlashRequestFragment" />
+
+        <action
+            android:id="@+id/action_flash_to_debugger"
+            app:destination="@id/DebuggerFragment"
+            app:popUpTo="@id/FlashRequestFragment"/>
+
     </fragment>
 
     <fragment
         android:id="@+id/FlashResultFragment"
-        android:name="programatorus.client.screens.flashrequest.FlashResultFragment"
+        android:name="programatorus.client.screens.flashresult.FlashResultFragment"
         android:label="@string/flash_result_fragment_label"
         tools:layout="@layout/fragment_flash_result">
 
@@ -109,6 +111,12 @@
         android:label="@string/debugger_fragment_label"
         tools:layout="@layout/fragment_debugger">
 
+        <argument
+            android:name="board"
+            app:argType="string" />
+        <argument
+            android:name="firmware"
+            app:argType="string" />
     </fragment>
 
 </navigation>

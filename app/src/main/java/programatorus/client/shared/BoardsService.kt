@@ -28,5 +28,8 @@ class BoardsService() {
 
     fun getAll(): List<Board> = repository.getAll()
 
+    fun getAllSorted(): List<Board> =
+        repository.getFavorites() + repository.getAll().filter { !it.isFavorite }
+
     fun getBoardsData(): BoardsData = BoardsData(repository.getAll(), repository.getFavorites())
 }

@@ -1,4 +1,4 @@
-package programatorus.client.screens.flashrequest;
+package programatorus.client.screens.flashresult
 
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -34,6 +34,11 @@ class FlashResultFragment: Fragment() {
 
         binding.message.movementMethod = ScrollingMovementMethod()
         binding.message.text = args.message
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
 }

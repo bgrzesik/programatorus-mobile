@@ -26,9 +26,4 @@
         android:id="@+id/btn_flash_request"
         android:text="@string/flash_request" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        style="@style/ButtonHome"
-        android:id="@+id/btn_debugger"
-        android:text="@string/debugger" />
-
 </LinearLayout>

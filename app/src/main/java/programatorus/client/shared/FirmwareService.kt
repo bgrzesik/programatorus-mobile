@@ -1,6 +1,7 @@
 package programatorus.client.shared
 
 import programatorus.client.device.IDevice
+import programatorus.client.model.Board
 import programatorus.client.model.Firmware
 import programatorus.client.model.FirmwareData
 import java.util.concurrent.CompletableFuture
@@ -27,6 +28,9 @@ class FirmwareService() {
     }
 
     fun getAll(): List<Firmware> = repository.getAll()
+
+    fun getAllSorted(): List<Firmware> =
+        repository.getFavorites() + repository.getAll().filter { !it.isFavorite }
 
     private fun getFirmwareData(): FirmwareData =
         FirmwareData(repository.getAll(), repository.getFavorites())

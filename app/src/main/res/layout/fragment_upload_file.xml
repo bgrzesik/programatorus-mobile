@@ -23,8 +23,8 @@
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
         android:drawableStart="@drawable/ic_upload"
+        android:drawablePadding="16dp"
         android:textSize="22sp"
-        android:padding="16dp"
         android:textAlignment="textStart"
         android:text="@string/choose_file_to_upload" />
 
