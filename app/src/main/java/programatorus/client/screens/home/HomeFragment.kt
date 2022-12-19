@@ -52,7 +52,7 @@ class HomeFragment : Fragment() {
 
         showLoading()
 
-        requireContext().registerReceiver(disconnectHandler, IntentFilter("programatorus,client.DISCONNECT"))
+        requireContext().registerReceiver(disconnectHandler, IntentFilter("programatorus.client.DISCONNECT"))
 
         setupButtons()
     }

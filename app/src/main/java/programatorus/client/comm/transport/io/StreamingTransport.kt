@@ -194,7 +194,7 @@ abstract class StreamingTransport<T : StreamingTransport<T>>(
 
         state = ConnectionState.DISCONNECTED
 
-        val intent = Intent("programatorus,client.DISCONNECT")
+        val intent = Intent("programatorus.client.DISCONNECT")
         MyApplication.getAppContext().sendBroadcast(intent)
 
     }
