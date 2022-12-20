@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
+import programatorus.client.R
 
 import programatorus.client.databinding.FragmentFlashResultBinding
 
@@ -33,7 +34,13 @@ class FlashResultFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.message.movementMethod = ScrollingMovementMethod()
+
         binding.message.text = args.message
+
+        if (args.message.contains("** verified ok **", ignoreCase = true))
+            binding.verified.setImageResource(R.drawable.ic_verified_ok)
+        else
+            binding.verified.setImageResource(R.drawable.ic_verified_fail)
     }
 
     override fun onDestroyView() {

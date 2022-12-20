@@ -1,17 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <ImageView
+        android:id="@+id/verified"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:src="@drawable/ic_verified_ok" />
+
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/message"
-        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_marginTop="48dp"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/verified"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="12dp"
+        android:gravity="left"
         android:scrollbars="vertical"
-        android:textSize="24sp"/>
+        android:textSize="20sp" />
 
-</LinearLayout>
+
+</RelativeLayout>

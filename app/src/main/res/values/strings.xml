@@ -23,10 +23,10 @@
     <string name="discover_button">Start discovery</string>
 
 <!--    Home -->
-    <string name="manage_boards">Manage Boards</string>
-    <string name="manage_firmware">Manage Firmware</string>
-    <string name="upload_file">Upload/Delete files</string>
-    <string name="flash_request">Work on DUT</string>
+    <string name="manage_boards">Boards list</string>
+    <string name="manage_firmware">Firmware list</string>
+    <string name="upload_file">Upload / Delete firmware</string>
+    <string name="flash_request">Program / Debug</string>
     <string name="debugger">Debugger</string>
 
 
