@@ -9,21 +9,25 @@
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_boards"
+        android:drawableStart="@drawable/ic_board"
         android:text="@string/manage_boards" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_firmware"
+        android:drawableStart="@drawable/ic_firmware"
         android:text="@string/manage_firmware" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_upload_file"
+        android:drawableStart="@drawable/ic_upload_delete"
         android:text="@string/upload_file" />
 
     <androidx.appcompat.widget.AppCompatButton
         style="@style/ButtonHome"
         android:id="@+id/btn_flash_request"
+        android:drawableStart="@drawable/ic_play"
         android:text="@string/flash_request" />
 
 </LinearLayout>

@@ -7,13 +7,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".screens.firmware.ManageFirmwaresFragment">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/btn"
-        />
-
     <com.google.android.material.tabs.TabLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
