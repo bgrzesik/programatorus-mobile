@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import programatorus.client.R
 import programatorus.client.RemoteContext
@@ -26,7 +27,7 @@ class FlashRequestFragment : Fragment() {
 
     private var _binding: FragmentFlashRequestBinding? = null
 
-    private lateinit var dialog: AlertDialog
+    private var dialog: AlertDialog? = null
     private val binding get() = _binding!!
     private val device = RemoteContext.device
     private lateinit var selectedBoard: String
@@ -39,10 +40,12 @@ class FlashRequestFragment : Fragment() {
 
         _binding = FragmentFlashRequestBinding.inflate(inflater, container, false)
 
-        selectedBoard = getString(R.string.placeholder_selection)
-        selectedFirmware = getString(R.string.placeholder_selection)
+        selectedBoard = Selected.board
+        selectedFirmware = Selected.firmware
         updateBoardText()
         updateFirmwareText()
+
+        requireContext().registerReceiver(resultsHandler, IntentFilter(FLASH_RESULT))
 
         return binding.root
     }
@@ -52,7 +55,9 @@ class FlashRequestFragment : Fragment() {
     }
 
     fun stopLoading() {
-        dialog.dismiss()
+        dialog?.let {
+            it.dismiss()
+        }
     }
 
     private val resultsHandler: BroadcastReceiver = object : BroadcastReceiver() {
@@ -108,9 +113,6 @@ class FlashRequestFragment : Fragment() {
                     navigateToDebugger()
             }
         }
-
-        requireContext().registerReceiver(resultsHandler, IntentFilter(FLASH_RESULT))
-
     }
 
     private fun chooseBoardAlert() {
@@ -120,7 +122,7 @@ class FlashRequestFragment : Fragment() {
             RemoteContext.boardsService.getAllSorted().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
-            selectedBoard = it
+            Selected.board = it
             updateBoardText()
         }
     }
@@ -140,16 +142,18 @@ class FlashRequestFragment : Fragment() {
             RemoteContext.firmwareService.getAllSorted().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
-            selectedFirmware = it
+            Selected.firmware = it
             updateFirmwareText()
         }
     }
 
     private fun updateFirmwareText() {
+        selectedFirmware = Selected.firmware
         binding.btnChooseFirmware.text = getString(R.string.selected_firmware, selectedFirmware)
     }
 
     private fun updateBoardText() {
+        selectedBoard = Selected.board
         binding.btnChooseBoard.text = getString(R.string.selected_board, selectedBoard)
     }
 
@@ -163,14 +167,21 @@ class FlashRequestFragment : Fragment() {
     }
 
     fun navigateToResults(message: String) {
-        val action = FlashRequestFragmentDirections.actionFlashRequestToFlashResult(message)
-        findNavController().navigate(action)
+        lifecycleScope.launchWhenResumed {
+            val action = FlashRequestFragmentDirections.actionFlashRequestToFlashResult(message)
+            findNavController().navigate(action)
+        }
     }
 
     fun navigateToDebugger() {
-        val action =
-            FlashRequestFragmentDirections.actionFlashToDebugger(selectedBoard, selectedFirmware)
-        findNavController().navigate(action)
+        lifecycleScope.launchWhenResumed {
+            val action =
+                FlashRequestFragmentDirections.actionFlashToDebugger(
+                    selectedBoard,
+                    selectedFirmware
+                )
+            findNavController().navigate(action)
+        }
     }
 
     override fun onDestroyView() {
