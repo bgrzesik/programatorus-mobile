@@ -4,21 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.*
 import programatorus.client.databinding.AllFirmwaresListItemBinding
+import programatorus.client.screens.boards.all.AllBoardsListItem
 
 typealias ClickListener = (target: AllFirmwaresListItem) -> Unit
 
 class FirmwaresListAdapter():
     RecyclerView.Adapter<FirmwaresListAdapter.FirmwareItemViewHolder>() {
 
-    val differ = AsyncListDiffer(
-        this,
-        object : DiffUtil.ItemCallback<AllFirmwaresListItem>() {
-            override fun areItemsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
-                item == other
+    var filtered: List<AllFirmwaresListItem> = listOf()
 
-            override fun areContentsTheSame(item: AllFirmwaresListItem, other: AllFirmwaresListItem): Boolean =
-                item == other
-        })
+    var all: List<AllFirmwaresListItem> = listOf()
 
     private var onItemClickListener: ClickListener = {}
 
@@ -35,20 +30,25 @@ class FirmwaresListAdapter():
     }
 
     override fun onBindViewHolder(holder: FirmwareItemViewHolder, position: Int) {
-        val item= differ.currentList[position]
-        holder.bind(item, onItemClickListener)
+        holder.bind(filtered[position], onItemClickListener)
     }
 
 
-    override fun getItemCount() = differ.currentList.size
+    override fun getItemCount() = filtered.size
 
     fun setItems(items: List<AllFirmwaresListItem>) {
-        differ.submitList(items)
+        all = items
+        filtered = items
         notifyDataSetChanged()
     }
 
     fun getItems(): List<AllFirmwaresListItem> {
-        return differ.currentList
+        return all
+    }
+
+    fun filterWith(query: (item: AllFirmwaresListItem) -> Boolean) {
+        filtered = all.filter(query)
+        notifyDataSetChanged()
     }
 
     inner class FirmwareItemViewHolder(private val binding: AllFirmwaresListItemBinding)

@@ -10,15 +10,9 @@ typealias ClickListener = (target: AllBoardsListItem) -> Unit
 class BoardListAdapter():
     RecyclerView.Adapter<BoardListAdapter.BoardItemViewHolder>() {
 
-    val differ = AsyncListDiffer(
-        this,
-        object : DiffUtil.ItemCallback<AllBoardsListItem>() {
-            override fun areItemsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
-                item == other
+    var filtered: List<AllBoardsListItem> = listOf()
 
-            override fun areContentsTheSame(item: AllBoardsListItem, other: AllBoardsListItem): Boolean =
-                item == other
-        })
+    var all: List<AllBoardsListItem> = listOf()
 
     private var onItemClickListener: ClickListener = {}
 
@@ -35,20 +29,24 @@ class BoardListAdapter():
     }
 
     override fun onBindViewHolder(holder: BoardItemViewHolder, position: Int) {
-        val item= differ.currentList[position]
-        holder.bind(item, onItemClickListener)
+        holder.bind(filtered[position], onItemClickListener)
     }
 
-
-    override fun getItemCount() = differ.currentList.size
+    override fun getItemCount() = filtered.size
 
     fun setItems(items: List<AllBoardsListItem>) {
-        differ.submitList(items)
+        all = items
+        filtered = items
         notifyDataSetChanged()
     }
 
     fun getItems(): List<AllBoardsListItem> {
-        return differ.currentList
+        return all
+    }
+
+    fun filterWith(query: (item: AllBoardsListItem) -> Boolean) {
+        filtered = all.filter(query)
+        notifyDataSetChanged()
     }
 
     inner class BoardItemViewHolder(private val binding: AllBoardsListItemBinding)
