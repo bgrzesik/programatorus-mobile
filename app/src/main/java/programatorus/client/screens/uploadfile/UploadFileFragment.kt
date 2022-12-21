@@ -53,6 +53,7 @@ class UploadFileFragment : Fragment() {
 
         with(binding) {
             btnChooseFile.setOnClickListener {
+                RemoteContext.fetchNeeded = true
                 _selectFile.launch(arrayOf("*/*"))
             }
 
@@ -66,6 +67,7 @@ class UploadFileFragment : Fragment() {
                     requireContext(),
                     getString(R.string.delete_file_text, it.name)
                 ) {
+                    RemoteContext.fetchNeeded = true
                     val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
                     device.deleteFirmware(it.name).thenAccept {
                         dialog.dismiss()

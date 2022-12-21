@@ -8,6 +8,14 @@ import java.util.concurrent.CompletableFuture
 
 object RemoteContext {
 
+    var isInitialized: Boolean = false
+    var fetchNeeded: Boolean = true
+    lateinit var device: IDevice
+
+    val boardsService = BoardsService()
+    val firmwareService = FirmwareService()
+    val flashService = FlashService()
+
     fun start(device: IDevice): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
         if (!isInitialized) {
@@ -15,7 +23,11 @@ object RemoteContext {
             initServices(device)
         }
         isInitialized = true
-        fetchInitialConfig(future)
+
+        if (fetchNeeded)
+            fetch(future)
+        else
+            future.complete(true)
         return future
     }
 
@@ -25,20 +37,14 @@ object RemoteContext {
         flashService.client = device
     }
 
-    private fun fetchInitialConfig(future: CompletableFuture<Boolean>) {
+    private fun fetch(future: CompletableFuture<Boolean>) {
         boardsService.pull().thenRun {
             firmwareService.pull().thenRun {
                 future.complete(true)
             }
         }
+        fetchNeeded = false
     }
 
-    var isInitialized: Boolean = false
-
-    lateinit var device: IDevice
-
-    val boardsService = BoardsService()
-    val firmwareService = FirmwareService()
-    val flashService = FlashService()
 
 }
