@@ -2,7 +2,7 @@ package programatorus.client.comm.transport.wrapper
 
 import android.util.Log
 import programatorus.client.comm.transport.*
-import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.Tasker
 import programatorus.client.utils.TaskRunner
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.LinkedBlockingQueue
@@ -19,7 +19,7 @@ class Transport private constructor(
     private val mTaskRunner: TaskRunner,
     // TODO(bgrzesik): Remove client TaskRunners in favour of ProxyTransportClient
     private val mClientTaskRunner: TaskRunner
-) : ITransport, ActiveObject {
+) : ITransport, Tasker {
 
     companion object {
         private const val TAG = "Transport"

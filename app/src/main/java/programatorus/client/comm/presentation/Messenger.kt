@@ -2,7 +2,7 @@ package programatorus.client.comm.presentation
 
 import android.util.Log
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.Tasker
 import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import java.util.concurrent.CompletableFuture
@@ -12,7 +12,7 @@ class Messenger private constructor(
     client: IMessageClient,
     private val mTaskRunner: TaskRunner,
     private val mClientTaskRunner: TaskRunner
-) : IMessenger, ActiveObject {
+) : IMessenger, Tasker {
 
     companion object {
         const val TAG = "Messenger"

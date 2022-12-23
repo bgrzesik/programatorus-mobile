@@ -6,7 +6,7 @@ import programatorus.client.comm.presentation.IMessageClient
 import programatorus.client.comm.presentation.IMessengerProvider
 import programatorus.client.comm.presentation.IOutgoingMessage
 import programatorus.client.comm.transport.ConnectionState
-import programatorus.client.utils.ActiveObject
+import programatorus.client.utils.Tasker
 import programatorus.client.utils.TaskRunner
 import programus.proto.Protocol
 import programus.proto.Protocol.GenericMessage
@@ -20,7 +20,7 @@ class Session private constructor(
     client: ISessionClient,
     private val mTaskRunner: TaskRunner,
     private val mClientTaskRunner: TaskRunner
-) : ISession, ActiveObject {
+) : ISession, Tasker {
 
     private companion object {
         const val TAG = "Session"

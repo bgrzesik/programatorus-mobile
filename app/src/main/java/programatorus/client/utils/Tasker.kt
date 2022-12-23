@@ -3,7 +3,7 @@ package programatorus.client.utils
 import android.util.Log
 import java.util.concurrent.atomic.AtomicBoolean
 
-interface ActiveObject {
+interface Tasker {
     companion object {
         const val TAG = "HandlerActor"
     }
