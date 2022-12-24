@@ -18,8 +18,6 @@ class ManageBoardsFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val boardsService = RemoteContext.boardsService
-    private val repository = boardsService.repository
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,14 +41,14 @@ class ManageBoardsFragment : Fragment() {
         with(binding) {
             allBoards.visibility = View.GONE
             favBoards.setBoards(
-                repository.getFavorites().map { FavBoardsListItem.from(it) }
+                boardsService.getFavorites().map { FavBoardsListItem.from(it) }
             )
             binding.favBoards.visibility = View.VISIBLE
         }
     }
 
     private fun setOrderedFavorites() {
-        repository.setOrderedFavorites(
+        boardsService.updateOrderedFavorites(
                 favorites()
         )
     }
@@ -79,14 +77,14 @@ class ManageBoardsFragment : Fragment() {
     }
 
     private fun persistState() {
-        repository.setState(
+        boardsService.setState(
                 binding.allBoards.getBoards().map { it.asBoard() },
                 binding.favBoards.getBoards().map { it.asBoard() }
         )
     }
 
     private fun addNewFavorites() {
-        repository.updateState(
+        boardsService.updateNewFavorites(
                 all(),
                 extractFavorites()
         )
@@ -99,11 +97,11 @@ class ManageBoardsFragment : Fragment() {
             favBoards.enableTouch()
 
             allBoards.setBoards(
-                repository.getAll().map { AllBoardsListItem.from(it) }
+                boardsService.getAll().map { AllBoardsListItem.from(it) }
             )
 
             favBoards.setBoards(
-                repository.getFavorites().map { FavBoardsListItem.from(it) }
+                boardsService.getFavorites().map { FavBoardsListItem.from(it) }
             )
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }
