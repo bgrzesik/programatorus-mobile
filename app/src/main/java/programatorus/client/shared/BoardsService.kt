@@ -28,6 +28,20 @@ class BoardsService() {
 
     fun getAll(): List<Board> = repository.getAll()
 
+    fun getFavorites(): List<Board> = repository.getFavorites()
+
+    fun updateNewFavorites(all: List<Board>, favorites: List<Board>) {
+        repository.updateNewFavorites(all, favorites)
+    }
+
+    fun setState(all: List<Board>, favorites: List<Board>) {
+        repository.setState(all, favorites)
+    }
+
+    fun updateOrderedFavorites(favorites: List<Board>) {
+        repository.updateOrderedFavorites(favorites)
+    }
+
     fun getAllSorted(): List<Board> =
         repository.getFavorites() + repository.getAll().filter { !it.isFavorite }
 

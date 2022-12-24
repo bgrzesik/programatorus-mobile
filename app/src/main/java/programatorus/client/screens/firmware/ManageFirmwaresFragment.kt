@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import programatorus.client.MyApplication
 import programatorus.client.RemoteContext
 import programatorus.client.databinding.FragmentManageFirmwaresBinding
 import programatorus.client.screens.firmware.all.AllFirmwaresListItem
@@ -20,7 +19,6 @@ class ManageFirmwaresFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val firmwareService = RemoteContext.firmwareService
-    private val repository = firmwareService.repository
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +37,7 @@ class ManageFirmwaresFragment : Fragment() {
     }
 
     private fun setOrderedFavorites() {
-        repository.setOrderedFavorites(
+        firmwareService.updateOrderedFavorites(
                 favorites()
         )
     }
@@ -50,7 +48,7 @@ class ManageFirmwaresFragment : Fragment() {
         with(binding) {
             allFirmwares.visibility = View.GONE
             favFirmwares.setFirmwares(
-                repository.getFavorites().map { FavFirmwaresListItem.from(it) }
+                firmwareService.getFavorites().map { FavFirmwaresListItem.from(it) }
             )
             binding.favFirmwares.visibility = View.VISIBLE
         }
@@ -80,14 +78,14 @@ class ManageFirmwaresFragment : Fragment() {
     }
 
     private fun persistState() {
-        repository.setState(
+        firmwareService.setState(
                 binding.allFirmwares.getFirmwares().map { it.asFirmware() },
                 binding.favFirmwares.getFirmwares().map { it.asFirmware() }
         )
     }
 
     private fun addNewFavorites() {
-        repository.updateState(
+        firmwareService.updateNewFavorites(
                 all(),
                 extractFavorites()
         )
@@ -100,11 +98,11 @@ class ManageFirmwaresFragment : Fragment() {
             favFirmwares.enableTouch()
 
             allFirmwares.setFirmwares(
-                repository.getAll().map { AllFirmwaresListItem.from(it) }
+                firmwareService.getAll().map { AllFirmwaresListItem.from(it) }
             )
 
             favFirmwares.setFirmwares(
-                repository.getFavorites().map { FavFirmwaresListItem.from(it) }
+                firmwareService.getFavorites().map { FavFirmwaresListItem.from(it) }
             )
 
             tabs.getTabAt(ALL)?.view?.setOnClickListener { useAll() }

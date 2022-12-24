@@ -3,7 +3,6 @@ package programatorus.client
 import programatorus.client.device.IDevice
 import programatorus.client.shared.BoardsService
 import programatorus.client.shared.FirmwareService
-import programatorus.client.shared.FlashService
 import java.util.concurrent.CompletableFuture
 
 object RemoteContext {
@@ -14,7 +13,6 @@ object RemoteContext {
 
     val boardsService = BoardsService()
     val firmwareService = FirmwareService()
-    val flashService = FlashService()
 
     fun start(device: IDevice): CompletableFuture<Boolean> {
         val future = CompletableFuture<Boolean>()
@@ -34,7 +32,6 @@ object RemoteContext {
     private fun initServices(device: IDevice) {
         boardsService.client = device
         firmwareService.client = device
-        flashService.client = device
     }
 
     private fun fetch(future: CompletableFuture<Boolean>) {

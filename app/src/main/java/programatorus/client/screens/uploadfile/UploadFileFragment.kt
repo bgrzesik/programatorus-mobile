@@ -92,6 +92,7 @@ class UploadFileFragment : Fragment() {
     private fun openFile(documentUri: Uri) {
         val fileDescriptor = contentResolver.openFileDescriptor(documentUri, "r") ?: return
         val dialog = LoadingDialog.loadingDialog(layoutInflater, requireContext())
+//        documentUri.
         device.upload(documentUri).thenAccept {
             dialog.dismiss()
         }

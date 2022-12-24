@@ -6,7 +6,7 @@ class FavoritesRepository<T>(
 ) {
 
 
-    fun updateState(all: List<T>, favorites: List<T>) {
+    fun updateNewFavorites(all: List<T>, favorites: List<T>) {
         allItems = all
 
         val old = favItems.toSet()
@@ -20,8 +20,8 @@ class FavoritesRepository<T>(
         favItems = favorites
     }
 
-    fun setOrderedFavorites(boards: List<T>) {
-        favItems = boards as MutableList<T>
+    fun updateOrderedFavorites(favorites: List<T>) {
+        favItems = favorites
     }
 
     fun getAll(): List<T> = allItems
