@@ -10,14 +10,12 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Wrapper class responsible for keeping ITransport logic sane.
- * TODO(bgrzesik) wrap mImpl method calls with try/catch
  */
 
 class Transport private constructor(
     transport: ITransportProvider,
     client: ITransportClient,
     private val mTaskRunner: TaskRunner,
-    // TODO(bgrzesik): Remove client TaskRunners in favour of ProxyTransportClient
     private val mClientTaskRunner: TaskRunner
 ) : ITransport, ActiveObject {
 

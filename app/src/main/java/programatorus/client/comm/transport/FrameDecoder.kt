@@ -13,7 +13,6 @@ class FrameDecoder(
     val isEof: Boolean get() = mEof
 
     fun readFrame(): ByteArray? {
-        // TODO(bgrzesik): Don't read byte by byte
         var read : Int
         mFrameBuffer.clear()
 
@@ -38,7 +37,6 @@ class FrameDecoder(
 
             read = mInputStream.read()
             if (read == 0 || read == -1) {
-                // Error while parsing slice size
                 mEof = read == -1
                 return null
             }

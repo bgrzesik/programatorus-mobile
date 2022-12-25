@@ -208,7 +208,7 @@ object FileUpload {
                     .setName(name)
                     .setSize(size.toLong())
                     .setChunks(chunks)
-                    .setType(FileType.FIRMWARE) // TODO(bgrzesik): If more types arise parametrize this
+                    .setType(FileType.FIRMWARE)
             )
         }
 
