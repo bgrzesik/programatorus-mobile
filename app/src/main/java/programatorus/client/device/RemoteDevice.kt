@@ -42,7 +42,6 @@ class RemoteDevice(
     private val mOnDisconnect = CompletableFuture<ConnectionState>()
 
     init {
-        // TODO(bgrzesik): Proper connection handling
         mSession.reconnect()
     }
 

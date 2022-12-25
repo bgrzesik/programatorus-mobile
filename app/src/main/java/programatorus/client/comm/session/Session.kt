@@ -118,7 +118,7 @@ class Session private constructor(
                         sessionId = mSessionId!!
                     }
                 }
-                .setError( // TODO(bgrzesik): proper error mapping
+                .setError(
                     Protocol.ErrorMessage.newBuilder()
                         .setDescription(exception.message)
                 )
@@ -257,7 +257,6 @@ class Session private constructor(
                 return@assertLooper
             }
             Log.d(TAG, "onResponse(): Completing request id=${response.response}")
-            // TODO(bgrzesik): Ensure proper order.
             pendingMessage.future.complete(response)
         }
 
