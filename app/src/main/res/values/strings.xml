@@ -20,7 +20,7 @@
 <!--    Choose Device-->
     <string name="paired_devices">Paired devices</string>
     <string name="discovered_devices">Discovered devices</string>
-    <string name="discover_button">Start discovery</string>
+    <string name="discover_button">Discover devices</string>
 
 <!--    Home -->
     <string name="manage_boards">Boards list</string>
@@ -35,9 +35,9 @@
 
 
     <string name="submit_flash">Flash Request</string>
-    <string name="select_board_message">Select file corresponding to the model of the board you want to use</string>
+    <string name="select_board_message">Select file board configuration file</string>
     <string name="selected_board">Selected Board\n %1$s</string>
-    <string name="select_firmware_message">Select firmware file you want to use in configuration</string>
+    <string name="select_firmware_message">Select firmware file you want to use</string>
     <string name="selected_firmware">Selected Firmware\n %1$s</string>
 
     <string name="selected_board_alert">Choose board file</string>

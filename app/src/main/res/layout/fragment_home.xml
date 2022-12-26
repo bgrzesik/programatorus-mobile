@@ -1,33 +1,38 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".screens.home.HomeFragment">
 
-    <androidx.appcompat.widget.AppCompatButton
-        style="@style/ButtonHome"
-        android:id="@+id/btn_boards"
-        android:drawableStart="@drawable/ic_board"
-        android:text="@string/manage_boards" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatButton
-        style="@style/ButtonHome"
-        android:id="@+id/btn_firmware"
-        android:drawableStart="@drawable/ic_firmware"
-        android:text="@string/manage_firmware" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_boards"
+            style="@style/ButtonHome"
+            android:drawableStart="@drawable/ic_board"
+            android:text="@string/manage_boards" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        style="@style/ButtonHome"
-        android:id="@+id/btn_upload_file"
-        android:drawableStart="@drawable/ic_upload_delete"
-        android:text="@string/upload_file" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_firmware"
+            style="@style/ButtonHome"
+            android:drawableStart="@drawable/ic_firmware"
+            android:text="@string/manage_firmware" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        style="@style/ButtonHome"
-        android:id="@+id/btn_flash_request"
-        android:drawableStart="@drawable/ic_play"
-        android:text="@string/flash_request" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_upload_file"
+            style="@style/ButtonHome"
+            android:drawableStart="@drawable/ic_upload_delete"
+            android:text="@string/upload_file" />
 
-</LinearLayout>
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_flash_request"
+            style="@style/ButtonHome"
+            android:drawableStart="@drawable/ic_play"
+            android:text="@string/flash_request" />
+
+    </LinearLayout>
+</ScrollView>

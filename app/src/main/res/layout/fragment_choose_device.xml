@@ -20,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/paired_devices_title"
+                android:gravity="center"
                 android:text="@string/paired_devices"
                 android:textSize="32sp"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -33,6 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/discovered_devices_title"
+                android:gravity="center"
                 android:text="@string/discovered_devices"
                 android:textSize="32sp"
                 app:layout_constraintTop_toTopOf="parent"/>

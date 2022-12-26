@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:gravity="left"
-        android:text="@string/select_board_message"
-        android:textSize="24sp" />
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_choose_board"
-        style="@style/ButtonFlash"
-        android:gravity="center"
-        android:text="@string/selected_board" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="12dp"
+            android:gravity="left"
+            android:text="@string/select_board_message"
+            android:textSize="24sp" />
 
-
-    <androidx.appcompat.widget.AppCompatTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:gravity="left"
-        android:text="@string/select_firmware_message"
-        android:textSize="24sp" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_choose_firmware"
-        style="@style/ButtonFlash"
-        android:gravity="center"
-        android:text="@string/selected_firmware" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_flash_request"
-        style="@style/ButtonFlash"
-        android:layout_marginTop="48dp"
-        android:gravity="left | center_vertical"
-        android:drawableStart="@drawable/ic_play_36"
-        android:text="@string/submit_flash" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btn_start_debug"
-        style="@style/ButtonFlash"
-        android:layout_marginTop="12dp"
-        android:gravity="left | center_vertical"
-        android:drawableStart="@drawable/ic_debug"
-        android:text="@string/start_debugger" />
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_choose_board"
+            style="@style/ButtonFlash"
+            android:gravity="center"
+            android:text="@string/selected_board" />
 
 
-</LinearLayout>
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="12dp"
+            android:gravity="left"
+            android:text="@string/select_firmware_message"
+            android:textSize="24sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_choose_firmware"
+            style="@style/ButtonFlash"
+            android:gravity="center"
+            android:text="@string/selected_firmware" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_flash_request"
+            style="@style/ButtonFlash"
+            android:layout_marginTop="48dp"
+            android:drawableStart="@drawable/ic_play_36"
+            android:gravity="left | center_vertical"
+            android:text="@string/submit_flash" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_start_debug"
+            style="@style/ButtonFlash"
+            android:layout_marginTop="12dp"
+            android:drawableStart="@drawable/ic_debug"
+            android:gravity="left | center_vertical"
+            android:text="@string/start_debugger" />
+
+    </LinearLayout>
+
+
+</ScrollView>
