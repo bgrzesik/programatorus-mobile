@@ -76,7 +76,6 @@ class FlashRequestFragment : Fragment() {
 
     private fun chooseFileAlert(
         title: String,
-        currentFile: String,
         files: List<FileListItem>,
         onComplete: (text: String) -> Unit
     ) {
@@ -85,7 +84,6 @@ class FlashRequestFragment : Fragment() {
             layoutInflater,
             files,
             title,
-            currentFile,
         ) { onComplete(it) }
     }
 
@@ -118,7 +116,6 @@ class FlashRequestFragment : Fragment() {
     private fun chooseBoardAlert() {
         val title = getString(R.string.selected_board_alert)
         chooseFileAlert(title,
-            selectedBoard,
             RemoteContext.boardsService.getAllSorted().map {
                 FileListItem(it.name, it.isFavorite)
             }) {
@@ -138,7 +135,6 @@ class FlashRequestFragment : Fragment() {
     private fun chooseFirmwareAlert() {
         val title = getString(R.string.selected_firmware_alert)
         chooseFileAlert(title,
-            selectedFirmware,
             RemoteContext.firmwareService.getAllSorted().map {
                 FileListItem(it.name, it.isFavorite)
             }) {

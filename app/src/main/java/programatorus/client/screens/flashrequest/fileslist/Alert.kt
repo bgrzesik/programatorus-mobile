@@ -16,7 +16,6 @@ object Alert {
         layoutInflater: LayoutInflater,
         list: List<FileListItem>,
         title: String,
-        currentFile: String,
         onConfirm: (text: String) -> Unit
     ) {
 
@@ -30,31 +29,26 @@ object Alert {
             adapter = filesAdapter
         }
 
-        binding.chooseFileText.text = currentFile
         binding.chooseFileTitle.text = title
-
-        val clickListener: ClickListener = {
-            binding.chooseFileText.text = it.name
-        }
-
-        filesAdapter.setClickListener(clickListener)
-
 
         filesAdapter.setItems(list as MutableList<FileListItem>)
 
         setupSearch(binding, filesAdapter)
 
-        AlertDialog.Builder(context)
+        val dialog = AlertDialog.Builder(context)
             .setView(view)
             .setCancelable(true)
-            .setPositiveButton("confirm") { _, _ -> onConfirm(getFilename(binding)) }
             .setNegativeButton("dismiss") { _, _ -> null }
             .show()
 
-    }
+        val clickListener: ClickListener = {
+            onConfirm(it.name)
+            dialog.dismiss()
+        }
 
-    fun getFilename(binding: ChooseFileFromListBinding): String =
-        binding.chooseFileText.text as String
+        filesAdapter.setClickListener(clickListener)
+
+    }
 
     private fun setupSearch(binding: ChooseFileFromListBinding, filesAdapter: FileListAdapter) {
         binding.search.setOnQueryTextListener(
