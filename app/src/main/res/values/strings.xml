@@ -35,7 +35,7 @@
 
 
     <string name="submit_flash">Flash Request</string>
-    <string name="select_board_message">Select file board configuration file</string>
+    <string name="select_board_message">Select target board configuration file</string>
     <string name="selected_board">Selected Board\n %1$s</string>
     <string name="select_firmware_message">Select firmware file you want to use</string>
     <string name="selected_firmware">Selected Firmware\n %1$s</string>
